@@ -1,0 +1,20 @@
+{
+  "name": "checkpoint",
+  "version": "1.0.0",
+  "description": "CS 35L",
+  "homepage": "https://github.com/eladefneerkan/CHECKPOINT#readme",
+  "bugs": {
+    "url": "https://github.com/eladefneerkan/CHECKPOINT/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eladefneerkan/CHECKPOINT.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
