@@ -3,7 +3,7 @@ import { Outlet, Link } from "react-router-dom";
 // Outlet = placeholder for routed pages
 
 export default function GlobalUI() {
-  return ( // add stuff inside div to create global UI layout
+  return ( 
     <div>
       <header
         style={{
@@ -11,8 +11,9 @@ export default function GlobalUI() {
         color: "red",
         padding: "1rem",
         display: "flex",
-        justifyContent: "space-between", // pushes title left, nav right
-        alignItems: "center" // centers vertically
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%"
         }}
       >
     {/* Left side — site name */}
@@ -31,7 +32,13 @@ export default function GlobalUI() {
         <Outlet />
       </main>
 
-      <footer style={{ background: "#123", color: "red", padding: "1rem", marginTop: "2rem" }}>
+      <footer style={{ 
+        background: "#123",
+        color: "red",
+        padding: "1rem",
+        marginTop: "2rem",
+        width: "100%",
+      }}>
         <p>This is our footer! Gonna write our names here</p>
       </footer>
     </div>
