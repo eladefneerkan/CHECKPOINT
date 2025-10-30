@@ -1,0 +1,10 @@
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+  }
+  nav a {
+    text-decoration: none;
+    color: red;
+  }
+  

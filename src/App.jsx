@@ -1,21 +1,18 @@
-import { Routes, Route, Link } from 'react-router-dom'
-import List from '../Frontend/List.jsx'
-import Profile from '../Frontend/Profile.jsx'
+import { Routes, Route } from "react-router-dom";
+import GlobalUI from "./Global.jsx"; 
+import List from "../Frontend/List.jsx";
+import Profile from "../Frontend/Profile.jsx";
+//need to add other pages here as we go
 
 export default function App() {
   return (
-    <div>
-      <nav>
-        <Link to="/">Home</Link> | 
-        <Link to="/list">List</Link> | 
-        <Link to="/profile">Profile</Link>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<h1>Welcome Home</h1>} />
-        <Route path="/list" element={<List />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-    </div>
-  )
+    <Routes>
+      {/* GlobalUI wraps all pages */}
+      <Route path="/" element={<GlobalUI />}>
+        <Route index element={<h1>Welcome Home</h1>} />
+        <Route path="list" element={<List />} />
+        <Route path="profile" element={<Profile />} />
+      </Route>
+    </Routes>
+  );
 }
