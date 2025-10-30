@@ -37,6 +37,14 @@ export default function Home() {
         <p style={{ fontSize: "1.5rem" }}>
           Track, share, and discover your favorite games
         </p>
+        <button style={{ 
+          alignItems: "center",
+          backgroundColor: "ffffff"
+        }}>LOGIN</button>
+        <button style={{ 
+          alignItems: "center",
+          backgroundColor: "#ffffff"
+        }}>SIGN UP</button>        
       </div>
     </section>
   );

@@ -17,7 +17,7 @@ export default function GlobalUI() {
         }}
       >
     {/* Left side — site name */}
-    <h1 style={{ margin: 0, fontSize: "1.5rem" }}>🎮 CHECKPOINT</h1>
+    <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#ffffff"}}>🎮 CHECKPOINT</h1>
     {/* Right side — navigation */}
     
   <nav style={{ display: "flex", gap: "2rem" }}>
@@ -33,8 +33,8 @@ export default function GlobalUI() {
       </main>
 
       <footer style={{ 
-        background: "#123",
-        color: "red",
+        background: "#000000",
+        color: "white",
         padding: "1rem",
         marginTop: "2rem",
         width: "100%",
