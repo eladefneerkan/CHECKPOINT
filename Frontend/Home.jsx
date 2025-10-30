@@ -14,6 +14,7 @@ export default function Home() {
         color: "white",
         textAlign: "center",
         position: "relative",
+        width: "100vw"
       }}
     >
       <div
