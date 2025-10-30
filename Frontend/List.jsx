@@ -6,6 +6,7 @@ const MOCK_GAMES_LIST = [
   'Five Nights at Freddy\'s',
   'Genshin Impact',
   'Overwatch',
+  'It Takes Two',
   'Valorant',
   'The Legend of Zelda: Breath of the Wild',
   'Among Us',
