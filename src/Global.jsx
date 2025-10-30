@@ -7,7 +7,7 @@ export default function GlobalUI() {
     <div>
       <header
         style={{
-        background: "#123",
+        background: "#000000",
         color: "red",
         padding: "1rem",
         display: "flex",

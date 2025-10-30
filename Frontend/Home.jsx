@@ -3,8 +3,10 @@ import grassBg from "../assets/grass_bg.avif";
 export default function Home() {
   return (
     <section
+      className="fade-in"
       style={{
-        backgroundImage: `url(${grassBg})`,
+        /*backgroundImage: `url(${grassBg})`,*/
+        backgroundImage: "linear-gradient(to top, #8c52ff, black)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         height: "100vh",
