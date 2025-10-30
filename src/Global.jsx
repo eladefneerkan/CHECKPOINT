@@ -28,7 +28,7 @@ export default function GlobalUI() {
 </header>
 
 
-      <main style={{ padding: "1rem" }}>
+      <main style={{ padding: 0, margin: 0 }}>
         <Outlet />
       </main>
 
