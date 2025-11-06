@@ -11,7 +11,7 @@ export default function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    //http://localhost:5000/users
+    //http://localhost:3000/users
     fetch("/users")
       .then((res) => res.json())
       .then((data) => setUsers(data))
