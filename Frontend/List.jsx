@@ -103,4 +103,13 @@ function SearchBar() {
   );
 }
 
-export default SearchBar;
+function SearchRender() {
+  return (
+    <div className="SearchRender">
+      <h1>Search</h1>
+      <SearchBar /> 
+    </div>
+  );
+}
+
+export default SearchRender;
