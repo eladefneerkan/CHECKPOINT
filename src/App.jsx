@@ -1,39 +1,39 @@
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import GlobalUI from "./Global.jsx"; 
+import GlobalUI from "./Global.jsx";
+import Home from "../Frontend/Home.jsx";
 import List from "../Frontend/List.jsx";
 import Profile from "../Frontend/Profile.jsx";
-import Home from "../Frontend/Home.jsx";
+import "./styles.css";
 
 export default function App() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    //http://localhost:5000/users
+    fetch("/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.error("Fetch error:", err));
+  }, []);
+
   return (
     <Routes>
-      {/* GlobalUI */}
-      <Route path="/" element={<GlobalUI />}>
-        <Route index element={<Home />} />
-        <Route path="list" element={<List />} />
+      {/* GlobalUI provides shared layout, navbar, etc. */}
+      <Route path="/" element={<GlobalUI users={users} />}>
+        <Route index element={<Home users={users} />} />
+        <Route path="list" element={<List users={users} />} />
         <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );
 }
 
-
-/* -------------------------------------------------------------------------------- */
-import { useEffect, useState } from "react";
-
-function App() {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("Error:", err));
-  }, []);
-
+/*
+export default function List({ users }) {
   return (
     <div>
-      <h1>Users</h1>
+      <h2>All Users</h2>
       <ul>
         {users.map((u) => (
           <li key={u.id}>{u.name}</li>
@@ -42,5 +42,4 @@ function App() {
     </div>
   );
 }
-
-export default App;
+*/
