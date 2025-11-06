@@ -2,17 +2,15 @@
 // 
 
 import React, { useState } from 'react';
-import { useAuth } from './Auth';
 function Profile() {
     <h2>This is the Profile page</h2>
   }
 
 const ProfilePictureUploader = () => {
-  const { user, updateProfile, logout } = useAuth();
   // State to store the selected file object (for upload to server)
   const [imageFile, setImageFile] = useState(null);
   // State to store the URL for the preview image
-  const [previewUrl, setPreviewUrl] = useState(user?.profilePicture || null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   // Handler for when the user selects a file
   const handleFileChange = (event) => {
