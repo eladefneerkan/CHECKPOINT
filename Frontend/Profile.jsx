@@ -64,8 +64,8 @@ const ProfilePictureUploader = () => {
   };
 
   return (
-    
     <div>
+      <h1 className= "tools" >Tools</h1>
       <h1>This is the Profile page</h1>
       <h2>Profile Picture</h2>
       {/* Image Preview Area */}

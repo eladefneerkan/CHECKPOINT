@@ -38,7 +38,22 @@ section {
     transform: translateY(0);
   }
 }
-
+@keyframes toolBar {
+  from {
+    width: 10%;
+    
+  }
+  to {
+    width: 80%;
+  }
+}
+.tools{
+  background-color: teal;
+  animation: toolBar 1s ease-in-out;
+  width: 80%;
+  text-align: left;
+}
 .fade-in {
   animation: fadeIn 0.8s ease-out;
 }
+
