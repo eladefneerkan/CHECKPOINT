@@ -4,6 +4,7 @@ import GlobalUI from "./Global.jsx";
 import Home from "../Frontend/Home.jsx";
 import List from "../Frontend/List.jsx";
 import Profile from "../Frontend/Profile.jsx";
+import Login from "../Frontend/Login.jsx";
 import "./styles.css";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route index element={<Home users={users} />} />
         <Route path="list" element={<List users={users} />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="login" element={<Login />} />
       </Route>
     </Routes>
   );

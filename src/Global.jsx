@@ -24,6 +24,7 @@ export default function GlobalUI() {
     <Link to="/">Home Page</Link>
     <Link to="/list">Search Games</Link>
     <Link to="/profile">Profile</Link>
+    <Link to="/login">Login</Link>
   </nav>
 </header>
 
