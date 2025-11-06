@@ -11,14 +11,13 @@
     "url": "git+https://github.com/eladefneerkan/CHECKPOINT.git"
   },
   "scripts": {
-    "start": "node server.js",
+  "start": "node Backend/server.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "zip": "npm-pack-zip"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mysql": "^2.18.1",
