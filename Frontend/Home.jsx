@@ -39,7 +39,7 @@ export default function Home() {
         </p>
         <button style={{ 
           alignItems: "center",
-          backgroundColor: "ffffff"
+          backgroundColor: "#ffffff"
         }}>LOGIN</button>
         <button style={{ 
           alignItems: "center",
