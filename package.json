@@ -11,12 +11,14 @@
     "url": "git+https://github.com/eladefneerkan/CHECKPOINT.git"
   },
   "scripts": {
+    "start": "node Backend/server.js",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "zip": "npm-pack-zip"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mysql": "^2.18.1",
@@ -31,7 +33,9 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "globals": "^16.0.0",
+    "jest": "^30.2.0",
     "npm-pack-zip": "^1.3.0",
+    "supertest": "^7.1.4",
     "vite": "^6.3.1"
   },
   "main": "vite.config.js",
