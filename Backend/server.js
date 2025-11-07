@@ -14,6 +14,12 @@ app.get("/", (req, res) => {
   res.send("Backend running successfully!");
 });
 
-app.listen(process.env.PORT, () =>
-  console.log(`Server running on port ${process.env.PORT}`)
-);
+
+//listen IF not a test process!!!
+if (process.env.NODE_ENV !== "test") {
+  app.listen(process.env.PORT, () =>
+    console.log(`Server running on port ${process.env.PORT}`)
+  );
+}
+
+module.exports = app;
