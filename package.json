@@ -17,9 +17,14 @@
     "zip": "npm-pack-zip"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.15.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.9.5"
+    "react-router-dom": "^7.9.5",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
