@@ -1,52 +1,56 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db");
 const bcrypt = require("bcrypt");
+const User = require("../models/User");
 
-// POST signup
+// POST
 router.post("/signup", async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password)
     return res.status(400).json({ error: "username and password required" });
 
   try {
+    const existingUser = await User.findOne({ username });
+    if (existingUser)
+      return res.status(409).json({ error: "Username already exists" });
     const hashedPassword = await bcrypt.hash(password, 10);
-    db.query(
-      "INSERT INTO loginInfo (username, password) VALUES (?, ?)",
-      [username, hashedPassword],
-      (err, result) => {
-        if (err) return res.status(500).json({ error: err.sqlMessage });
-        res.json({ message: "User signed up successfully!" });
-      }
-    );
+    const newUser = await User.create({ username, password: hashedPassword });
+
+    res.status(201).json({
+      message: "User signed up successfully!",
+      user: { username: newUser.username },
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// POST login
-router.post("/login", (req, res) => {
+// POST
+router.post("/login", async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password)
     return res.status(400).json({ error: "username and password required" });
 
-  db.query(
-    "SELECT * FROM loginInfo WHERE username = ?",
-    [username],
-    async (err, results) => {
-      if (err) return res.status(500).json({ error: err.sqlMessage });
-      if (results.length === 0)
-        return res.status(401).json({ error: "Invalid username or password" });
+  try {
+    const user = await User.findOne({ username });
+    if (!user)
+      return res.status(401).json({ error: "Invalid username or password" });
 
-      const user = results[0];
-      const match = await bcrypt.compare(password, user.password);
-      if (!match)
-        return res.status(401).json({ error: "Invalid username or password" });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match)
+      return res.status(401).json({ error: "Invalid username or password" });
 
-      res.json({ message: "Login successful!", user: { username: user.username } });
-    }
-  );
+    res.json({
+      message: "Login successful!",
+      user: { username: user.username },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
-// Export router
 module.exports = router;
