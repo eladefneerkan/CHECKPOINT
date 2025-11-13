@@ -8,6 +8,7 @@ class GameObj{
             this.image = image //make sure the url returned by the db is valid and have a method to parse that
             this.dev = dev
             
+            
             //To add later: genres (add as string array or as a genre obj array if genres have IDs etc.)
         }
 

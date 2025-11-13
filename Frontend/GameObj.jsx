@@ -8,5 +8,6 @@ const GameObj = ({game}) =>{
             {/*To add later: display developer, genres*/}
         </div>
     )
-
 }
+
+export default GameObj
