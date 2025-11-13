@@ -1,56 +1,68 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const User = require("../models/User");
+const User = require("../models/User"); 
 
-// POST
+// POST signup
 router.post("/signup", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password)
-    return res.status(400).json({ error: "username and password required" });
-
+  console.log("SIGNUP BODY:", req.body);
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser)
-      return res.status(409).json({ error: "Username already exists" });
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ username, password: hashedPassword });
+    const { username, password, email, bio, profilePicture } = req.body;
 
-    res.status(201).json({
-      message: "User signed up successfully!",
-      user: { username: newUser.username },
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password required" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+      email,
+      bio,
+      profilePicture,
     });
+
+    await newUser.save();
+
+    res.json({ message: "User signed up successfully!" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// POST
+// POST login
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password)
-    return res.status(400).json({ error: "username and password required" });
+  console.log("SIGNUP BODY:", req.body);
 
   try {
-    const user = await User.findOne({ username });
-    if (!user)
-      return res.status(401).json({ error: "Invalid username or password" });
+    const { username, password } = req.body;
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(401).json({ error: "Invalid username or password" });
+    const user = await User.findOne({ username });
+
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: "Invalid credentials" });
 
     res.json({
       message: "Login successful!",
-      user: { username: user.username },
+      user: {
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+      },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   }
+});
+
+// GET all users
+router.get("/", async (req, res) => {
+  const users = await User.find();
+  res.json(users);
 });
 
 module.exports = router;
