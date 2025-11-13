@@ -67,7 +67,7 @@ const ProfilePictureUploader = () => {
     <div>
       <div className= "tools" > 
         <button className="toolButtons">lists</button>
-        <button className="toolButtons">reviews</button>
+        <button className="toolButtons" onClick={() => window.location.href = "/review"}>reviews</button>
         <button className="toolButtons">stats</button>
       </div>
       <h1>This is the Profile page</h1>

@@ -16,3 +16,5 @@ class ReviewClass{
             return this.gameIMG || 'https://placehold.co/150x200?text=Image+Missing' //temporary placehold image if image not found, we can replace w something else
        }
 }
+
+export default ReviewClass
