@@ -1,3 +1,4 @@
+//login.jsx
 import { useState } from "react";
 
 export default function Login() {
@@ -46,7 +47,7 @@ export default function Login() {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
   };
 
-  // Handle login
+// Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -55,12 +56,19 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
+
       const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
       setLoginMessage(data.message || data.error);
     } catch (err) {
       setLoginMessage("Error connecting to server");
     }
   };
+
 
   return (
     <div style={{ maxWidth: "400px", margin: "auto" }}>
