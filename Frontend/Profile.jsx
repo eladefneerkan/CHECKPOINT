@@ -1,5 +1,7 @@
 // Frontend/Profile.jsx
 import React, { useEffect, useState } from "react";
+import LogoutButton from "./LogoutButton";
+
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -21,7 +23,7 @@ export default function Profile() {
       .catch((err) => console.error("Profile fetch error:", err));
   }, []);
 
-  if (!user) return <h2>Loading profile...</h2>;
+  if (!user) return <h2>Log In To See Profile</h2>; //WRITE WHAT NON-LOGGED IN USER WILL BE HERE (UI COMP)
 
   // -------- IMAGE UPLOAD LOGIC ----------
   const handleFileChange = (event) => {
@@ -112,6 +114,7 @@ export default function Profile() {
       <button onClick={handleUpload} disabled={!imageFile}>
         Upload Picture
       </button>
+      <LogoutButton />
     </div>
   );
 }
