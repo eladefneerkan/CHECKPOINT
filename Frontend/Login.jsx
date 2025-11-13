@@ -2,23 +2,37 @@ import { useState } from "react";
 
 export default function Login() {
   // Signup state
-  const [signupUsername, setSignupUsername] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
+  const [signupData, setSignupData] = useState({
+    username: "",
+    password: "",
+    email: "",
+    bio: "",
+    profilePicture: ""
+  });
+  
   const [signupMessage, setSignupMessage] = useState("");
 
   // Login state
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const [loginData, setLoginData] = useState({
+    username: "",
+    password: ""
+  });
+
   const [loginMessage, setLoginMessage] = useState("");
 
-  // Signup handler
+  // Handle input updates for signup
+  const handleSignupChange = (e) => {
+    setSignupData({ ...signupData, [e.target.name]: e.target.value });
+  };
+
+  // Handle signup
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:3000/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: signupUsername, password: signupPassword }),
+        body: JSON.stringify(signupData),
       });
       const data = await res.json();
       setSignupMessage(data.message || data.error);
@@ -27,14 +41,19 @@ export default function Login() {
     }
   };
 
-  // Login handler
+  // Handle login input updates
+  const handleLoginChange = (e) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
+  };
+
+  // Handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch("http://localhost:3000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: loginUsername, password: loginPassword }),
+        body: JSON.stringify(loginData),
       });
       const data = await res.json();
       setLoginMessage(data.message || data.error);
@@ -44,38 +63,65 @@ export default function Login() {
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "400px", margin: "auto" }}>
+      {/* SIGNUP */}
       <h1>Signup</h1>
       <form onSubmit={handleSignup}>
         <input
           type="text"
+          name="username"
           placeholder="Username"
-          value={signupUsername}
-          onChange={(e) => setSignupUsername(e.target.value)}
+          value={signupData.username}
+          onChange={handleSignupChange}
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={signupPassword}
-          onChange={(e) => setSignupPassword(e.target.value)}
+          value={signupData.password}
+          onChange={handleSignupChange}
         />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={signupData.email}
+          onChange={handleSignupChange}
+        />
+        <textarea
+          name="bio"
+          placeholder="Short bio"
+          value={signupData.bio}
+          onChange={handleSignupChange}
+        />
+        <input
+          type="text"
+          name="profilePicture"
+          placeholder="Profile picture URL"
+          value={signupData.profilePicture}
+          onChange={handleSignupChange}
+        />
+
         <button type="submit">Sign Up</button>
       </form>
       {signupMessage && <p>{signupMessage}</p>}
 
+      {/* LOGIN */}
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <input
           type="text"
+          name="username"
           placeholder="Username"
-          value={loginUsername}
-          onChange={(e) => setLoginUsername(e.target.value)}
+          value={loginData.username}
+          onChange={handleLoginChange}
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={loginPassword}
-          onChange={(e) => setLoginPassword(e.target.value)}
+          value={loginData.password}
+          onChange={handleLoginChange}
         />
         <button type="submit">Login</button>
       </form>
