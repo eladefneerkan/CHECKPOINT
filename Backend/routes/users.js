@@ -78,6 +78,8 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+
 // GET logged-in user's info
 router.get("/me", auth, async (req, res) => {
   try {
@@ -92,5 +94,33 @@ router.get("/", async (req, res) => {
   const users = await User.find();
   res.json(users);
 });
+
+
+// UPDATE profile (email, bio, pp)
+router.put("/me", auth, async (req, res) => {
+  try {
+    const updates = {};
+
+    if (req.body.email) updates.email = req.body.email;
+    if (req.body.bio) updates.bio = req.body.bio;
+    if (req.body.profilePicture) updates.profilePicture = req.body.profilePicture;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updates },
+      { new: true }
+    ).select("-password");
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+
+
 
 module.exports = router;
