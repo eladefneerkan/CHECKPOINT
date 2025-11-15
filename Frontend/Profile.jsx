@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import LogoutButton from "./LogoutButton";
 
-
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -109,7 +108,6 @@ export default function Profile() {
           No Image
         </div>
       )}
-
       <input type="file" accept="image/*" onChange={handleFileChange} />
       <button onClick={handleUpload} disabled={!imageFile}>
         Upload Picture

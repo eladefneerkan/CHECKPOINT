@@ -8,6 +8,15 @@ const auth = require("../middleware/authorize");
 
 // POST signup
 router.post("/signup", async (req, res) => {
+
+  const defaultPictures = [
+    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/default_profile_blue.png?rand=" + Math.random(),
+    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/default_profile_green.png?rand=" + Math.random(),
+    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/default_profile_red.png?rand=" + Math.random(),
+  ];
+  
+  const randomDefault = defaultPictures[Math.floor(Math.random() * defaultPictures.length)];
+  
   console.log("SIGNUP BODY:", req.body);
   try {
     const { username, password, email, bio, profilePicture } = req.body;
@@ -23,7 +32,7 @@ router.post("/signup", async (req, res) => {
       password: hashedPassword,
       email,
       bio,
-      profilePicture,
+      profilePicture: randomDefault,
     });
 
     await newUser.save();
