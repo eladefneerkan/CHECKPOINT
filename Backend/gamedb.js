@@ -1,41 +1,14 @@
 const axios = require("axios");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+const mongoose = require("./mongo");
+const Game = require("./models/Games");
 
-dotenv.config();
-
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/checkpoint_db";
-
+const apiKey = process.env.API_KEY;
+const url = `https://api.rawg.io/api/games?key=${apiKey}&page_size=40&page=50`;
 
 async function fetchGame() {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(uri);
-    console.log("mdb connected");
-  } catch (err) {
-    console.error("mdb connection error:", err);
-    process.exit(1);
-  }
-
-  // Schema
-  const gameSchema = new mongoose.Schema({
-    id: Number,
-    name: String,
-    released: String,
-    rating: Number,
-    description: String,
-    background_image: String,
-    slug: String,
-    genres: [{id: Number, name: String}]
-  });
-
-  const Game = mongoose.models.Game || mongoose.model("Game", gameSchema);
-
+  
   // Fetch data from RAWG API
-  const apiKey = process.env.API_KEY;
-  const url = `https://api.rawg.io/api/games?key=${apiKey}&page_size=40&page=1000`;
-
-  try {
     const gameData = (await axios.get(url)).data.results;
 
     for (const g of gameData) {
@@ -47,9 +20,9 @@ async function fetchGame() {
         {
           id: g.id,
           name: g.name,
-          slug: g.slug,
-          released: g.released,
           rating: g.rating,
+          released: g.released,
+          slug: g.slug,
           background_image: g.background_image,
           genres: g.genres,
           description: detail.description_raw || "No description available."
@@ -58,15 +31,12 @@ async function fetchGame() {
       );
 
     }
-
     console.log(" Games added/updated successfully!");
   } catch (error) {
     console.error(" Error fetching or saving data:", error.message);
   }
-
-  mongoose.connection.close();
+   await mongoose.connection.close();
+    console.log("MongoDB connection closed.");
+    process.exit(0);
 }
-
 fetchGame();
-
-

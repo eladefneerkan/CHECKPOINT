@@ -6,11 +6,12 @@ router.get("/Games", async (req, res) => {
 
     const query = req.query.q || "";
 
-    if (!query) return res.status(400).json({ error: "query undefined"});
+    if (!query.trim()) return res.json([]);
 
     try {
         const results = await Game.find(
-        {name: new RegExp(`^${query}`, "i" )}
+        {name: new RegExp(query, "i" )},
+        { id: 1, name: 1} // only returns name and id fields
     ).limit(10);
 
     res.json(results);

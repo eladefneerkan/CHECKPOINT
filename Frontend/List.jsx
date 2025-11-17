@@ -31,7 +31,7 @@ function SearchBar() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/search/Games?q=${encodeURIComponent(currInput)}`);
+      const response = await fetch(`http://localhost:5000/search/Games?q=${encodeURIComponent(currInput)}`);
       const data = await response.json();
       setMatchedResults(data);   
       } catch (error) {
