@@ -1,104 +1,181 @@
 // Frontend/Profile.jsx
-// 
+import React, { useEffect, useState } from "react";
+import LogoutButton from "./LogoutButton";
 
-import React, { useState } from 'react';
-function Profile() {
-    <h2>This is the Profile page</h2>
-  }
-
-const ProfilePictureUploader = () => {
-  // State to store the selected file object (for upload to server)
+export default function Profile() {
+  const [user, setUser] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [bio, setBio] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  // State to store the URL for the preview image
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // Handler for when the user selects a file
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    fetch("http://localhost:3000/users/me", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data);
+        setEmail(data.email);
+        setBio(data.bio);
+        setProfilePicture(data.profilePicture);
+      })
+      .catch((err) => console.error("Profile fetch error:", err));
+  }, []);
+
+  if (!user)
+    return (
+      <h2 style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
+        Please log in to view your profile.
+      </h2>
+    );
+
+  //Handle selecting a new image locally
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      // 1. Store the file object in state
+    if (file && file.type.startsWith("image/")) {
       setImageFile(file);
-      
-      // 2. Create a temporary URL for the image preview
-      setPreviewUrl(URL.createObjectURL(file));
+      setPreviewUrl(URL.createObjectURL(file)); //preveiw
     } else {
-      // Clear states if the file is not an image or no file is selected
       setImageFile(null);
       setPreviewUrl(null);
-      alert('Please select an image file (e.g., JPEG, PNG).');
+      alert("Please select a valid image file.");
     }
   };
 
-  // Handler for the upload action (e.g., when a submit button is clicked)
-  const handleUpload = async () => {
-    if (!imageFile) {
-      alert('Please select an image first.');
-      return;
-    }
+  const handleSaveChanges = async () => {
+    const token = localStorage.getItem("token");
 
-    // 3. Prepare data for server upload using FormData
-    const formData = new FormData();
-    formData.append('profilePicture', imageFile); // 'profilePicture' is the field name your server expects
+    const res = await fetch("http://localhost:3000/users/me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        email,
+        bio,
+        profilePicture: previewUrl ? previewUrl : profilePicture, 
+      }),
+    });
 
-    // 4. Send the file to your API endpoint
-    try {
-      // Replace '/api/upload-profile-picture' with your actual endpoint
-      const response = await fetch('/api/upload-profile-picture', {
-        method: 'POST',
-        body: formData,
-        // The browser automatically sets the correct 'Content-Type' header 
-        // (multipart/form-data) when a FormData object is passed as the body.
-      });
-
-      if (response.ok) {
-        // Handle success (e.g., show a success message, update user context)
-        console.log('File uploaded successfully!');
-      } else {
-        // Handle server errors
-        console.error('Upload failed with status:', response.status);
-      }
-    } catch (error) {
-      // Handle network errors
-      console.error('Network error during upload:', error);
-    }
+    const updated = await res.json();
+    setUser(updated);
+    setEditMode(false);
+    setImageFile(null);
+    setPreviewUrl(null);
   };
 
   return (
-    <div>
-      <div className= "tools" > 
+    <div style={{ color: "white", maxWidth: "600px", margin: "auto" }}>
+      
+      {/* TOP BUTTONS */}
+      <div className="tools">
         <button className="toolButtons">lists</button>
-        <button className="toolButtons">reviews</button>
+        <button className="toolButtons" onClick={() => (window.location.href = "/review")}>
+          reviews
+        </button>
         <button className="toolButtons">stats</button>
       </div>
-      <h1>This is the Profile page</h1>
-      <h2>Profile Picture</h2>
-      {/* Image Preview Area */}
-      {previewUrl ? (
-        <img 
-          src={previewUrl} 
-          alt="Profile Preview" 
-          style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }} 
-        />
-      ) : (
-        <div style={{ width: '150px', height: '150px', backgroundColor: '#ccc', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          No Image Selected
-        </div>
+
+      <h1>Welcome, {user.username}!</h1>
+
+      {/* ----- VIEW MODE ----- */}
+      {!editMode && (
+        <>
+          <img
+            src={user.profilePicture}
+            alt="Profile"
+            style={{
+              width: 150,
+              height: 150,
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "3px solid white",
+            }}
+          />
+
+          <p>Email: {user.email}</p>
+          <p>Bio: {user.bio || "No bio yet"}</p>
+
+          <button onClick={() => setEditMode(true)} style={{ marginTop: "20px" }}>
+            Edit Profile
+          </button>
+
+          <LogoutButton />
+        </>
       )}
 
-      {/* File Input for selection */}
-      <input 
-        type="file" 
-        accept="image/*" // Restricts the file selector to image types
-        onChange={handleFileChange} 
-        style={{ display: 'block', margin: '20px 0' }}
-      />
-      
-      {/* Upload Button */}
-      <button onClick={handleUpload} disabled={!imageFile}>
-        Upload Picture
-      </button>
+      {/* ----- EDIT MODE ----- */}
+      {editMode && (
+        <div style={{ marginTop: "20px" }}>
+          <h2>Edit Profile</h2>
+
+          {/* Profile picture preview */}
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="Preview"
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "3px solid white",
+              }}
+            />
+          ) : (
+            <img
+              src={profilePicture}
+              alt="Profile"
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "3px solid white",
+              }}
+            />
+          )}
+
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+
+          <label>Email:</label>
+          <input
+            style={{ width: "100%", marginBottom: "10px" }}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <label>Bio:</label>
+          <textarea
+            style={{ width: "100%", marginBottom: "10px" }}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+          />
+
+          <button onClick={handleSaveChanges} style={{ marginRight: "10px" }}>
+            Save
+          </button>
+
+          <button
+            onClick={() => {
+              setEditMode(false);
+              setPreviewUrl(null);
+              setImageFile(null);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
-};
-
-export default ProfilePictureUploader;
+}
