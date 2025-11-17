@@ -31,7 +31,7 @@ function SearchBar() {
     }
 
     try {
-      const response = await fetch(`/Backend/routes/search_games?q=${encodeURIComponent(currInput)}`);
+      const response = await fetch(`http://localhost:3000/search/Games?q=${encodeURIComponent(currInput)}`);
       const data = await response.json();
       setMatchedResults(data);   
       } catch (error) {
@@ -85,9 +85,9 @@ function SearchBar() {
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             zIndex: 10 
           }}>
-            {matchedResults.map((game, index) => (
+            {matchedResults.map((game) => (
               <div 
-                key={game.id} 
+                key={game._id || game.id} 
                 style={{ 
                   padding: '10px', 
                   cursor: 'pointer', 
@@ -97,7 +97,7 @@ function SearchBar() {
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0f0f0'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'white'}
               >
-                {game}
+                {game.name}
               </div>
             ))}
           </div>

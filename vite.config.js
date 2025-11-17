@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/users": "http://localhost:5000",
+      "/search": "http://localhost:5000"
     },
   },
 });
