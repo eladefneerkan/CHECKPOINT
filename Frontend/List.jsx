@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+/*
 const MOCK_GAMES_LIST = [
   'Ghost of Yotei',
   'Sally Face',
@@ -12,24 +13,31 @@ const MOCK_GAMES_LIST = [
   'Among Us',
   'Afterworld'
 ];
+*/
+
+
 
 function SearchBar() {
   const [userSearch, setUserSearch] = useState('');
   const [matchedResults, setMatchedResults] = useState([]);
   
-  const handleInputChange = (event) => {
+  const handleInputChange = async (event) => {
     const currInput = event.target.value;
     setUserSearch(currInput);
     
-    if (currInput.length > 0) {
-      const matched = MOCK_GAMES_LIST.filter(game =>
-        game.toLowerCase().startsWith(currInput.toLowerCase())
-      );
-      setMatchedResults(matched);
-    } else {
+    if (currInput.length < 1) {
       setMatchedResults([]);
+      return;
     }
-  };
+
+    try {
+      const response = await fetch(`/Backend/routes/search_games?q=${encodeURIComponent(currInput)}`);
+      const data = await response.json();
+      setMatchedResults(data);   
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    };
 
   const handleGameSelect = (gameName) => {
     setUserSearch(gameName); 
@@ -79,13 +87,13 @@ function SearchBar() {
           }}>
             {matchedResults.map((game, index) => (
               <div 
-                key={index} 
+                key={game.id} 
                 style={{ 
                   padding: '10px', 
                   cursor: 'pointer', 
                   borderBottom: '1px solid #eee',
                 }}
-                onClick={() => handleGameSelect(game)}
+                onClick={() => handleGameSelect(game.name)}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0f0f0'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'white'}
               >
