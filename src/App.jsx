@@ -4,7 +4,8 @@ import List from "../Frontend/List.jsx";
 import Profile from "../Frontend/Profile.jsx";
 import Home from "../Frontend/Home.jsx";
 import ReviewModel from "../Frontend/Review.jsx";
-
+import AW from "../Frontend/Afterworld.jsx";
+import SearchGame from "../Frontend/SearchedGame.jsx";
 export default function App() {
   return (
     <Routes>
@@ -13,6 +14,8 @@ export default function App() {
         <Route path="list" element={<List />} />
         <Route path="profile" element={<Profile />} />
         <Route path="review" element={<ReviewModel />} /> 
+        <Route path="aw" element={<AW />} /> 
+        <Route path="searchgame" element={<SearchGame />} /> 
       </Route>
     </Routes>
   );

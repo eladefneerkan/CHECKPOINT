@@ -16,11 +16,22 @@ const MOCK_GAMES_LIST = [
 function SearchBar() {
   const [userSearch, setUserSearch] = useState('');
   const [matchedResults, setMatchedResults] = useState([]);
-  
+  function keyDownInput(){
+    
+    //˙𐃷˙
+  }
+  const handleKeyEnter = (event) => {
+    if ( event.key === "Enter"){
+      let stringMatchedResults = matchedResults.join("☝");
+      localStorage.setItem("searchedGame", stringMatchedResults);
+      
+      window.location.href = "/searchgame";
+    }
+  }
   const handleInputChange = (event) => {
     const currInput = event.target.value;
     setUserSearch(currInput);
-    
+
     if (currInput.length > 0) {
       const matched = MOCK_GAMES_LIST.filter(game =>
         game.toLowerCase().startsWith(currInput.toLowerCase())
@@ -29,12 +40,17 @@ function SearchBar() {
     } else {
       setMatchedResults([]);
     }
+    
   };
 
   const handleGameSelect = (gameName) => {
     setUserSearch(gameName); 
     setMatchedResults([]);
+    if (gameName == "Afterworld"){
+      window.location.href = "/aw";
+    }
   };
+  
 
   return (
     // Outer div for page centering (Flexbox)
@@ -45,7 +61,7 @@ function SearchBar() {
       padding: '20px' 
     }}>
       
-      <h1>Search for Games to add to your List!</h1>
+      <h1 id="bum"  >Search for Games to add to your List!</h1>
     
       <div style={{ position: 'relative', width: '650px' }}> 
 
@@ -54,6 +70,7 @@ function SearchBar() {
           placeholder="Type to Search Games..."
           value={userSearch}    
           onChange={handleInputChange} 
+          onKeyDown={handleKeyEnter}
           style={{ 
             padding: '10px', 
             borderRadius: '5px', 
@@ -85,6 +102,7 @@ function SearchBar() {
                   cursor: 'pointer', 
                   borderBottom: '1px solid #eee',
                 }}
+                onKeyDown={()=> handleKeyEnter(game)}
                 onClick={() => handleGameSelect(game)}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f0f0f0'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'white'}
@@ -95,7 +113,7 @@ function SearchBar() {
           </div>
         )}
       </div>
-      
+
 
       <p style={{ marginTop: '20px' }}>{userSearch}</p>
 
