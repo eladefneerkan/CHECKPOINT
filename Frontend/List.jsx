@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import GameObj from './GameObj.jsx'
 /*
 const MOCK_GAMES_LIST = [
   'Ghost of Yotei',
@@ -15,7 +15,24 @@ const MOCK_GAMES_LIST = [
 ];
 */
 
+const fetchGamesByQuery = async (query) => {
 
+    if (!query) return [];
+    
+    try {
+        const response = await fetch(`/search/Games?q=${encodeURIComponent(query)}`);
+        
+        if (!response.ok) {
+            console.error('Final search request failed:', response.status);
+            return [];
+        }
+        const data = await response.json();
+        return data; 
+    } catch (error) {
+        console.error('Error fetching final search results:', error);
+        return [];
+    }
+}
 
 function SearchBar() {
   const [userSearch, setUserSearch] = useState('');
