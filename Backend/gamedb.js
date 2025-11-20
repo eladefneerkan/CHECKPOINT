@@ -39,4 +39,3 @@ async function fetchGame() {
     console.log("MongoDB connection closed.");
     process.exit(0);
 }
-fetchGame();

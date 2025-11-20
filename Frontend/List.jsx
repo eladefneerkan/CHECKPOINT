@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /*
 const MOCK_GAMES_LIST = [
@@ -21,23 +21,41 @@ function SearchBar() {
   const [userSearch, setUserSearch] = useState('');
   const [matchedResults, setMatchedResults] = useState([]);
   
-  const handleInputChange = async (event) => {
+  const handleInputChange = (event) => {
     const currInput = event.target.value;
     setUserSearch(currInput);
-    
-    if (currInput.length < 1) {
+  };
+
+  // Debounce fetch: wait 300ms after typing stops
+  useEffect(() => {
+    const query = userSearch.trim();
+
+    if (query.length < 1) {
       setMatchedResults([]);
       return;
     }
 
-    try {
-      const response = await fetch(`http://localhost:5000/search/Games?q=${encodeURIComponent(currInput)}`);
-      const data = await response.json();
-      setMatchedResults(data);   
+    const handler = setTimeout(async () => {
+      try {
+        // If user typed exactly one character, ask backend for games
+        // that start with that character by sending a start-anchored regex.
+        const qParam = query.length === 1 && /^[a-z]$/i.test(query)
+          ? `^${query}`
+          : query;
+        const response = await fetch(`/search/Games?q=${encodeURIComponent(qParam)}`);
+        if (!response.ok) {
+          console.error('Search request failed:', response.status);
+          return;
+        }
+        const data = await response.json();
+        setMatchedResults(data);
       } catch (error) {
-        console.error("Error fetching search results:", error);
+        console.error('Error fetching search results:', error);
       }
-    };
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [userSearch]);
 
   const handleGameSelect = (gameName) => {
     setUserSearch(gameName); 

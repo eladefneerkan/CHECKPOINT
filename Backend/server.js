@@ -20,13 +20,10 @@ app.get("/", (req, res) => {
   res.send("Backend running successfully!");
 });
 
-
-
-//listen IF not a test process!!!
+// Listen (use default port 3000 when PORT isn't provided)
+const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "test") {
-  app.listen(process.env.PORT, () =>
-    console.log(`Server running on port ${process.env.PORT}`)
-  );
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 module.exports = app;

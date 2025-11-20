@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/users": "http://localhost:5000",
-      "/search": "http://localhost:5000"
+      "/users": "http://localhost:3000",
+      "/search": "http://localhost:3000"
     },
   },
 });
