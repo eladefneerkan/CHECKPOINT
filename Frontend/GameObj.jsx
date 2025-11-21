@@ -2,16 +2,17 @@ import React from 'react'
 
 const GameObj = ({game}) =>{
 
+    const imageUrl = game.getImageDisplay()
     //some games don't have genres, so use if/else to see if the games.genre exists
     let genreList = "NA";
-    if(games.genres && Array.isArray(game.genres))
+    if(game.genres && Array.isArray(game.genres))
     {
-        genreList = game.genres.map(genre => genre.name).join(',')
+        genreList = game.genres.map(genre => genre.name).join(', ')
     }
     return(
         <div className="game-obj">
             <div className="game-obj-img-display">
-                <img src={game.getImageDisplay()} alt={game.name} className="game-image" />
+                <img src={imageUrl} alt={game.name} className="game-image" />
             </div>
             <div className="game-obj-contents">
 
