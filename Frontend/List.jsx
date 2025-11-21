@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import GameObj from './GameObj.jsx'
-import GameData from './models/GameObj.js'
+import GameComp from './GameObj.jsx'
+import GameObj from './models/GameObj.js'
 
 /*
 const MOCK_GAMES_LIST = [
@@ -23,20 +23,19 @@ const fetchGamesByQuery = async (query) => {
         if (!response.ok) return []
          const data = await response.json()
         
-        console.log("RAW API DATA:", data)
+        console.log("RAW API DATA:", JSON.stringify(data, null, 2))
 
         
         const hydratedData = data.map(rawGame => {
-            return new GameData(
-                rawGame.ID || rawGame.id, 
+            return new GameObj(
+                rawGame.id, 
                 rawGame.name, 
-                rawGame.image, 
-                rawGame.Background_image, 
-                rawGame.rating, 
-                rawGame.genres, 
-                rawGame.description, 
+                rawGame.slug, 
                 rawGame.released, 
-                rawGame.slug
+                rawGame.rating, 
+                rawGame.description, 
+                rawGame.background_image, 
+                rawGame.genres
             )
         })
         return hydratedData
@@ -79,7 +78,16 @@ function SearchBar({ onFinalSearch }) {
           return;
         }
         const data = await response.json();
-        setMatchedResults(data);
+        setMatchedResults( data.map(rawGame => new GameObj(
+          rawGame.id,
+          rawGame.name,
+          rawGame.slug,
+          rawGame.released,
+          rawGame.rating,
+          rawGame.description,
+          rawGame.background_image,
+          rawGame.genres
+        )));  
       } catch (error) {
         console.error('Error fetching search results:', error);
       }
@@ -223,7 +231,7 @@ function SearchRender() {
               width: '650px', 
               margin: '20px auto'}}>
               {finalSearchRes.map((game, index) => ( 
-                <GameObj key={game.ID || game.slug || index} game={game} /> 
+                <GameComp key={game.id || game.slug || index} game={game} /> 
               ))}
           </div>
       )}

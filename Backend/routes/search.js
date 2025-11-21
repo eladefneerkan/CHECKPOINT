@@ -19,7 +19,17 @@ router.get("/Games", async (req, res) => {
 
         const results = await Game.find(
             { name: regex },
-            { id: 1, name: 1 } // only returns name and id fields
+            { 
+                id: 1, 
+                name: 1, 
+                slug: 1, 
+                released: 1, 
+                rating: 1, 
+                description: 1, 
+                background_image: 1, 
+                genres: 1 
+            } // before: only returns name and id fields
+            // now: returns all fields so that it will show up on search
         ).limit(limit);
 
     res.json(results);
