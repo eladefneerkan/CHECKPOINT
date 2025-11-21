@@ -48,9 +48,10 @@ const fetchGamesByQuery = async (query) => {
 }
 
 function SearchBar({ onFinalSearch }) {
-  const [userSearch, setUserSearch] = useState('');
-  const [matchedResults, setMatchedResults] = useState([]);
-  
+  const [userSearch, setUserSearch] = useState('')
+  const [matchedResults, setMatchedResults] = useState([])
+  const [timeoutId, setTimeoutId] = useState(null)
+
   const handleInputChange = (event) => {
     const currInput = event.target.value;
     setUserSearch(currInput);
@@ -93,15 +94,18 @@ function SearchBar({ onFinalSearch }) {
       }
     }, 300);
 
+    setTimeoutId(handler)
     return () => clearTimeout(handler);
   }, [userSearch]);
 
 
   const handleSearchRes = (query = userSearch) => {
+    if (timeoutId) clearTimeout(timeoutId)
     onFinalSearch(query.trim())
     setMatchedResults([])
   }
   const handleGameSelect = (gameName) => {
+    if (timeoutId) clearTimeout(timeoutId)
     setUserSearch(gameName)
     setMatchedResults([])
     handleSearchRes(gameName)
@@ -162,6 +166,8 @@ function SearchBar({ onFinalSearch }) {
         {matchedResults.length > 0 && (
           <div style={{
             position: 'absolute', 
+            top: '100%',
+            left: 0,
             width: '100%',
             maxHeight: '300px',
             overflowY: 'auto',
