@@ -13,6 +13,7 @@ export default function GameListDetail({ listId, onBack }) {
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleteListConfirm, setDeleteListConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   const token = localStorage.getItem("token");
@@ -120,6 +121,33 @@ export default function GameListDetail({ listId, onBack }) {
     }
   };
 
+  const handleDeleteList = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/gameLists/${listId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || "Failed to delete list");
+      }
+
+      // navigate back to lists page or call onBack
+      setSuccessMessage("List deleted");
+      setTimeout(() => setSuccessMessage(""), 2000);
+      if (onBack) onBack();
+      else {
+        navigate("/profile");
+        // give Profile a moment to mount, then request it open the lists tab
+        setTimeout(() => window.dispatchEvent(new Event("openProfileListsTab")), 120);
+      }
+    } catch (err) {
+      console.error("Error deleting list:", err);
+      alert("Failed to delete list");
+    }
+  };
+
   const getCoverImage = () => {
     if (coverImagePreview) return coverImagePreview;
     if (editCoverImage) return editCoverImage;
@@ -209,7 +237,7 @@ export default function GameListDetail({ listId, onBack }) {
               this list
             </p>
 
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", alignItems: 'center' }}>
               <button
                 onClick={() => setEditMode(true)}
                 style={{
@@ -236,6 +264,20 @@ export default function GameListDetail({ listId, onBack }) {
               >
                 + Add Game
               </button>
+              <button
+                onClick={() => setDeleteListConfirm(true)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  marginLeft: '8px'
+                }}
+              >
+                Delete List
+              </button>
             </div>
           </div>
 
@@ -247,33 +289,34 @@ export default function GameListDetail({ listId, onBack }) {
               No games in this list yet. Click "Add Game" to get started!
             </p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+            <div style={{gap: "15px" }}>
               {gameObjects.map((game) => (
-                <div key={game.id} style={{ position: "relative" }}>
-                  <GameComp game={game} />
-                  <button
-                    onClick={() => setDeleteConfirm(game.id)}
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      backgroundColor: "#dc3545",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "50%",
-                      width: "32px",
-                      height: "32px",
-                      cursor: "pointer",
-                      fontSize: "18px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "bold",
-                    }}
-                    title="Remove game"
-                  >
-                    ×
-                  </button>
+                <div key={game.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 8px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', width: '100%' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <GameComp game={game} />
+                  </div>
+                  <div style={{ marginLeft: '12px' }}>
+                    <button
+                      onClick={() => setDeleteConfirm(game.id)}
+                      style={{
+                        backgroundColor: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        width: "36px",
+                        height: "36px",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                      title="Remove game"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -431,6 +474,71 @@ export default function GameListDetail({ listId, onBack }) {
               </button>
               <button
                 onClick={() => handleDeleteGame(deleteConfirm)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteListConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setDeleteListConfirm(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "#222",
+              borderRadius: "8px",
+              padding: "30px",
+              maxWidth: "420px",
+              textAlign: "center",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ color: "white", marginTop: 0 }}>Delete List?</h2>
+            <p style={{ color: "#bbb" }}>
+              This will permanently delete the whole list and its associations. Are you sure?
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              <button
+                onClick={() => setDeleteListConfirm(false)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                No
+              </button>
+              <button
+                onClick={() => {
+                  setDeleteListConfirm(false);
+                  handleDeleteList();
+                }}
                 style={{
                   padding: "10px 20px",
                   backgroundColor: "#dc3545",
