@@ -6,6 +6,12 @@ const UserSchema = new mongoose.Schema({
   email: String,
   bio: String,
   profilePicture: String,
+  lists: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "GameList",
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 
