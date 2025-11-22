@@ -1,6 +1,8 @@
 // Frontend/Profile.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
+import GameListManager from "./GameListManager";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -10,15 +12,14 @@ export default function Profile() {
   const [profilePicture, setProfilePicture] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     fetch("http://localhost:3000/users/me", {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
+      headers: { Authorization: "Bearer " + token },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -30,19 +31,51 @@ export default function Profile() {
       .catch((err) => console.error("Profile fetch error:", err));
   }, []);
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handler = () => setActiveTab("profile");
+    window.addEventListener("resetProfileToProfileTab", handler);
+    const listsHandler = () => setActiveTab("lists");
+    window.addEventListener("openProfileListsTab", listsHandler);
+    return () => {
+      window.removeEventListener("resetProfileToProfileTab", handler);
+      window.removeEventListener("openProfileListsTab", listsHandler);
+    };
+  }, []);
+
   if (!user)
     return (
-      <h2 style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
-        Please log in to view your profile.
-      </h2>
+      <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
+        <h2>Please log in to view your profile.</h2>
+        <div style={{ marginTop: 12 }}>
+          <button
+            onClick={() => navigate("/login")}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              border: "none",
+              cursor: "pointer",
+              background: "#2563eb",
+              color: "white",
+              fontWeight: 600,
+            }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
     );
 
-  //Handle selecting a new image locally
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith("image/")) {
       setImageFile(file);
-      setPreviewUrl(URL.createObjectURL(file)); //preveiw
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target.result); // This is a base64 data URL
+      };
+      reader.readAsDataURL(file);
     } else {
       setImageFile(null);
       setPreviewUrl(null);
@@ -52,20 +85,14 @@ export default function Profile() {
 
   const handleSaveChanges = async () => {
     const token = localStorage.getItem("token");
-
     const res = await fetch("http://localhost:3000/users/me", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({
-        email,
-        bio,
-        profilePicture: previewUrl ? previewUrl : profilePicture, 
-      }),
+      body: JSON.stringify({ email, bio, profilePicture: previewUrl ? previewUrl : profilePicture }),
     });
-
     const updated = await res.json();
     setUser(updated);
     setEditMode(false);
@@ -73,107 +100,131 @@ export default function Profile() {
     setPreviewUrl(null);
   };
 
+  const colors = { accent: "#2563eb", muted: "#9ca3af", success: "#10b981", teal: "#008080" };
+  const btnBase = { padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600 };
+
   return (
-    <div style={{ color: "white", maxWidth: "600px", margin: "auto" }}>
-      
-      {/* TOP BUTTONS */}
-      <div className="tools">
-        <button className="toolButtons">lists</button>
-        <button className="toolButtons" onClick={() => (window.location.href = "/review")}>
-          reviews
+    <div style={{ color: "white", maxWidth: 720, margin: "32px auto", padding: 16 }}>
+      {/* Nav */}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          marginBottom: 18,
+          padding: 8,
+          background: "#008080",
+          borderRadius: 12,
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+        }}
+      >
+        <button
+          onClick={() => setActiveTab("lists")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "lists" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          My Game Lists
         </button>
-        <button className="toolButtons">stats</button>
+
+        <button
+          onClick={() => (window.location.href = "/review")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "reviews" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Reviews
+        </button>
+
+        <button
+          onClick={() => alert("Stats coming soon")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "stats" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Stats
+        </button>
       </div>
 
-      <h1>Welcome, {user.username}!</h1>
+      {activeTab !== "lists" && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <h1 style={{ margin: 0 }}>Welcome, {user.username}!</h1>
 
-      {/* ----- VIEW MODE ----- */}
-      {!editMode && (
-        <>
           <img
-            src={user.profilePicture}
+            src={previewUrl ? previewUrl : user.profilePicture}
             alt="Profile"
-            style={{
-              width: 150,
-              height: 150,
-              borderRadius: "50%",
-              objectFit: "cover",
-              border: "3px solid white",
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://via.placeholder.com/140/008080/ffffff?text=User`;
             }}
+            style={{ width: 140, height: 140, borderRadius: 12, objectFit: "cover", border: `2px solid ${colors.teal}` }}
           />
 
-          <p>Email: {user.email}</p>
-          <p>Bio: {user.bio || "No bio yet"}</p>
+          <h2 style={{ margin: 0 }}>{user.username}</h2>
+          <p style={{ margin: "8px 0", color: colors.muted }}>{user.bio || "No bio yet"}</p>
+          <p style={{ margin: 0, color: colors.muted }}>{user.email}</p>
 
-          <button onClick={() => setEditMode(true)} style={{ marginTop: "20px" }}>
-            Edit Profile
-          </button>
-
-          <LogoutButton />
-        </>
-      )}
-
-      {/* ----- EDIT MODE ----- */}
-      {editMode && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Edit Profile</h2>
-
-          {/* Profile picture preview */}
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Preview"
-              style={{
-                width: 150,
-                height: 150,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "3px solid white",
-              }}
-            />
-          ) : (
-            <img
-              src={profilePicture}
-              alt="Profile"
-              style={{
-                width: 150,
-                height: 150,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "3px solid white",
-              }}
-            />
+          {!editMode && (
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button onClick={() => setEditMode(true)} style={{ ...btnBase, background: colors.teal, color: "white" }}>Edit Profile</button>
+              <LogoutButton />
+            </div>
           )}
 
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {editMode && (
+            <div style={{ width: "100%", marginTop: 12 }}>
+              <h3 style={{ marginTop: 0 }}>Edit Profile</h3>
 
-          <label>Email:</label>
-          <input
-            style={{ width: "100%", marginBottom: "10px" }}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+              <div style={{ marginBottom: 8 }}>
+                <label style={{ display: "block", marginBottom: 6 }}>Choose new profile picture</label>
+                <input type="file" accept="image/*" onChange={handleFileChange} />
+              </div>
 
-          <label>Bio:</label>
-          <textarea
-            style={{ width: "100%", marginBottom: "10px" }}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
+              <div style={{ marginBottom: 8 }}>
+                <label style={{ display: "block", marginBottom: 6 }}>Email</label>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%" }} />
+              </div>
 
-          <button onClick={handleSaveChanges} style={{ marginRight: "10px" }}>
-            Save
-          </button>
+              <div style={{ marginBottom: 8 }}>
+                <label style={{ display: "block", marginBottom: 6 }}>Bio</label>
+                <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ width: "100%", minHeight: 100 }} />
+              </div>
 
-          <button
-            onClick={() => {
-              setEditMode(false);
-              setPreviewUrl(null);
-              setImageFile(null);
-            }}
-          >
-            Cancel
-          </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={handleSaveChanges} style={{ ...btnBase, background: colors.success, color: "white" }}>Save</button>
+                <button onClick={() => { setEditMode(false); setPreviewUrl(null); setImageFile(null); }} style={{ ...btnBase, background: "transparent", border: `1px solid rgba(255,255,255,0.06)`, color: colors.muted }}>Cancel</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "lists" && (
+        <div>
+          <h1 style={{ marginTop: 0 }}>My Game Lists</h1>
+          <div style={{ marginBottom: "12px" }}>
+            <button onClick={() => setActiveTab("profile")} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginBottom: "8px" }}>← Back to Profile</button>
+          </div>
+          <GameListManager />
         </div>
       )}
     </div>

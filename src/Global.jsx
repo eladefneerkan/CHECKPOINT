@@ -39,7 +39,7 @@ export default function GlobalUI() {
         <nav style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
           <Link to="/">Home Page</Link>
           <Link to="/list">Search Games</Link>
-          <Link to="/profile">Profile</Link>
+          <Link to="/profile" onClick={() => window.dispatchEvent(new Event('resetProfileToProfileTab'))}>Profile</Link>
 
           {/*If logged in show PFP  else show Login */}
           {user ? (
