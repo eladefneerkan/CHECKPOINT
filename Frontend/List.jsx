@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GameComp from './GameObj.jsx'
 import GameObj from './models/GameObj.js'
+import AddToListModal from './AddToListModal.jsx'
 
 /*
 const MOCK_GAMES_LIST = [
@@ -206,6 +207,13 @@ function SearchBar({ onFinalSearch }) {
 function SearchRender() {
   const [finalSearchRes, setFinalSearchRes] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [showAddToListModal, setShowAddToListModal] = useState(false)
+  const [selectedGameForList, setSelectedGameForList] = useState(null)
+  const [userLists, setUserLists] = useState([])
+  const [successMessage, setSuccessMessage] = useState("")
+
+  const token = localStorage.getItem("token")
+
   const handleFinalSearchRes = async (query) => {
         if (!query) {
             setFinalSearchRes([]);
@@ -216,8 +224,122 @@ function SearchRender() {
         setFinalSearchRes(results);
         setIsLoading(false);
     }
+
+  const fetchUserLists = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/gameLists", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const data = await response.json()
+      setUserLists(data)
+    } catch (err) {
+      console.error("Error fetching lists:", err)
+    }
+  }
+
+  const handleAddToListClick = (game) => {
+    setSelectedGameForList(game)
+    fetchUserLists()
+    setShowAddToListModal(true)
+  }
+
+  const handleAddGameToLists = async (selectedListIds, game) => {
+    try {
+      const gameToAdd = {
+        _id: game.id,
+        name: game.name,
+        slug: game.slug,
+        released: game.released,
+        rating: game.rating,
+        description: game.description,
+        background_image: game.background_image,
+        genres: game.genres,
+      }
+
+      // Add game to backend first
+      for (const listId of selectedListIds) {
+        const response = await fetch(`http://localhost:3000/gameLists/${listId}/games`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ gameId: game.id }),
+        })
+
+        if (!response.ok) {
+          console.error("Error adding game to list")
+        }
+      }
+
+      // Get the list name(s) for the success message
+      const listNames = userLists
+        .filter(list => selectedListIds.includes(list._id))
+        .map(list => list.title)
+        .join(", ")
+
+      setSuccessMessage(`Successfully added to ${listNames}`)
+      setTimeout(() => setSuccessMessage(""), 3000)
+      setShowAddToListModal(false)
+      setSelectedGameForList(null)
+    } catch (err) {
+      console.error("Error adding game to lists:", err)
+      alert("Failed to add game to list")
+    }
+  }
+
+  const handleCreateNewList = async (title) => {
+    try {
+      const response = await fetch("http://localhost:3000/gameLists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          description: "",
+        }),
+      })
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        alert(err.error || err.message || "Failed to create list")
+        return null
+      }
+
+      const result = await response.json()
+      const newList = result.list
+      setUserLists([newList, ...userLists])
+      return newList
+    } catch (err) {
+      console.error("Error creating list:", err)
+      alert("Failed to create list")
+      return null
+    }
+  }
+
   return (
     <div className="SearchRender">
+      {successMessage && (
+        <div
+          style={{
+            backgroundColor: "#28a745",
+            color: "white",
+            padding: "10px",
+            borderRadius: "4px",
+            marginBottom: "20px",
+            textAlign: "center",
+            maxWidth: "650px",
+            margin: "0 auto 20px",
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+
       <h1>Search</h1>
       <SearchBar onFinalSearch={handleFinalSearchRes}/> 
       <hr style={{ width: '650px', margin: '30px auto' }} />
@@ -237,9 +359,26 @@ function SearchRender() {
               width: '650px', 
               margin: '20px auto'}}>
               {finalSearchRes.map((game, index) => ( 
-                <GameComp key={game.id || game.slug || index} game={game} /> 
+                <GameComp 
+                  key={game.id || game.slug || index} 
+                  game={game}
+                  onAddToList={handleAddToListClick}
+                /> 
               ))}
           </div>
+      )}
+
+      {showAddToListModal && selectedGameForList && (
+        <AddToListModal
+          lists={userLists}
+          game={selectedGameForList}
+          onClose={() => {
+            setShowAddToListModal(false)
+            setSelectedGameForList(null)
+          }}
+          onAddToLists={handleAddGameToLists}
+          onCreateNewList={handleCreateNewList}
+        />
       )}
     </div>
   );
