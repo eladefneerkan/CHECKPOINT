@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const usersRoute = require("./routes/users");
 const searchRoute = require("./routes/search");
+const gameListsRoute = require("./routes/gameLists");
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 
 app.use("/users", usersRoute);
 app.use("/search", searchRoute);
+app.use("/gameLists", gameListsRoute);
 
 
 app.get("/", (req, res) => {
