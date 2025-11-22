@@ -35,6 +35,7 @@ router.post("/", auth, async (req, res) => {
       list: newList,
     });
   } catch (err) {
+    console.error("Server Error:", err); // THIS will show you the real bug
     res.status(500).json({ error: err.message });
   }
 });
@@ -153,18 +154,41 @@ router.post("/:listId/games", auth, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    // Check if game exists
-    const game = await Game.findById(gameId);
-    if (!game) {
-      return res.status(404).json({ error: "Game not found" });
+    // Resolve Game document:
+    // The frontend sends the external game `id` (number) from the RAW API,
+    // while our Game documents use `_id` (ObjectId) as the primary key and
+    // store the external id in the `id` field. Try to find by _id first,
+    // then by numeric `id`. If not found, create a minimal Game doc so we
+    // can reference it from the list.
+    let game = null;
+    try {
+      game = await Game.findById(gameId);
+    } catch (e) {
+      // ignore invalid ObjectId cast errors
     }
 
-    // Check if game is already in the list
-    if (list.games.includes(gameId)) {
+    if (!game) {
+      const numericId = Number(gameId);
+      if (!Number.isNaN(numericId)) {
+        game = await Game.findOne({ id: numericId });
+      }
+    }
+
+    if (!game) {
+      // create a minimal game record so lists can reference it
+      const toCreate = {};
+      const numericId = Number(gameId);
+      if (!Number.isNaN(numericId)) toCreate.id = numericId;
+      game = new Game(toCreate);
+      await game.save();
+    }
+
+    // Check if game is already in the list (compare ObjectId strings)
+    if (list.games.some((id) => id.toString() === game._id.toString())) {
       return res.status(400).json({ error: "Game already in list" });
     }
 
-    list.games.push(gameId);
+    list.games.push(game._id);
     list.updatedAt = Date.now();
 
     await list.save();
