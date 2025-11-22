@@ -1,6 +1,6 @@
 import React from 'react'
 
-const GameComp = ({game}) =>{
+const GameComp = ({game, onAddToList}) =>{
 
     const imageUrl = game.getImageDisplay()
     //some games don't have genres, so use if/else to see if the games.genre exists
@@ -58,6 +58,25 @@ const GameComp = ({game}) =>{
                 <p className="game-obj-detail">
                     <b>Genres:</b> {genreList}
                 </p>
+
+                {onAddToList && (
+                    <button
+                        onClick={() => onAddToList(game)}
+                        style={{
+                            marginTop: '10px',
+                            padding: '8px 16px',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        + Add to List
+                    </button>
+                )}
             </div>
         </div>
     )
