@@ -95,10 +95,13 @@ router.put("/:listId", auth, async (req, res) => {
     list.updatedAt = Date.now();
 
     await list.save();
+  // Populate games before responding so frontend has complete data
+  const populatedList = await GameList.findById(req.params.listId).populate("games");
+
 
     res.json({
       message: "List updated successfully",
-      list,
+      list: populatedList,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
