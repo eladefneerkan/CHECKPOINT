@@ -3,20 +3,6 @@ import GameComp from './GameObj.jsx'
 import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
 
-/*
-const MOCK_GAMES_LIST = [
-  'Ghost of Yotei',
-  'Sally Face',
-  'Five Nights at Freddy\'s',
-  'Genshin Impact',
-  'Overwatch',
-  'It Takes Two',
-  'Valorant',
-  'The Legend of Zelda: Breath of the Wild',
-  'Among Us',
-  'Afterworld'
-];
-*/
 
 const fetchGamesByQuery = async (query) => {
     try {
@@ -303,12 +289,6 @@ function SearchRender() {
           description: "",
         }),
       })
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}))
-        alert(err.error || err.message || "Failed to create list")
-        return null
-      }
 
       const result = await response.json()
       const newList = result.list
