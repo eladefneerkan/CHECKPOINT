@@ -1,6 +1,7 @@
 // Frontend/Profile.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./Auth";
 import LogoutButton from "./LogoutButton";
 import GameListManager from "./GameListManager";
 
@@ -13,6 +14,7 @@ export default function Profile() {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const { updateProfile } = useAuth();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -104,6 +106,7 @@ export default function Profile() {
 
       const updated = await res.json();
       setUser(updated);
+      updateProfile(updated);
       setEditMode(false);
       setImageFile(null);
       setPreviewUrl(null);
