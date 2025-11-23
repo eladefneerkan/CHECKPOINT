@@ -6,7 +6,7 @@ import LogoutButton from "./LogoutButton";
 import GameListManager from "./GameListManager";
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
+  const { user: authUser, updateProfile, isLoading } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -14,24 +14,15 @@ export default function Profile() {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
-  const { updateProfile } = useAuth();
 
+  // Sync local state with auth context when authUser changes
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    fetch("http://localhost:3000/users/me", {
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data);
-        setEmail(data.email);
-        setBio(data.bio);
-        setProfilePicture(data.profilePicture);
-      })
-      .catch((err) => console.error("Profile fetch error:", err));
-  }, []);
+    if (authUser) {
+      setEmail(authUser.email);
+      setBio(authUser.bio);
+      setProfilePicture(authUser.profilePicture);
+    }
+  }, [authUser]);
 
   const navigate = useNavigate();
 
@@ -46,7 +37,7 @@ export default function Profile() {
     };
   }, []);
 
-  if (!user)
+  if (!authUser || isLoading)
     return (
       <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
         <h2>Please log in to view your profile.</h2>
@@ -105,7 +96,6 @@ export default function Profile() {
       }
 
       const updated = await res.json();
-      setUser(updated);
       updateProfile(updated);
       setEditMode(false);
       setImageFile(null);
@@ -183,10 +173,10 @@ export default function Profile() {
 
       {activeTab !== "lists" && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <h1 style={{ margin: 0 }}>Welcome, {user.username}!</h1>
+          <h1 style={{ margin: 0 }}>Welcome, {authUser.username}!</h1>
 
           <img
-            src={previewUrl ? previewUrl : user.profilePicture}
+            src={previewUrl ? previewUrl : authUser.profilePicture}
             alt="Profile"
             onError={(e) => {
               e.target.onerror = null;
@@ -195,9 +185,9 @@ export default function Profile() {
             style={{ width: 140, height: 140, borderRadius: 12, objectFit: "cover", border: `2px solid ${colors.teal}` }}
           />
 
-          <h2 style={{ margin: 0 }}>{user.username}</h2>
-          <p style={{ margin: "8px 0", color: colors.muted }}>{user.bio || "No bio yet"}</p>
-          <p style={{ margin: 0, color: colors.muted }}>{user.email}</p>
+          <h2 style={{ margin: 0 }}>{authUser.username}</h2>
+          <p style={{ margin: "8px 0", color: colors.muted }}>{authUser.bio || "No bio yet"}</p>
+          <p style={{ margin: 0, color: colors.muted }}>{authUser.email}</p>
 
           {!editMode && (
             <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
