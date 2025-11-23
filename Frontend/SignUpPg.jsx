@@ -83,7 +83,7 @@ const SignupForm = () => {
         <h2 style={{ marginBottom: 12 }}>Sign Up</h2>
         <div>
           <div style={{ marginBottom: '12px' }}>
-            <label htmlFor="signup-username" style={{ display: 'block', marginBottom: '6px' }}>
+            <label htmlFor="signup-username" style={{ display: 'block', marginBottom: '6px', color: 'white' }}>
               Username:
             </label>
             <input
@@ -99,7 +99,7 @@ const SignupForm = () => {
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label htmlFor="signup-email" style={{ display: 'block', marginBottom: '6px' }}>
+            <label htmlFor="signup-email" style={{ display: 'block', marginBottom: '6px', color: 'white' }}>
               Email:
             </label>
             <input
@@ -115,7 +115,7 @@ const SignupForm = () => {
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label htmlFor="signup-password" style={{ display: 'block', marginBottom: '6px' }}>
+            <label htmlFor="signup-password" style={{ display: 'block', marginBottom: '6px', color: 'white' }}>
               Password:
             </label>
             <input
@@ -131,7 +131,7 @@ const SignupForm = () => {
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label htmlFor="signup-confirm" style={{ display: 'block', marginBottom: '6px' }}>
+            <label htmlFor="signup-confirm" style={{ display: 'block', marginBottom: '6px', color: 'white' }}>
               Confirm Password:
             </label>
             <input

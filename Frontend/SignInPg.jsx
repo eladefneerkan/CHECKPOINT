@@ -38,7 +38,7 @@ const SignInPg = () => {
         <h2 style={{ marginBottom: 12 }}>Login</h2>
        <div>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="login-username" style={{ display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="login-username" style={{ display: 'block', marginBottom: '5px', color: 'white' }}>
             Username:
           </label>
           <input
@@ -54,7 +54,7 @@ const SignInPg = () => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="login-password" style={{ display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="login-password" style={{ display: 'block', marginBottom: '5px', color: 'white' }}>
             Password:
           </label>
           <input
