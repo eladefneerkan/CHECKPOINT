@@ -4,7 +4,8 @@ import GlobalUI from "./Global.jsx";
 import Home from "../Frontend/Home.jsx";
 import List from "../Frontend/List.jsx";
 import Profile from "../Frontend/Profile.jsx";
-import Login from "../Frontend/Login.jsx";
+import SignInPg from "../Frontend/SignInPg.jsx";
+import SignUpPg from "../Frontend/SignUpPg.jsx";
 import "./styles.css";
 import ReviewModel from "../Frontend/Review.jsx";
 
@@ -26,7 +27,8 @@ export default function App() {
         <Route index element={<Home users={users} />} />
         <Route path="list" element={<List users={users} />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="login" element={<Login />} />
+        <Route path="login" element={<SignInPg />} />
+        <Route path="signup" element={<SignUpPg />} />
       </Route>
     </Routes>
   );

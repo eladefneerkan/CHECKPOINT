@@ -1,35 +1,21 @@
 import { Outlet, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useAuth } from "../Frontend/Auth.jsx";
 
 export default function GlobalUI() {
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    fetch("http://localhost:3000/users/me", {
-      headers: { Authorization: "Bearer " + token }
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) setUser(data);
-      })
-      .catch(() => {});
-  }, []);
+  const { user } = useAuth();
 
   return (
     <div>
       <header
         style={{
-          background: "#000000",
+          background: "linear-gradient(90deg,#0f1724,#071126)",
           color: "red",
           padding: "1rem",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           width: "100%",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.6)",
         }}
       >
         <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#ffffff" }}>
@@ -41,7 +27,6 @@ export default function GlobalUI() {
           <Link to="/list">Search Games</Link>
           <Link to="/profile" onClick={() => window.dispatchEvent(new Event('resetProfileToProfileTab'))}>Profile</Link>
 
-          {/*If logged in show PFP  else show Login */}
           {user ? (
             <Link to="/profile">
               <img
