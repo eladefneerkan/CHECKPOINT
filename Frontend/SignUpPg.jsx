@@ -14,23 +14,43 @@ const SignupForm = () => {
   const handleSubmit = async () => {
     setError('');
 
+    // Required fields
     if (!username || !password || !confirmPassword || !email) {
       setError('Please fill in all fields');
       return;
     }
 
+    // Username length
+    if (username.length < 6 || username.length > 32) {
+      setError('Usernames must be between 6 and 32 characters.');
+      return;
+    }
+
+    // Username characters
+    const usernameRegex = /^[A-Za-z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      setError('Usernames must only contain letters, numbers, and underscores');
+      return;
+    }
+
+    // Password length
+    if (password.length < 8) {
+      setError('Passwords must be at least 8 characters.');
+      return;
+    }
+
+    // Password composition: uppercase, number, special
+    const upperRe = /[A-Z]/;
+    const numberRe = /[0-9]/;
+    const specialRe = /[!@#$%&*?+~]/;
+    if (!upperRe.test(password) || !numberRe.test(password) || !specialRe.test(password)) {
+      setError('Passwords must contain at least one uppercase character (A-Z), at least one number (0-9), and at least one special character (!, @, #, $, %, &, *, ?, +, ~).');
+      return;
+    }
+
+    // Confirm password
     if (password !== confirmPassword) {
       setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    if (username.length < 3) {
-      setError('Username must be at least 3 characters');
       return;
     }
 
