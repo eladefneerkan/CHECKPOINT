@@ -36,7 +36,7 @@ const SignInPg = () => {
     <div className="auth-page">
       <div className="auth-card">
         <h2 style={{ marginBottom: 12 }}>Login</h2>
-      <div>
+       <div>
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="login-username" style={{ display: 'block', marginBottom: '5px' }}>
             Username:
@@ -78,24 +78,13 @@ const SignInPg = () => {
         <button className="btn-primary" onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-      </div>
+        </div>
 
-        <div style={{ marginTop: 18, textAlign: 'center' }}>
-          <p style={{ fontSize: '14px' }}>
-            Don't have an account?{' '}
-            <button
-              onClick={() => navigate('/signup')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#38bdf8',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
-            >
-              Sign up
-            </button>
-          </p>
+        {/* Sign up button placed below the fields */}
+        <div style={{ marginTop: 12 }}>
+          <button className="btn-secondary" onClick={() => navigate('/signup')}>
+            Create an account
+          </button>
         </div>
       </div>
     </div>

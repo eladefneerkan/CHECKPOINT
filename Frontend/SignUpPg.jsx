@@ -130,22 +130,11 @@ const SignupForm = () => {
           </button>
         </div>
 
-        <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px' }}>
-            Already have an account?{' '}
-            <button
-              onClick={() => navigate('/login')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#38bdf8',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
-            >
-              Login
-            </button>
-          </p>
+        {/* Login button placed below the fields */}
+        <div style={{ marginTop: 12 }}>
+          <button className="btn-secondary" onClick={() => navigate('/login')}>
+            Already have an account? Log in
+          </button>
         </div>
       </div>
     </div>
