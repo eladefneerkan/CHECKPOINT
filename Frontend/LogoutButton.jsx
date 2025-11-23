@@ -1,12 +1,15 @@
 // LogoutButton.jsx
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./Auth";
 
 export default function LogoutButton() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");   //remove JWT
-    navigate("/login");                 //redirect to login
+    // clear auth state and token
+    logout();
+    navigate("/login");
   };
 
   return (
