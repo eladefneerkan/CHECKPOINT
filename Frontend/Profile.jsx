@@ -84,20 +84,33 @@ export default function Profile() {
   };
 
   const handleSaveChanges = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:3000/users/me", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-      body: JSON.stringify({ email, bio, profilePicture: previewUrl ? previewUrl : profilePicture }),
-    });
-    const updated = await res.json();
-    setUser(updated);
-    setEditMode(false);
-    setImageFile(null);
-    setPreviewUrl(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3000/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ email, bio, profilePicture: previewUrl ? previewUrl : profilePicture }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Save failed:", res.status, text);
+        alert("Failed to save profile: " + (text || res.status));
+        return;
+      }
+
+      const updated = await res.json();
+      setUser(updated);
+      setEditMode(false);
+      setImageFile(null);
+      setPreviewUrl(null);
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Error saving profile: " + err.message);
+    }
   };
 
   const colors = { accent: "#2563eb", muted: "#9ca3af", success: "#10b981", teal: "#008080" };

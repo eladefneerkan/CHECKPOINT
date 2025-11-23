@@ -54,6 +54,13 @@ const SignupForm = () => {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
     const result = await signup({ username, password, email });
     if (!result.success) {
       setError(result.error || 'Signup failed. Please try again.');
