@@ -60,7 +60,7 @@ export default function GlobalUI() {
           width: "100%",
         }}
       >
-        <p>This is our footer! Gonna write our names here</p>
+        <p>Development Team: Vaishnavi Sam, Ela Defne Erkan, Anam Siddiqui, Jeffrey Joseph, Allison Gao</p>
       </footer>
     </div>
   );
