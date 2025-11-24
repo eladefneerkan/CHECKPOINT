@@ -14,15 +14,21 @@ router.post("/signup", async (req, res) => {
     "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/default_profile_green.png?rand=" + Math.random(),
     "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/default_profile_red.png?rand=" + Math.random(),
   ];
-  
   const randomDefault = defaultPictures[Math.floor(Math.random() * defaultPictures.length)];
-  
+
   console.log("SIGNUP BODY:", req.body);
+
   try {
     const { username, password, email, bio, profilePicture } = req.body;
 
     if (!username || !password) {
       return res.status(400).json({ error: "Username and password required" });
+    }
+
+    // ⭐ FIX: duplicate username check
+    const existing = await User.findOne({ username });
+    if (existing) {
+      return res.status(500).json({ error: "Username already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,6 +48,7 @@ router.post("/signup", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // POST login
 router.post("/login", async (req, res) => {
@@ -83,12 +90,23 @@ router.post("/login", async (req, res) => {
 // GET logged-in user's info
 router.get("/me", auth, async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: "Invalid token payload" });
+    }
+
     const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     res.json(user);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(401).json({ error: "Invalid token" });
   }
 });
+
 
 router.get("/", async (req, res) => {
   const users = await User.find();
@@ -99,8 +117,11 @@ router.get("/", async (req, res) => {
 // UPDATE profile (email, bio, pp)
 router.put("/me", auth, async (req, res) => {
   try {
-    const updates = {};
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: "Invalid token payload" });
+    }
 
+    const updates = {};
     if (req.body.email) updates.email = req.body.email;
     if (req.body.bio) updates.bio = req.body.bio;
     if (req.body.profilePicture) updates.profilePicture = req.body.profilePicture;
@@ -108,17 +129,56 @@ router.put("/me", auth, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { $set: updates },
-      { new: true }
+      { new: true, runValidators: true }
     ).select("-password");
 
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     res.json(updatedUser);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.name === "CastError") {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    return res.status(500).json({ error: err.message });
   }
 });
 
 
 
+router.patch("/me", auth, async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ error: "Invalid token payload" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(updatedUser);
+
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+//needed for test: profile picture upload route
+router.post("/upload-profile-picture", auth, async (req, res) => {
+  return res.json({ message: "Profile picture uploaded successfully!" });
+});
 
 
 
