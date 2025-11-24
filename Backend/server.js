@@ -1,9 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const usersRoute = require("./routes/users");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-dotenv.config();
+
 const app = express();
 
 app.use(express.json({ limit: "10mb" }));
