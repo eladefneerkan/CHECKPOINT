@@ -25,7 +25,6 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Username and password required" });
     }
 
-    // ⭐ FIX: duplicate username check
     const existing = await User.findOne({ username });
     if (existing) {
       return res.status(500).json({ error: "Username already exists" });
@@ -180,6 +179,70 @@ router.post("/upload-profile-picture", auth, async (req, res) => {
   return res.json({ message: "Profile picture uploaded successfully!" });
 });
 
+
+
+//CHANGE PASSWORD
+router.patch("/me/password", auth, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: "Old and new passwords required" });
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const valid = await bcrypt.compare(oldPassword, user.password);
+    if (!valid) {
+      return res.status(401).json({ error: "Old password is incorrect" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+//DELETE ACCOUNT (requires password confirmation)
+router.delete("/me", auth, async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required to delete the account" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // verify password
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(401).json({ error: "Incorrect password" });
+    }
+
+    // delete
+    await User.findByIdAndDelete(req.user.id);
+
+    res.json({ message: "Account permanently deleted" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 
