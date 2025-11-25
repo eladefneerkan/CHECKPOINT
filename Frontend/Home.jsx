@@ -39,14 +39,8 @@ export default function Home() {
         <p style={{ fontSize: "1.5rem" }}>
           Track, share, and discover your favorite games
         </p>
-        <button style={{ 
-          alignItems: "center",
-          backgroundColor: "#ffffff"
-        }} onClick={() => navButtonToPage('/login')}>LOGIN</button>
-        <button style={{ 
-          alignItems: "center",
-          backgroundColor: "#ffffff"
-        }} onClick={() => navButtonToPage('/signup')}>SIGN UP</button>        
+        <button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
+        <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>        
       </div>
     </section>
   );
