@@ -1,6 +1,8 @@
 import grassBg from "../assets/grass_bg.avif";
+import {useNavigate} from 'react-router-dom';
 
 export default function Home() {
+  const navButtonToPage = useNavigate()
   return (
     <section
       className="fade-in"
@@ -40,11 +42,11 @@ export default function Home() {
         <button style={{ 
           alignItems: "center",
           backgroundColor: "#ffffff"
-        }}>LOGIN</button>
+        }} onClick={() => navButtonToPage('/login')}>LOGIN</button>
         <button style={{ 
           alignItems: "center",
           backgroundColor: "#ffffff"
-        }}>SIGN UP</button>        
+        }} onClick={() => navButtonToPage('/signup')}>SIGN UP</button>        
       </div>
     </section>
   );
