@@ -6,6 +6,7 @@ import List from "../Frontend/List.jsx";
 import Profile from "../Frontend/Profile.jsx";
 import SignInPg from "../Frontend/SignInPg.jsx";
 import SignUpPg from "../Frontend/SignUpPg.jsx";
+import VerifyEmail from "../Frontend/VerifyEmail.jsx";
 import "./styles.css";
 import ReviewModel from "../Frontend/Review.jsx";
 
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="login" element={<SignInPg />} />
         <Route path="signup" element={<SignUpPg />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
       </Route>
     </Routes>
   );

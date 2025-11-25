@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+
 const UserSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -13,6 +14,10 @@ const UserSchema = new mongoose.Schema({
     },
   ],
   createdAt: { type: Date, default: Date.now },
+  isVerified: { type: Boolean, default: false },
+  emailVerificationCode: String,
+  emailVerificationExpiry: Date,
+
 });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -226,70 +226,80 @@ export default function Profile() {
             </div>
           )}
 
-        <div style={{ marginTop: 24, padding: 16, background: "#220000", borderRadius: 8 }}>
-          <h3 style={{ color: "#ff6b6b", marginTop: 0 }}>Delete Account</h3>
-
-          <p style={{ color: "#ddd" }}>Enter your password to permanently delete your account.</p>
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-            style={{
-              width: "100%",
-              marginBottom: 8,
-              padding: 8,
-              borderRadius: 6,
-              border: "1px solid #555",
-            }}
-          />
-
-          <button
-            onClick={deleteAccount}
-            disabled={!deletePassword}
-            style={{
-            padding: "10px 14px",
-            borderRadius: 8,
-            border: "none",
-            background: deletePassword ? "#cc0000" : "#7a3b3b",
-            color: "white",
-            fontWeight: 600,
-            cursor: deletePassword ? "pointer" : "not-allowed",
-            width: "100%",
-            opacity: deletePassword ? 1 : 0.6,
-          }}
-          >
-            Delete My Account
-          </button>
-        </div>
+        
 
 
           {editMode && (
-            <div style={{ width: "100%", marginTop: 12 }}>
-              <h3 style={{ marginTop: 0 }}>Edit Profile</h3>
+            <>
+              <div style={{ width: "100%", marginTop: 12 }}>
+                <h3 style={{ marginTop: 0 }}>Edit Profile</h3>
 
-              <div style={{ marginBottom: 8 }}>
-                <label style={{ display: "block", marginBottom: 6 }}>Choose new profile picture</label>
-                <input type="file" accept="image/*" onChange={handleFileChange} />
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Choose new profile picture</label>
+                  <input type="file" accept="image/*" onChange={handleFileChange} />
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Email</label>
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%" }} />
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Bio</label>
+                  <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ width: "100%", minHeight: 100 }} />
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={handleSaveChanges} style={{ ...btnBase, background: colors.success, color: "white" }}>Save</button>
+                  <button
+                    onClick={() => { setEditMode(false); setPreviewUrl(null); setImageFile(null); }}
+                    style={{ ...btnBase, background: "transparent", border: `1px solid rgba(255,255,255,0.06)`, color: colors.muted }}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
 
-              <div style={{ marginBottom: 8 }}>
-                <label style={{ display: "block", marginBottom: 6 }}>Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%" }} />
-              </div>
+              <div style={{ marginTop: 24, padding: 16, background: "#220000", borderRadius: 8 }}>
+                <h3 style={{ color: "#ff6b6b", marginTop: 0 }}>Delete Account</h3>
 
-              <div style={{ marginBottom: 8 }}>
-                <label style={{ display: "block", marginBottom: 6 }}>Bio</label>
-                <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ width: "100%", minHeight: 100 }} />
-              </div>
+                <p style={{ color: "#ddd" }}>Enter your password to permanently delete your account.</p>
 
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={handleSaveChanges} style={{ ...btnBase, background: colors.success, color: "white" }}>Save</button>
-                <button onClick={() => { setEditMode(false); setPreviewUrl(null); setImageFile(null); }} style={{ ...btnBase, background: "transparent", border: `1px solid rgba(255,255,255,0.06)`, color: colors.muted }}>Cancel</button>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  style={{
+                    width: "100%",
+                    marginBottom: 8,
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #555",
+                  }}
+                />
+
+                <button
+                  onClick={deleteAccount}
+                  disabled={!deletePassword}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: deletePassword ? "#cc0000" : "#7a3b3b",
+                    color: "white",
+                    fontWeight: 600,
+                    cursor: deletePassword ? "pointer" : "not-allowed",
+                    width: "100%",
+                    opacity: deletePassword ? 1 : 0.6,
+                  }}
+                >
+                  Delete My Account
+                </button>
               </div>
-            </div>
+            </>
           )}
+
         </div>
       )}
 

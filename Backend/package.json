@@ -15,7 +15,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
-    "mysql2": "^3.15.3"
+    "mysql2": "^3.15.3",
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "jest": "^30.2.0",
@@ -23,10 +24,12 @@
     "supertest": "^7.1.4"
   },
   "jest": {
-  "setupFilesAfterEnv": ["./tests/setup.js"],
-  "moduleNameMapper": {
-    "^jsonwebtoken$": "<rootDir>/__mocks__/jsonwebtoken.js"
-  },
-  "testEnvironment": "node"
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ],
+    "moduleNameMapper": {
+      "^jsonwebtoken$": "<rootDir>/__mocks__/jsonwebtoken.js"
+    },
+    "testEnvironment": "node"
   }
 }

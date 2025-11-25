@@ -67,8 +67,14 @@ const SignupForm = () => {
       return;
     }
 
-    // success
-    navigate('/profile');
+    //success: check if email verification is required
+    if (result.requiresEmailVerification) {
+      navigate("/verify-email", { state: { username } });
+      return;
+    }
+
+    //fallback 
+    navigate("/login");
   };
 
   const handleKeyPress = (e) => {
