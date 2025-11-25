@@ -14,6 +14,8 @@ export default function Profile() {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const [deletePassword, setDeletePassword] = useState("");
+
 
   // Sync local state with auth context when authUser changes
   useEffect(() => {
@@ -106,6 +108,34 @@ export default function Profile() {
     }
   };
 
+  const deleteAccount = async () => {
+    if (!deletePassword) {
+      alert("Please enter your password to delete your account.");
+      return;
+    }
+  
+    const res = await fetch("http://localhost:3000/users/me", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ password: deletePassword }),
+    });
+  
+    const data = await res.json();
+  
+    if (!res.ok) {
+      alert(data.error || "Delete failed");
+      return;
+    }
+  
+    localStorage.removeItem("token");
+    alert("Account deleted.");
+    navigate("/");
+  };
+  
+
   const colors = { accent: "#2563eb", muted: "#9ca3af", success: "#10b981", teal: "#008080" };
   const btnBase = { padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600 };
 
@@ -195,6 +225,45 @@ export default function Profile() {
               <LogoutButton />
             </div>
           )}
+
+        <div style={{ marginTop: 24, padding: 16, background: "#220000", borderRadius: 8 }}>
+          <h3 style={{ color: "#ff6b6b", marginTop: 0 }}>Delete Account</h3>
+
+          <p style={{ color: "#ddd" }}>Enter your password to permanently delete your account.</p>
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            style={{
+              width: "100%",
+              marginBottom: 8,
+              padding: 8,
+              borderRadius: 6,
+              border: "1px solid #555",
+            }}
+          />
+
+          <button
+            onClick={deleteAccount}
+            disabled={!deletePassword}
+            style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "none",
+            background: deletePassword ? "#cc0000" : "#7a3b3b",
+            color: "white",
+            fontWeight: 600,
+            cursor: deletePassword ? "pointer" : "not-allowed",
+            width: "100%",
+            opacity: deletePassword ? 1 : 0.6,
+          }}
+          >
+            Delete My Account
+          </button>
+        </div>
+
 
           {editMode && (
             <div style={{ width: "100%", marginTop: 12 }}>
