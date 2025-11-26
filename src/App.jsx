@@ -9,6 +9,7 @@ import SignUpPg from "../Frontend/SignUpPg.jsx";
 import VerifyEmail from "../Frontend/VerifyEmail.jsx";
 import "./styles.css";
 import PageTransition from "../Frontend/PageTransition.jsx";
+import GamePage from "../Frontend/GamePage.jsx"
 import ReviewModel from "../Frontend/Review.jsx";
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="login" element={<PageTransition><SignInPg /></PageTransition>} />
         <Route path="signup" element={<PageTransition><SignUpPg /></PageTransition>} />
         <Route path="verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
+        <Route path="game/:id" element={<PageTransition><GamePage /></PageTransition>} />
       </Route>
     </Routes>
   );

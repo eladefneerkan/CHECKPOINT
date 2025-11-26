@@ -1,7 +1,9 @@
 import React from 'react'
+import {useNavigate} from 'react-router-dom'
 
 const GameComp = ({game, onAddToList}) =>{
 
+    const navigate = useNavigate();
     const imageUrl = game.getImageDisplay()
     //some games don't have genres, so use if/else to see if the games.genre exists
     let genreList = "N/A";
@@ -36,8 +38,16 @@ const GameComp = ({game, onAddToList}) =>{
         return m_str + ' ' + d + ', ' + yr
     }
 
+    const handleGameClick = () => {
+        navigate(`/game/${game.id}`, { state: { game } });
+    };
+
     return(
-        <div className="game-obj">
+        <div 
+            className="game-obj"
+            onClick={handleGameClick}
+            style={{ cursor: 'pointer' }}
+        >            
             <div className="game-obj-img-display">
                 <img src={imageUrl} alt={game.name} className="game-image" />
             </div>
@@ -61,7 +71,10 @@ const GameComp = ({game, onAddToList}) =>{
 
                 {onAddToList && (
                     <button
-                        onClick={() => onAddToList(game)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onAddToList(game);
+                        }}
                         style={{
                             marginTop: '10px',
                             padding: '8px 16px',
