@@ -122,7 +122,12 @@ router.get("/me", auth, async (req, res) => {
       return res.status(401).json({ error: "Invalid token payload" });
     }
 
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user.id)
+    .select("-password")
+    .populate("friends", "username profilePicture")
+    .populate("friendRequestsSent", "username profilePicture")
+    .populate("friendRequestsReceived", "username profilePicture");
+
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -337,6 +342,118 @@ router.post("/resend-verification", async (req, res) => {
   await sendEmail(user.email, "New verification code", `Code: ${newCode}`);
 
   return res.json({ message: "New verification code sent" });
+});
+
+
+router.post("/friends/request/:id", auth, async (req, res) => {
+  const myId = req.user.id;
+  const targetId = req.params.id;
+
+  if (myId === targetId) {
+    return res.status(400).json({ error: "You cannot friend yourself" });
+  }
+
+  const me = await User.findById(myId);
+  const target = await User.findById(targetId);
+
+  if (!target) return res.status(404).json({ error: "User not found" });
+
+  if (me.friends.includes(targetId)) {
+    return res.status(400).json({ error: "Already friends" });
+  }
+
+  if (me.friendRequestsSent.includes(targetId)) {
+    return res.status(400).json({ error: "Request already sent" });
+  }
+
+  me.friendRequestsSent.push(targetId);
+  target.friendRequestsReceived.push(myId);
+
+  await me.save();
+  await target.save();
+
+  res.json({ message: "Friend request sent" });
+});
+
+
+router.post("/friends/accept/:id", auth, async (req, res) => {
+  const myId = req.user.id;
+  const fromId = req.params.id;
+
+  const me = await User.findById(myId);
+  const from = await User.findById(fromId);
+
+  if (!from) return res.status(404).json({ error: "User not found" });
+
+  // Check if request exists
+  if (!me.friendRequestsReceived.includes(fromId)) {
+    return res.status(400).json({ error: "No request from this user" });
+  }
+
+  // Add as friends
+  me.friends.push(fromId);
+  from.friends.push(myId);
+
+  // Remove records from requests arrays
+  me.friendRequestsReceived = me.friendRequestsReceived.filter(id => id.toString() !== fromId);
+  from.friendRequestsSent = from.friendRequestsSent.filter(id => id.toString() !== myId);
+
+  await me.save();
+  await from.save();
+
+  res.json({ message: "Friend request accepted" });
+});
+
+
+router.post("/friends/reject/:id", auth, async (req, res) => {
+  const myId = req.user.id;
+  const fromId = req.params.id;
+
+  const me = await User.findById(myId);
+  const from = await User.findById(fromId);
+
+  if (!from) return res.status(404).json({ error: "User not found" });
+
+  me.friendRequestsReceived = me.friendRequestsReceived.filter(id => id.toString() !== fromId);
+  from.friendRequestsSent = from.friendRequestsSent.filter(id => id.toString() !== myId);
+
+  await me.save();
+  await from.save();
+
+  res.json({ message: "Friend request rejected" });
+});
+
+
+router.post("/friends/cancel/:id", auth, async (req, res) => {
+  const myId = req.user.id;
+  const targetId = req.params.id;
+
+  const me = await User.findById(myId);
+  const target = await User.findById(targetId);
+
+  me.friendRequestsSent = me.friendRequestsSent.filter(id => id.toString() !== targetId);
+  target.friendRequestsReceived = target.friendRequestsReceived.filter(id => id.toString() !== myId);
+
+  await me.save();
+  await target.save();
+
+  res.json({ message: "Friend request canceled" });
+});
+
+router.delete("/friends/remove/:id", auth, async (req, res) => {
+  const myId = req.user.id;
+  const friendId = req.params.id;
+
+  const me = await User.findById(myId);
+  const friend = await User.findById(friendId);
+
+  me.friends = me.friends.filter(id => id.toString() !== friendId);
+  friend.friends = friend.friends.filter(id => id.toString() !== myId);
+
+  await me.save();
+  await friend.save();
+
+  res.json({ message: "Friend removed" });
 });
 
 

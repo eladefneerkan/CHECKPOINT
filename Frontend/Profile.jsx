@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./Auth";
 import LogoutButton from "./LogoutButton";
 import GameListManager from "./GameListManager";
+import Friends from "./Friends";
+
 
 export default function Profile() {
   const { user: authUser, updateProfile, isLoading } = useAuth();
@@ -199,6 +201,20 @@ export default function Profile() {
         >
           Stats
         </button>
+        <button
+          onClick={() => setActiveTab("friends")}
+          style={{  
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "friends" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Friends
+        </button>
       </div>
 
       {activeTab !== "lists" && (
@@ -312,6 +328,11 @@ export default function Profile() {
           <GameListManager />
         </div>
       )}
+
+      {activeTab === "friends" && (
+        <Friends token={localStorage.getItem("token")} />
+      )}
+
     </div>
   );
 }
