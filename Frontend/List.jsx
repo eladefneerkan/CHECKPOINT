@@ -197,6 +197,7 @@ function SearchRender() {
   const [selectedGameForList, setSelectedGameForList] = useState(null)
   const [userLists, setUserLists] = useState([])
   const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
   const token = localStorage.getItem("token")
 
@@ -244,6 +245,8 @@ function SearchRender() {
         genres: game.genres,
       }
 
+      const goodLists = []
+      const duplicateLists = []
       // Add game to backend first
       for (const listId of selectedListIds) {
         const response = await fetch(`http://localhost:3000/gameLists/${listId}/games`, {
@@ -255,19 +258,29 @@ function SearchRender() {
           body: JSON.stringify({ gameId: game.id }),
         })
 
-        if (!response.ok) {
-          console.error("Error adding game to list")
+        const list = userLists.find(l => l._id === listId);
+
+        if (response.ok)
+          goodLists.push(list.title)
+        else {
+          const result = await response.json()
+          if (response.status === 400 && result.error?.includes("already")) {
+            duplicateLists.push(list.title)
+          } 
+          else {
+            console.error("Error adding game to list")
+          }
         }
       }
 
-      // Get the list name(s) for the success message
-      const listNames = userLists
-        .filter(list => selectedListIds.includes(list._id))
-        .map(list => list.title)
-        .join(", ")
-
-      setSuccessMessage(`Successfully added to ${listNames}`)
+      if (goodLists.length > 0) {
+      setSuccessMessage(`Successfully added "${game.name}" to ${goodLists.join(", ")}`)
       setTimeout(() => setSuccessMessage(""), 3000)
+      }
+      if (duplicateLists.length > 0) {
+        setErrorMessage(`"${game.name}" is already in ${duplicateLists.join(", ")}`)
+        setTimeout(() => setErrorMessage(""), 3000)
+      }
       setShowAddToListModal(false)
       setSelectedGameForList(null)
     } catch (err) {
@@ -319,6 +332,23 @@ function SearchRender() {
           {successMessage}
         </div>
       )}
+      
+      {errorMessage && (
+        <div
+          style={{
+          backgroundColor: "#dc3545",
+          color: "white",
+          padding: "10px",
+          borderRadius: "4px",
+          marginBottom: "20px",
+          textAlign: "center",
+          maxWidth: "650px",
+          margin: "0 auto 20px",
+        }}
+      >
+        {errorMessage}
+      </div>
+    )}
 
       <h1>Search</h1>
       <SearchBar onFinalSearch={handleFinalSearchRes}/> 
