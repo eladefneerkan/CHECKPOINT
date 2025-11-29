@@ -43,34 +43,6 @@ CHECKPOINT is a full-stack web application for discovering, searching, and manag
 **External APIs:**
 - RAWG Video Games Database API
 
-### Project Structure
-
-```
-CHECKPOINT/
-├── Frontend/          # React components
-│   ├── Auth.jsx       # Authentication context
-│   ├── Home.jsx       # Landing page
-│   ├── List.jsx       # Game search and list
-│   ├── Profile.jsx    # User profile
-│   ├── Login.jsx      # Authentication pages
-│   └── Review.jsx     # Game reviews
-├── Backend/           # Express API server
-│   ├── server.js      # Main server file
-│   ├── db.js          # MongoDB connection (with fallback)
-│   ├── gamedb.js      # RAWG API seeder script
-│   ├── models/        # Mongoose schemas
-│   ├── routes/        # API endpoints
-│   │   ├── search.js  # Game search API
-│   │   └── users.js   # User management
-│   └── middleware/    # Auth middleware
-├── src/               # Main app entry
-│   ├── App.jsx        # Root component with routing
-│   ├── Global.jsx     # Global layout/navbar
-│   └── main.jsx       # Vite entry point
-└── vite.config.js     # Vite config with proxy
-
-```
-
 ### Setup and Installation
 
 **Prerequisites:**
