@@ -245,8 +245,8 @@ function SearchRender() {
         genres: game.genres,
       }
 
-      const goodLists = []
-      const duplicateLists = []
+      const listsToUpdate = []
+      const listsWithDuplicates = []
       // Add game to backend first
       for (const listId of selectedListIds) {
         const response = await fetch(`http://localhost:3000/gameLists/${listId}/games`, {
@@ -261,11 +261,11 @@ function SearchRender() {
         const list = userLists.find(l => l._id === listId);
 
         if (response.ok)
-          goodLists.push(list.title)
+          listsToUpdate.push(list.title)
         else {
           const result = await response.json()
           if (response.status === 400 && result.error?.includes("already")) {
-            duplicateLists.push(list.title)
+            listsWithDuplicates.push(list.title)
           } 
           else {
             console.error("Error adding game to list")
@@ -273,12 +273,12 @@ function SearchRender() {
         }
       }
 
-      if (goodLists.length > 0) {
-      setSuccessMessage(`Successfully added "${game.name}" to ${goodLists.join(", ")}`)
+      if (listsToUpdate.length > 0) {
+      setSuccessMessage(`Successfully added "${game.name}" to ${listsToUpdate.join(", ")}`)
       setTimeout(() => setSuccessMessage(""), 3000)
       }
-      if (duplicateLists.length > 0) {
-        setErrorMessage(`"${game.name}" is already in ${duplicateLists.join(", ")}`)
+      if (listsWithDuplicates.length > 0) {
+        setErrorMessage(`"${game.name}" is already in ${listsWithDuplicates.join(", ")}`)
         setTimeout(() => setErrorMessage(""), 3000)
       }
       setShowAddToListModal(false)
