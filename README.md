@@ -15,18 +15,16 @@ CHECKPOINT is a full-stack web application for discovering, searching, and manag
 ### Features
 
 - **Game Search**: Real-time search functionality with autocomplete dropdown
-  - Single-letter search shows all games starting with that letter (up to 100 results)
-  - Multi-character search shows substring matches (up to 10 results)
-  - Debounced requests (300ms) to reduce API calls
+  - Single-letter search shows all games starting with that letter
+  - Multi-character search shows substring matches
 - **Game Database**: Powered by RAWG
   - Concurrent batch fetching for fast database population
-  - Automatic retry logic with exponential backoff
   - Follows pagination links to fetch comprehensive game data
 - **User Authentication**: JWT-based authentication system
 - **User Profiles**: Personalized user accounts and game lists
 - **Reviews**: Users can write and share game reviews
 
-### Project tech
+### Bulit with
 
 **Frontend:**
 - React with Vite

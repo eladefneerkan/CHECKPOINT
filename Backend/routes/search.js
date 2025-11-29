@@ -5,20 +5,31 @@ const Game = require("../models/Games");
 router.get("/Games", async (req, res) => {
 
     const query = req.query.q || "";
+    const genres = req.query.genres || "";
 
-    if (!query.trim()) return res.json([]);
+    // If no query and no genres, return empty
+    if (!query.trim() && !genres.trim()) return res.json([]);
 
     try {
+        let searchCriteria = {};
     
-        // return games that start with that letter and increase the result limit.
-        const isSingleChar = query.length === 1;
-        const regex = isSingleChar
-            ? new RegExp(`^${query}`, "i")
-            : new RegExp(query, "i");
-        const limit = isSingleChar ? 100 : 10;
+        // Handle name search
+        if (query.trim()) {
+            const isSingleChar = query.length === 1;
+            const regex = isSingleChar
+                ? new RegExp(`^${query}`, "i")
+                : new RegExp(query, "i");
+            searchCriteria.name = regex;
+        }
+
+        // Handle genre filter
+        if (genres.trim()) {
+            const genreList = genres.split(',').map(g => g.trim());
+            searchCriteria['genres.name'] = { $all: genreList };
+        }
 
         const results = await Game.find(
-            { name: regex },
+            searchCriteria,
             { 
                 id: 1, 
                 name: 1, 
@@ -28,9 +39,8 @@ router.get("/Games", async (req, res) => {
                 description: 1, 
                 background_image: 1, 
                 genres: 1 
-            } // before: only returns name and id fields
-            // now: returns all fields so that it will show up on search
-        ).limit(limit);
+            }
+        );
 
     res.json(results);
     }catch (error) {

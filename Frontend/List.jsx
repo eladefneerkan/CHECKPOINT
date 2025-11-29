@@ -4,15 +4,23 @@ import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
 
 
-const fetchGamesByQuery = async (query) => {
+const fetchGamesByQuery = async (query, genres = []) => {
     try {
-        const response = await fetch(`/search/Games?q=${encodeURIComponent(query)}`)
-        if (!response.ok) return []
-         const data = await response.json()
-        
-        console.log("RAW API DATA:", JSON.stringify(data, null, 2))
-
+        // Build URL with query and genres
+        let url = '/search/Games?';
+        const params = new URLSearchParams();
         
+        if (query) params.append('q', query);
+        if (genres.length > 0) params.append('genres', genres.join(','));
+        
+        url += params.toString();
+        
+        const response = await fetch(url);
+        if (!response.ok) return [];
+        const data = await response.json();
+        
+        console.log("RAW API DATA:", JSON.stringify(data, null, 2));
+
         const hydratedData = data.map(rawGame => {
             return new GameObj(
                 rawGame.id, 
@@ -34,7 +42,7 @@ const fetchGamesByQuery = async (query) => {
     }
 }
 
-function SearchBar({ onFinalSearch }) {
+function SearchBar({ onFinalSearch, selectedGenres }) {
   const [userSearch, setUserSearch] = useState('')
   const [matchedResults, setMatchedResults] = useState([])
   const [timeoutId, setTimeoutId] = useState(null)
@@ -44,7 +52,6 @@ function SearchBar({ onFinalSearch }) {
     setUserSearch(currInput);
   };
 
-  // Debounce fetch: wait 300ms after typing stops
   useEffect(() => {
     const query = userSearch.trim()
 
@@ -60,7 +67,14 @@ function SearchBar({ onFinalSearch }) {
         const qParam = query.length === 1 && /^[a-z]$/i.test(query)
           ? `^${query}`
           : query;
-        const response = await fetch(`/search/Games?q=${encodeURIComponent(qParam)}`);
+        
+        // Build URL with query and genres if any are selected
+        let url = `/search/Games?q=${encodeURIComponent(qParam)}`;
+        if (selectedGenres.length > 0) {
+          url += `&genres=${selectedGenres.join(',')}`;
+        }
+        
+        const response = await fetch(url);
         if (!response.ok) {
           console.error('Search request failed:', response.status);
           return;
@@ -83,7 +97,7 @@ function SearchBar({ onFinalSearch }) {
 
     setTimeoutId(handler)
     return () => clearTimeout(handler);
-  }, [userSearch]);
+  }, [userSearch, selectedGenres]);
 
 
   const handleSearchRes = (query = userSearch) => {
@@ -192,25 +206,57 @@ function SearchBar({ onFinalSearch }) {
 
 function SearchRender() {
   const [finalSearchRes, setFinalSearchRes] = useState([])
+  const [filteredResults, setFilteredResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [showAddToListModal, setShowAddToListModal] = useState(false)
   const [selectedGameForList, setSelectedGameForList] = useState(null)
   const [userLists, setUserLists] = useState([])
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
+  const [selectedGenres, setSelectedGenres] = useState([])
 
   const token = localStorage.getItem("token")
 
+  // Common genres for filtering
+  const availableGenres = [
+    "Action", "Adventure", "RPG", "Strategy", "Shooter", 
+    "Puzzle", "Simulation", "Sports", "Racing", "Platformer",
+    "Fighting", "Indie", "Casual", "Arcade", "Massively Multiplayer"
+  ]
+
   const handleFinalSearchRes = async (query) => {
-        if (!query) {
+        // Allow search with just genres or just query or both
+        if (!query && selectedGenres.length === 0) {
             setFinalSearchRes([]);
+            setFilteredResults([]);
             return;
         }
         setIsLoading(true);
-        const results = await fetchGamesByQuery(query);
+        const results = await fetchGamesByQuery(query, selectedGenres);
         setFinalSearchRes(results);
+        setFilteredResults(results);
         setIsLoading(false);
     }
+
+  // When genres change, automatically trigger new search if there are already results
+  useEffect(() => {
+    if (finalSearchRes.length > 0) {
+      const currentQuery = document.querySelector('input[type="search"]')?.value || '';
+      handleFinalSearchRes(currentQuery);
+    }
+  }, [selectedGenres])
+
+  const handleGenreToggle = (genre) => {
+    setSelectedGenres(prev => 
+      prev.includes(genre)
+        ? prev.filter(g => g !== genre)
+        : [...prev, genre]
+    )
+  }
+
+  const handleClearGenres = () => {
+    setSelectedGenres([])
+  }
 
   const fetchUserLists = async () => {
     try {
@@ -351,24 +397,126 @@ function SearchRender() {
     )}
 
       <h1>Search</h1>
-      <SearchBar onFinalSearch={handleFinalSearchRes}/> 
-      <hr style={{ width: '650px', margin: '30px auto' }} />
+      <SearchBar onFinalSearch={handleFinalSearchRes} selectedGenres={selectedGenres}/> 
 
-      <h2>Number of Games Matched: ({finalSearchRes.length})</h2>
+      <div style={{
+        width: '650px',
+        margin: '20px auto',
+        padding: '15px',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        backgroundColor: '#f8f9fa'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '10px'
+        }}>
+          <h3 style={{ margin: 0 }}>Filter by Genre</h3>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {selectedGenres.length > 0 && (
+              <>
+                <button
+                  onClick={() => handleFinalSearchRes('')}
+                  style={{
+                    padding: '5px 15px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Search by Genre
+                </button>
+                <button
+                  onClick={handleClearGenres}
+                  style={{
+                    padding: '5px 10px',
+                    backgroundColor: '#6c757d',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  Clear All
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px'
+          }}>
+            {availableGenres.map(genre => (
+              <label
+                key={genre}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '6px 12px',
+                  backgroundColor: selectedGenres.includes(genre) ? '#007bff' : 'white',
+                  color: selectedGenres.includes(genre) ? 'white' : '#333',
+                  border: '1px solid #ccc',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  userSelect: 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedGenres.includes(genre)}
+                  onChange={() => handleGenreToggle(genre)}
+                  style={{ marginRight: '6px' }}
+                />
+                {genre}
+              </label>
+            ))}
+          </div>
+        {selectedGenres.length > 0 && (
+          <p style={{ 
+            marginTop: '10px', 
+            marginBottom: '0',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            Active filters: <strong>{selectedGenres.join(', ')}</strong>
+          </p>
+        )}
+      </div>
+
+      <hr style={{ width: '650px', margin: '20px auto' }} />
+
+      {finalSearchRes.length > 0 && (
+        <h2>Number of Games Matched: ({filteredResults.length})</h2>
+      )}
       {isLoading && <p>Loading games...</p>}
       
-      {!isLoading && finalSearchRes.length === 0 && (
+      {!isLoading && filteredResults.length === 0 && finalSearchRes.length === 0 && (
           <p>No games found. Try searching above!</p>
       )}
 
-      {!isLoading && finalSearchRes.length > 0 && (
+      {!isLoading && filteredResults.length === 0 && finalSearchRes.length > 0 && (
+          <p>No games match the selected genres. Try different filters!</p>
+      )}
+
+      {!isLoading && filteredResults.length > 0 && (
           <div style={{
               display: 'flex',
               flexDirection: 'column', 
               gap: '15px', 
               width: '650px', 
               margin: '20px auto'}}>
-              {finalSearchRes.map((game, index) => ( 
+              {filteredResults.map((game, index) => ( 
                 <GameComp 
                   key={game.id || game.slug || index} 
                   game={game}
