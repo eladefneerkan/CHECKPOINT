@@ -1,6 +1,6 @@
 import grassBg from "../assets/grass_bg.avif";
 import {useNavigate} from 'react-router-dom';
-
+import Flag from '../assets/Flag.png';
 function PotionBackground() {
   const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
@@ -63,6 +63,17 @@ export default function Home() {
         <p style={{ fontSize: "1.5rem" }}>
           Track, share, and discover your <i>new</i> favorite games
         </p>
+        <h2 className='section-heading'>Rising games...</h2>
+        <ul class="poster-list -p70 -grid">
+          <li class="posteritem"> <img src={Flag} class="posterimg"/></li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+        </ul>
        {/*<button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
         <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>    */   } 
       </div>
