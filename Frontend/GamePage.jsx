@@ -15,6 +15,8 @@ const GamePage = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [editingReviewId, setEditingReviewId] = useState(null);
   const [editText, setEditText] = useState('');
+  const [editRating, setEditRating] = useState(0);
+  const [editHoverRating, setEditHoverRating] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showMenu, setShowMenu] = useState(null);
   const [error, setError] = useState('');
@@ -233,13 +235,14 @@ const GamePage = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ reviewText: editText })
+        body: JSON.stringify({ reviewText: editText, rating: editRating })
       });
 
       if (response.ok) {
         setSuccess('Review updated!');
         setEditingReviewId(null);
         setEditText('');
+        setEditRating(0);
         fetchReviews();
         setTimeout(() => setSuccess(''), 3000);
       } else {
@@ -512,6 +515,7 @@ const GamePage = () => {
                           <button onClick={() => {
                             setEditingReviewId(review._id);
                             setEditText(review.reviewText);
+                            setEditRating(review.rating);
                             setShowMenu(null);
                           }}>
                             Edit
@@ -537,6 +541,13 @@ const GamePage = () => {
                 {/* Review Text */}
                 {editingReviewId === review._id ? (
                   <div className="edit-review-form">
+                    <div className="rating-input">
+                      <label>Update Rating:</label>
+                      <div className="star-rating-input">
+                        {renderStars(editRating, true, setEditRating, setEditHoverRating)}
+                        {editRating > 0 && <span className="rating-label">{editRating}/5</span>}
+                      </div>
+                    </div>
                     <textarea
                       className="review-text-input"
                       value={editText}
@@ -555,6 +566,7 @@ const GamePage = () => {
                         onClick={() => {
                           setEditingReviewId(null);
                           setEditText('');
+                          setEditRating(0);
                         }}
                       >
                         Cancel
@@ -570,6 +582,8 @@ const GamePage = () => {
                   <button 
                     className={`vote-btn upvote ${currentUser && review.upvotedBy?.includes(currentUser.id) ? 'active' : ''}`}
                     onClick={() => handleVote(review._id, 'upvote')}
+                    disabled={currentUser && currentUser.id === review.user._id}
+                    style={{ opacity: currentUser && currentUser.id === review.user._id ? 0.5 : 1, cursor: currentUser && currentUser.id === review.user._id ? 'not-allowed' : 'pointer' }}
                   >
                     ▲
                   </button>
@@ -577,6 +591,8 @@ const GamePage = () => {
                   <button 
                     className={`vote-btn downvote ${currentUser && review.downvotedBy?.includes(currentUser.id) ? 'active' : ''}`}
                     onClick={() => handleVote(review._id, 'downvote')}
+                    disabled={currentUser && currentUser.id === review.user._id}
+                    style={{ opacity: currentUser && currentUser.id === review.user._id ? 0.5 : 1, cursor: currentUser && currentUser.id === review.user._id ? 'not-allowed' : 'pointer' }}
                   >
                     ▼
                   </button>
