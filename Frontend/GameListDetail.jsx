@@ -180,7 +180,7 @@ export default function GameListDetail({ listId, onBack }) {
 
   const gameObjects = list.games.map((game) => {
     return new GameObj(
-      game._id,
+      game.id,
       game.name,
       game.slug,
       game.released,
