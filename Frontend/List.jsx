@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GameComp from './GameObj.jsx'
 import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
-
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const fetchGames = async (query = '', genres = [], minRating = '', maxRating = '', sortOption = '') => {
     try {
@@ -45,20 +45,30 @@ const fetchGames = async (query = '', genres = [], minRating = '', maxRating = '
     }
 }
 
-function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
+function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initialQuery }) {
   const [userSearch, setUserSearch] = useState('')
   const [matchedResults, setMatchedResults] = useState([])
   const [timeoutId, setTimeoutId] = useState(null)
+  const [dropdownVisible, setDropdownVisible] = useState(false)
 
   const handleInputChange = (event) => {
     const currInput = event.target.value;
     setUserSearch(currInput);
+    if (currInput.length > 0) {
+    setDropdownVisible(true);
+    } else {
+    setDropdownVisible(false);
+    }
   };
 
   useEffect(() => {
       setMatchedResults([]);
   }, [clearDropdownTrigger]);
 
+
+  useEffect(() => {
+      setUserSearch(initialQuery || '');
+  }, [initialQuery])
 
   useEffect(() => {
     const query = userSearch.trim()
@@ -111,12 +121,12 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
   const handleSearchRes = (query = userSearch) => {
     if (timeoutId) clearTimeout(timeoutId)
     onFinalSearch(query.trim())
-    setMatchedResults([])
+    setDropdownVisible(false)
   }
   const handleGameSelect = (gameName) => {
     if (timeoutId) clearTimeout(timeoutId)
     setUserSearch(gameName)
-    setMatchedResults([])
+    setDropdownVisible(false)
     handleSearchRes(gameName)
   }
 
@@ -172,7 +182,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
             }}>
             Search
         </button>
-        {matchedResults.length > 0 && (
+        {matchedResults.length > 0 && dropdownVisible && (
           <div style={{
             position: 'absolute', 
             top: '100%',
@@ -213,6 +223,9 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
 }
 
 function SearchRender() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [finalSearchRes, setFinalSearchRes] = useState([])
   const [filteredResults, setFilteredResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -221,10 +234,20 @@ function SearchRender() {
   const [userLists, setUserLists] = useState([])
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
-  const [selectedGenres, setSelectedGenres] = useState([])
-  const [minRating, setMinRating] = useState("")
-  const [maxRating, setMaxRating] = useState("")
-  const [sortOption, setSortOption] = useState("")
+
+  const urlParams = new URLSearchParams(location.search)
+
+  const initialQuery = urlParams.get('q') || ''
+  const initialGenres = urlParams.get('genres')?.split(',') || []
+  const initialMinRating = urlParams.get('minRating') || ''
+  const initialMaxRating = urlParams.get('maxRating') || ''
+  const initialSortOption = urlParams.get('sortOption') || ''
+  
+  const [currentQuery, setCurrentQuery] = useState(initialQuery)
+  const [selectedGenres, setSelectedGenres] = useState(initialGenres)
+  const [minRating, setMinRating] = useState(initialMinRating)
+  const [maxRating, setMaxRating] = useState(initialMaxRating)
+  const [sortOption, setSortOption] = useState(initialSortOption)
   const [clearSearchbarDropdown, setClearSearchbarDropdown] = useState(0)
 
   const token = localStorage.getItem("token")
@@ -260,27 +283,42 @@ if (!option || results.length === 0) return results;
     "Fighting", "Indie", "Casual", "Arcade", "Massively Multiplayer"
   ]
 
-  const handleFinalSearchRes = async (query) => {
-        // Allow search with just genres or just query or both
-        if (!query && selectedGenres.length === 0) {
-            setFinalSearchRes([]);
-            return;
-        }
-        setIsLoading(true);
-        const results = await fetchGames(query, selectedGenres, minRating, maxRating, "");
-        setFinalSearchRes(results);
-        setIsLoading(false);
-    }
-  
+  const handleFinalSearchRes = useCallback(async (query = currentQuery, genres = selectedGenres, minR = minRating, maxR = maxRating, sortO = sortOption) => {
+    setIsLoading(true);
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (genres.length > 0) params.append('genres', genres.join(','));
+    if (minR) params.append('minRating', minR);
+    if (maxR) params.append('maxRating', maxR);
+    if (sortO) params.append('sortOption', sortO);
+    
+    navigate({ search: params.toString() }, { replace: true });
+    
+    setCurrentQuery(query);
+    setSelectedGenres(genres);
+    setMinRating(minR);
+    setMaxRating(maxR);
+    setSortOption(sortO);
+
+    const results = await fetchGames(query, genres, minR, maxR, sortO);
+    setFinalSearchRes(results);
+    setFilteredResults(sortResults(results, sortO)); 
+    setIsLoading(false);
+    setClearSearchbarDropdown(prev => prev + 1); 
+  }, [navigate]);
+
     useEffect(() => {
-    if (finalSearchRes.length > 0) {
-      const sorted = sortResults(finalSearchRes, sortOption);
-      setFilteredResults(sorted);
-    } else {
-      setFilteredResults([]);
+    const urlParams = new URLSearchParams(location.search);
+    const query = urlParams.get('q');
+    const genres = urlParams.get('genres')?.split(',') || [];
+    const minR = urlParams.get('minRating') || '';
+    const maxR = urlParams.get('maxRating') || '';
+    const sortO = urlParams.get('sortOption') || '';
+    
+    if (query && finalSearchRes.length === 0) { 
+        handleFinalSearchRes(query, genres, minR, maxR, sortO);
     }
-  }, [sortOption, finalSearchRes]);
-  // When genres or other filters change, automatically trigger new search if there are already results
+  }, [location.search, handleFinalSearchRes, finalSearchRes.length]);
 
   const handleGenreToggle = (genre) => {
     setSelectedGenres(prev => 
@@ -452,6 +490,7 @@ if (!option || results.length === 0) return results;
   const filterSelected = selectedGenres.length > 0 || minRating || maxRating || sortOption
 
   return (
+  <section  style={{backgroundImage: "linear-gradient(to top, #003632ff, #000000ff)"}}>
   <div 
     className="SearchRender"
     style={{
@@ -462,7 +501,7 @@ if (!option || results.length === 0) return results;
     }}>
     <div style={{ flex: 1 }}>
       <h1>Search</h1>
-      <SearchBar onFinalSearch={handleFinalSearchRes} selectedGenres={selectedGenres} clearDropdownTrigger={clearSearchbarDropdown} />
+      <SearchBar onFinalSearch={handleFinalSearchRes} initialQuery={currentQuery} selectedGenres={selectedGenres} clearDropdownTrigger={clearSearchbarDropdown} />
 
       {successMessage && (
         <div style={{
@@ -605,9 +644,14 @@ if (!option || results.length === 0) return results;
       <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
         <button
           onClick={() => {
-            const currentQuery = document.querySelector('input[type="search"]')?.value || '';
-            handleFinalSearchRes(currentQuery);
-            setClearSearchbarDropdown(prev => prev + 1);
+          const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
+          handleFinalSearchRes(
+          queryFromInput, 
+          selectedGenres, 
+          minRating, 
+          maxRating, 
+          sortOption);
+          setClearSearchbarDropdown(prev => prev + 1);
           }}
           style={{
             padding: "6px 10px",
@@ -653,6 +697,7 @@ if (!option || results.length === 0) return results;
     )}
 
   </div>
+  </section>
   );
 }
 

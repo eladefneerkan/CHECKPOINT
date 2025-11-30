@@ -116,7 +116,7 @@ export default function GameListManager() {
       {successMessage && (
         <div
           style={{
-            backgroundColor: "#28a745",
+            backgroundColor: "#10b981",
             color: "white",
             padding: "10px",
             borderRadius: "4px",
@@ -183,7 +183,7 @@ export default function GameListManager() {
               onClick={handleCreateList}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#28a745",
+                backgroundColor: "#10b981",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
@@ -199,7 +199,7 @@ export default function GameListManager() {
               }}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#6c757d",
+                backgroundColor: "#e52f3eff",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",

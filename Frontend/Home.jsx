@@ -1,9 +1,32 @@
 import grassBg from "../assets/grass_bg.avif";
 import {useNavigate} from 'react-router-dom';
+import Flag from '../assets/Flag.png';
+function PotionBackground() {
+  const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
+  return (
+    <div className="potion-background">
+      {bubbles.map((_, i) => (
+        <div
+
+          key={i}
+          className="bubble"
+          style={{
+            left: `${Math.random() * 100}%`,
+            width: `${bubbles[i]}px`,
+            height: `${bubbles[i]}px`,
+            animationDuration: `${10 + Math.random() *15}s`,
+            animationDelay: `${Math.random() * 3}s`,
+          }}
+        ></div>
+      ))}
+    </div>
+  );
+}
 export default function Home() {
   const navButtonToPage = useNavigate()
   return (
+    
     <section
       className="fade-in"
       style={{
@@ -21,6 +44,7 @@ export default function Home() {
         width: "100vw"
       }}
     >
+      <PotionBackground />
       <div
         style={{
           position: "absolute",
@@ -39,8 +63,19 @@ export default function Home() {
         <p style={{ fontSize: "1.5rem" }}>
           Track, share, and discover your <i>new</i> favorite games
         </p>
-        <button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
-        <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>        
+        <h2 className='section-heading'>Rising games...</h2>
+        <ul class="poster-list -p70 -grid">
+          <li class="posteritem"> <img src={Flag} class="posterimg"/></li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+          <li class="posteritem">AAA</li>
+        </ul>
+       {/*<button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
+        <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>    */   } 
       </div>
     </section>
   );

@@ -336,18 +336,21 @@ const GamePage = () => {
   const currentUser = getCurrentUser();
 
   return (
+    <section  style={{backgroundImage: "linear-gradient(to top, #430000ff, #000000ff)"}}>
     <div id="gamePage" className="fade-in" style={{ 
       
       padding: '0px',
       maxWidth: '800px',
       margin: '0 auto',
       minHeight: '100vh',
-      backgroundColor: '#1a1a1a',
+
+      backgroundImage: "linear-gradient(to top, #430000ff, #000000ff)",
       color: 'white'
     }}>
       <button
         onClick={() => navigate(-1)}
         style={{
+          opacity: '1',
           padding: '10px 20px',
           backgroundColor: '#6c757d',
           color: 'white',
@@ -366,7 +369,7 @@ const GamePage = () => {
         backgroundColor: 'rgba(30, 30, 30, 0.9)',
         borderRadius: '12px',
         padding: '30px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)', //turn these red for a fun time
         border: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         <div style={{
@@ -634,6 +637,7 @@ const GamePage = () => {
         </div>
       </div>
     </div>
+  </section>
   );
 };
 

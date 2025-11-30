@@ -1,6 +1,11 @@
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
+function RatingFlag(rating) {
+  const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
+  // convert 0-5 rating → 0-120 hue (red → yellow → green)`hsl(${hue}, 100%, 45%)`
+  const hue = clamp((rating / 5) * 120, 0, 120);}
+  
 const GameComp = ({game, onAddToList}) =>{
 
     const navigate = useNavigate();
@@ -78,7 +83,7 @@ const GameComp = ({game, onAddToList}) =>{
                         style={{
                             marginTop: '10px',
                             padding: '8px 16px',
-                            backgroundColor: '#28a745',
+                            backgroundColor: "#10b981",
                             color: 'white',
                             border: 'none',
                             borderRadius: '4px',

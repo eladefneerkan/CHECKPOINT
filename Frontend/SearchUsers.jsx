@@ -56,6 +56,7 @@ export default function SearchUsers() {
   };
 
   return (
+    <section  style={{backgroundImage: "linear-gradient(to top, #000000ff, #003632ff)"}}>
     <div style={{ color: "white", padding: "2rem" }}>
       <h1>User Search</h1>
 
@@ -229,5 +230,6 @@ export default function SearchUsers() {
         })}
       </div>
     </div>
+  </section>
   );
 }
