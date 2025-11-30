@@ -343,6 +343,11 @@ if (!option || results.length === 0) return results;
 
   const handleAddGameToLists = async (selectedListIds, game) => {
     try {
+      if (!token) {
+        alert("Please log in to add games to lists!");
+        return;
+      }
+
       const gameToAdd = {
         _id: game.id,
         name: game.name,
@@ -356,6 +361,7 @@ if (!option || results.length === 0) return results;
 
       const listsToUpdate = []
       const listsWithDuplicates = []
+      const authErrors = []
       // Add game to backend first
       for (const listId of selectedListIds) {
         const response = await fetch(`http://localhost:3000/gameLists/${listId}/games`, {
@@ -373,7 +379,9 @@ if (!option || results.length === 0) return results;
           listsToUpdate.push(list.title)
         else {
           const result = await response.json()
-          if (response.status === 400 && result.error?.includes("already")) {
+          if (response.status === 401 || response.status === 403) {
+            authErrors.push(list.title)
+          } else if (response.status === 400 && result.error?.includes("already")) {
             listsWithDuplicates.push(list.title)
           } 
           else {
@@ -382,6 +390,9 @@ if (!option || results.length === 0) return results;
         }
       }
 
+      if (authErrors.length > 0) {
+        alert("Please log in to add games to lists!");
+      }
       if (listsToUpdate.length > 0) {
       setSuccessMessage(`Successfully added "${game.name}" to ${listsToUpdate.join(", ")}`)
       setTimeout(() => setSuccessMessage(""), 3000)
@@ -400,6 +411,11 @@ if (!option || results.length === 0) return results;
 
   const handleCreateNewList = async (title) => {
     try {
+      if (!token) {
+        alert("Please log in to create lists!");
+        return null;
+      }
+
       const response = await fetch("http://localhost:3000/gameLists", {
         method: "POST",
         headers: {
@@ -411,6 +427,16 @@ if (!option || results.length === 0) return results;
           description: "",
         }),
       })
+
+      if (!response.ok) {
+        const result = await response.json();
+        if (response.status === 401 || response.status === 403) {
+          alert("Please log in to create lists!");
+        } else {
+          alert(result.error || "Failed to create list");
+        }
+        return null;
+      }
 
       const result = await response.json()
       const newList = result.list
