@@ -145,17 +145,7 @@ export default function Profile() {
     <div style={{ color: "white", maxWidth: 720, margin: "32px auto", padding: 16 }}>
       {/* Nav */}
       <div
-        style={{
-          display: "flex",
-          gap: 12,
-          marginBottom: 18,
-          padding: 8,
-          background: "#008080",
-          borderRadius: 12,
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
-        }}
+        className="potion-box"
       >
         <button
           onClick={() => setActiveTab("lists")}

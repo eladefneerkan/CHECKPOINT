@@ -10,7 +10,7 @@ export default function GlobalUI() {
     <div>
       <header
         style={{
-          background: "linear-gradient(90deg,#0f1724,#071126)",
+          background: "linear-gradient(90deg,#071126,#023d40)",
           color: "white",
           padding: "1rem",
           display: "flex",
