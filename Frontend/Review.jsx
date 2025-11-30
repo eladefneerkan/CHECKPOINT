@@ -3,19 +3,7 @@
 import React from 'react'
 import ReviewClass from '../Backend/Review.js'
 
-function displayStars(star){
-        var count = "";
-        while (star > 0.5){
-            
-            count = count.concat("☀️");
-            star = star -1;
-        }
-        if (star > 0){
-            count = count.concat("🔅");
-        }
-        return(count);
-        
-    }
+
 export default function ReviewModel() {
     
     //mock review list
@@ -44,7 +32,7 @@ export default function ReviewModel() {
             <h2 style={{ color: 'white'}}>This is the Review page</h2>
             <> {myReviews.map((item) => (
                 <div >
-                    <p className="review">Review ID: {item.ID} Stars: {displayStars(item.rating)}</p>
+                    <p className="review">Review ID: {item.ID} Stars: {item.displayStars(item.rating)}</p>
                     <>
                         <img 
                         src={item.displayGameImage()} 
