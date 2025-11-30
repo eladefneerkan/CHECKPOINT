@@ -336,7 +336,7 @@ const GamePage = () => {
   const currentUser = getCurrentUser();
 
   return (
-    <section  style={{backgroundImage: "linear-gradient(to top, #430000ff, #000000ff)"}}>
+    <section  style={{backgroundImage: "linear-gradient(to bottom, #430000ff, #000000ff)"}}>
     <div id="gamePage" className="fade-in" style={{ 
       
       padding: '0px',
@@ -344,7 +344,6 @@ const GamePage = () => {
       margin: '0 auto',
       minHeight: '100vh',
 
-      backgroundImage: "linear-gradient(to top, #430000ff, #000000ff)",
       color: 'white'
     }}>
       <button
