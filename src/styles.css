@@ -221,41 +221,461 @@ section {
   margin-top: 12px;
 }
 
-.btn-secondary:hover { background: rgba(255,255,255,0.05); }.review{
-  background-color: darkslateblue;
-  color: cyan;
-  width: 80%;
-  
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+/* Reviews Section */
+.reviews-section {
+  margin-top: 40px;
+  background: linear-gradient(135deg, rgba(106, 90, 205, 0.15), rgba(147, 112, 219, 0.1));
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(147, 112, 219, 0.3);
 }
-.review-game-image{
-  vertical-align: bottom;
+
+.reviews-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+  padding-bottom: 20px;
+}
+
+.reviews-header h2 {
+  color: #00ffff;
+  font-size: 2rem;
+  margin: 0 0 15px 0;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.average-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  color: #e0e0e0;
+}
+
+.average-rating .star {
+  font-size: 1.3rem;
+}
+
+.rating-number {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.review-count {
+  color: #b19cd9;
+  font-style: italic;
+}
+
+/* Submit Review Form */
+.submit-review-form {
+  background: rgba(72, 61, 139, 0.3);
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.submit-review-form h3 {
+  color: #00ffff;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.error-message {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+.success-message {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.rating-input {
+  margin-bottom: 20px;
+}
+
+.rating-input label {
+  display: block;
+  color: #b19cd9;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.star-rating-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.star {
+  font-size: 1.8rem;
+  transition: transform 0.2s;
+}
+
+.star-interactive {
+  cursor: pointer;
+}
+
+.star-interactive:hover {
+  transform: scale(1.2);
+}
+
+.rating-label {
+  margin-left: 10px;
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.review-text-input {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  background-color: rgba(30, 30, 30, 0.8);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.review-text-input:focus {
+  outline: none;
+  border-color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.char-count {
+  text-align: right;
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.submit-review-btn {
+  background: linear-gradient(135deg, #483d8b, #6a5acd);
+  color: #00ffff;
+  border: 2px solid #00ffff;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.submit-review-btn:hover {
+  background: linear-gradient(135deg, #6a5acd, #9370db);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Reviews List */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.no-reviews {
   text-align: center;
-  float: left;
-  background-color: darkslateblue;
-  height: 50px;
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
+  color: #b19cd9;
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 40px;
 }
-.stars{
+
+.review-card {
+  background: rgba(72, 61, 139, 0.25);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 205, 0.3);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.review-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.review-username {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.review-date {
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.review-menu {
+  position: relative;
+}
+
+.menu-dots {
+  background: none;
+  border: none;
+  color: #b19cd9;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: color 0.2s;
+}
+
+.menu-dots:hover {
+  color: #00ffff;
+}
+
+.menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  min-width: 120px;
+}
+
+.menu-dropdown button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #e0e0e0;
+  padding: 10px 15px;
   text-align: left;
-  text-align: top;
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-.reviewTxt{
-  min-height: 52px;
-  background-color: darkslateblue;
-  color: cyan;
-  width: 80%;
-  padding: 0px;
-  margin: 0px;
-  border: 0px;
+
+.menu-dropdown button:hover {
+  background: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
 }
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.review-rating .star {
+  font-size: 1.2rem;
+}
+
+.review-text {
+  color: #e0e0e0;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Edit Review Form */
+.edit-review-form {
+  margin-bottom: 15px;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #483d8b, #6a5acd);
+  color: #00ffff;
+  border: 1px solid #00ffff;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.save-btn:hover {
+  background: linear-gradient(135deg, #6a5acd, #9370db);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Vote Buttons */
+.review-votes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vote-btn {
+  background: rgba(72, 61, 139, 0.4);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #b19cd9;
+  width: 35px;
+  height: 35px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vote-btn:hover {
+  background: rgba(106, 90, 205, 0.6);
+  border-color: #00ffff;
+  transform: scale(1.1);
+}
+
+.vote-btn.upvote.active {
+  background: rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+  border-color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.vote-btn.downvote.active {
+  background: rgba(255, 99, 132, 0.3);
+  color: #ff6384;
+  border-color: #ff6384;
+  box-shadow: 0 0 10px rgba(255, 99, 132, 0.5);
+}
+
+.vote-score {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 1.2rem;
+  min-width: 35px;
+  text-align: center;
+}
+
+/* Delete Modal */
+.delete-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-modal-content {
+  background: linear-gradient(135deg, rgba(72, 61, 139, 0.95), rgba(106, 90, 205, 0.95));
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.delete-modal-content p {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.confirm-delete-btn {
+  background: linear-gradient(135deg, #dc143c, #ff6347);
+  color: #ffffff;
+  border: 2px solid #ff6b6b;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.confirm-delete-btn:hover {
+  background: linear-gradient(135deg, #ff6347, #ff7f7f);
+  box-shadow: 0 0 15px rgba(255, 99, 71, 0.6);
+  transform: scale(1.05);
+}
+
+.cancel-delete-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.cancel-delete-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #00ffff;
+}
+
 .no-flex {
   flex-grow: 0;
   flex-shrink: 0;
@@ -263,17 +683,6 @@ section {
 
 #gamelist {
   color: white;
-}
-#reviewsOnGame {
-
-  margin: 50px;
-  border-radius: 10px;
-
-
-  min-height: 100px;
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
-  background-color: plum;
-  color: rgb(195, 0, 0);
 }
 
 /* #gamePage {
