@@ -5,6 +5,7 @@ import { useAuth } from "./Auth";
 import LogoutButton from "./LogoutButton";
 import GameListManager from "./GameListManager";
 import Friends from "./Friends";
+import UserReviews from "./UserReviews";
 
 
 export default function Profile() {
@@ -171,7 +172,7 @@ export default function Profile() {
         </button>
 
         <button
-          onClick={() => (window.location.href = "/review")}
+          onClick={() => setActiveTab("reviews")}
           style={{
             padding: "8px 14px",
             borderRadius: 8,
@@ -185,20 +186,6 @@ export default function Profile() {
           Reviews
         </button>
 
-        <button
-          onClick={() => alert("Stats coming soon")}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 8,
-            background: activeTab === "stats" ? "rgba(255,255,255,0.08)" : "transparent",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.12)",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          Stats
-        </button>
         <button
           onClick={() => setActiveTab("friends")}
           style={{  
@@ -215,7 +202,7 @@ export default function Profile() {
         </button>
       </div>
 
-      {activeTab !== "lists" && (
+      {activeTab !== "lists" && activeTab !== "reviews" && activeTab !== "friends" && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <h1 style={{ margin: 0 }}>Welcome, {authUser.username}!</h1>
 
@@ -328,7 +315,23 @@ export default function Profile() {
       )}
 
       {activeTab === "friends" && (
-        <Friends token={localStorage.getItem("token")} />
+        <div>
+          <h1 style={{ marginTop: 0 }}>Friends</h1>
+          <div style={{ marginBottom: "12px" }}>
+            <button onClick={() => setActiveTab("profile")} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginBottom: "8px" }}>← Back to Profile</button>
+          </div>
+          <Friends token={localStorage.getItem("token")} />
+        </div>
+      )}
+
+      {activeTab === "reviews" && (
+        <div>
+          <h1 style={{ marginTop: 0 }}>My Reviews</h1>
+          <div style={{ marginBottom: "12px" }}>
+            <button onClick={() => setActiveTab("profile")} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginBottom: "8px" }}>← Back to Profile</button>
+          </div>
+          <UserReviews userId={authUser._id} />
+        </div>
       )}
 
     </div>

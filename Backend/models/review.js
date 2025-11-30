@@ -11,6 +11,10 @@ const ReviewSchema = new mongoose.Schema({
     type: Number, // RAWG API game ID
     required: true,
   },
+  gameName: {
+    type: String,
+    required: true,
+  },
   rating: {
     type: Number,
     required: true,

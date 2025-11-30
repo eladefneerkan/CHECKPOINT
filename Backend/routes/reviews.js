@@ -59,12 +59,12 @@ router.get("/user/:userId", async (req, res) => {
 // POST create a new review (requires authentication)
 router.post("/", auth, async (req, res) => {
   try {
-    const { gameId, rating, reviewText } = req.body;
+    const { gameId, gameName, rating, reviewText } = req.body;
 
     // Validation
-    if (!gameId || rating === undefined || !reviewText) {
+    if (!gameId || !gameName || rating === undefined || !reviewText) {
       return res.status(400).json({
-        error: "Missing required fields: gameId, rating, reviewText",
+        error: "Missing required fields: gameId, gameName, rating, reviewText",
       });
     }
 
@@ -96,6 +96,7 @@ router.post("/", auth, async (req, res) => {
     const newReview = new Review({
       user: req.user.id,
       gameId: Number(gameId),
+      gameName,
       rating: Number(rating),
       reviewText,
     });

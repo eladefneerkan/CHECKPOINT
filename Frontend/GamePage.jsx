@@ -33,7 +33,6 @@ const GamePage = () => {
     gameData.background_image,
     gameData.genres
   ) : null;
-  console.log("GamePage - game data:", game);
 
   if (!game) {
     return (
@@ -127,9 +126,17 @@ const GamePage = () => {
     try {
       const response = await fetch(`http://localhost:3000/reviews/game/${game.id}`);
       const data = await response.json();
-      setReviews(data);
+      
+      // Ensure data is an array before setting state
+      if (Array.isArray(data)) {
+        setReviews(data);
+      } else {
+        console.error('Reviews data is not an array:', data);
+        setReviews([]);
+      }
     } catch (err) {
       console.error('Error fetching reviews:', err);
+      setReviews([]);
     }
   };
 
@@ -199,6 +206,7 @@ const GamePage = () => {
         },
         body: JSON.stringify({
           gameId: game.id,
+          gameName: game.name,
           rating: newReviewRating,
           reviewText: newReviewText
         })
