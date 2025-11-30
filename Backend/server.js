@@ -5,8 +5,6 @@ const usersRoute = require("./routes/users");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
-
-
 const app = express();
 
 app.use(express.json({ limit: "10mb" }));
@@ -15,6 +13,7 @@ app.use(cors());
 app.use("/users", require("./routes/users"));
 app.use("/search", require("./routes/search"));
 app.use("/gameLists", require("./routes/gameLists"));
+app.use("/reviews", require("./routes/reviews"));
 
 app.get("/", (req, res) => {
   res.send("Backend running successfully!");

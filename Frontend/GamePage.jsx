@@ -1,32 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import GameObj from './models/GameObj.js';
-import ReviewClass from '../Backend/Review.js'
 
 const GamePage = () => {
-  const myReviews= [new ReviewClass(
-        1,                         // ID
-        "Great game!a aaaasdfds fdsfdsafdsadsfd fdsa fdsf dsfadsf sdf sdf sdf sd afdasfdsaasdfsadfdasf dfdsa fdsa",             // comment
-        5,                         // rating
-        123                        // gameID
-    ),
-    new ReviewClass(
-        2,                         // ID
-        "Ok game!",             // comment
-        3,                         // rating
-        123                        // gameID
-    ),
-    new ReviewClass(
-        3,                         // ID
-        "Great game!",             // comment
-        4.5,                         // rating
-        123                        // gameID
-    )];
-    
-    const items = ["a", "b"];
-
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Review state
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(null);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [newReviewText, setNewReviewText] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [editRating, setEditRating] = useState(0);
+  const [editHoverRating, setEditHoverRating] = useState(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [showMenu, setShowMenu] = useState(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const gameData = location.state?.game;
 
   const game = gameData ? new GameObj(
@@ -107,6 +101,231 @@ const GamePage = () => {
     if (!game.description) return 'No description available.';
     return game.description.replace(/<[^>]*>/g, '');
   };
+
+  // Get token and user info
+  const getToken = () => localStorage.getItem('token');
+  const getCurrentUser = () => {
+    const token = getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload;
+    } catch {
+      return null;
+    }
+  };
+
+  // Fetch reviews and average rating
+  useEffect(() => {
+    if (game) {
+      fetchReviews();
+      fetchAverageRating();
+    }
+  }, [game]);
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/reviews/game/${game.id}`);
+      const data = await response.json();
+      setReviews(data);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    }
+  };
+
+  const fetchAverageRating = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/reviews/game/${game.id}/average`);
+      const data = await response.json();
+      setAverageRating(data.average);
+      setReviewCount(data.count);
+    } catch (err) {
+      console.error('Error fetching average:', err);
+    }
+  };
+
+  // Star rating helpers
+  const renderStars = (rating, interactive = false, onClick = null, onHover = null) => {
+    const stars = [];
+    const displayRating = interactive ? (onHover && hoverRating > 0 ? hoverRating : rating) : rating;
+    
+    for (let i = 1; i <= 5; i++) {
+      const isFilled = displayRating >= i;
+      const isHalf = displayRating >= i - 0.5 && displayRating < i;
+      
+      stars.push(
+        <span
+          key={i}
+          className={`star ${interactive ? 'star-interactive' : ''}`}
+          onClick={() => interactive && onClick && onClick(i)}
+          onMouseEnter={() => interactive && onHover && onHover(i)}
+          onMouseLeave={() => interactive && onHover && onHover(0)}
+          style={{ cursor: interactive ? 'pointer' : 'default' }}
+        >
+          {isFilled ? '⭐' : isHalf ? '✨' : '☆'}
+        </span>
+      );
+    }
+    return stars;
+  };
+
+  // Submit new review
+  const handleSubmitReview = async () => {
+    const token = getToken();
+    if (!token) {
+      setError('Please log in to leave a review');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    if (!newReviewText.trim()) {
+      setError('Please write a review');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    if (newReviewRating === 0) {
+      setError('Please select a rating');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          gameId: game.id,
+          rating: newReviewRating,
+          reviewText: newReviewText
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess('Review submitted successfully!');
+        setNewReviewText('');
+        setNewReviewRating(0);
+        fetchReviews();
+        fetchAverageRating();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(data.error || 'Failed to submit review');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (err) {
+      setError('Error submitting review');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // Edit review
+  const handleEditReview = async (reviewId) => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ reviewText: editText, rating: editRating })
+      });
+
+      if (response.ok) {
+        setSuccess('Review updated!');
+        setEditingReviewId(null);
+        setEditText('');
+        setEditRating(0);
+        fetchReviews();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to update review');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (err) {
+      setError('Error updating review');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // Delete review
+  const handleDeleteReview = async (reviewId) => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setSuccess('Review deleted!');
+        setShowDeleteConfirm(null);
+        fetchReviews();
+        fetchAverageRating();
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to delete review');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (err) {
+      setError('Error deleting review');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  // Upvote/Downvote
+  const handleVote = async (reviewId, voteType) => {
+    const token = getToken();
+    if (!token) {
+      setError('Please log in to upvote/downvote');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/reviews/${reviewId}/${voteType}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        fetchReviews();
+      }
+    } catch (err) {
+      console.error('Error voting:', err);
+    }
+  };
+
+  // Format date
+  const formatReviewDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const currentUser = getCurrentUser();
 
   return (
     <section  style={{backgroundImage: "linear-gradient(to top, #430000ff, #000000ff)"}}>
@@ -212,26 +431,202 @@ const GamePage = () => {
           </p>
         </div>
       </div>
-      <div id="reviewsOnGame">Reviews
-        <div className="review-page-container">
-            <h2 style={{ color: 'white'}}>This is the Review page</h2>
-            <> {myReviews.map((item) => (
-                <div >
-                    <p className="review">Review ID: {item.ID} Stars: {item.displayStars(item.rating)}</p>
-                    <>
-                        <img 
-                        src={item.displayGameImage()} 
-                        alt={`Image for Game ID ${item.gameID}`} 
-                        className="review-game-image"
-                        />
-                    
-                        <p className="reviewTxt">Comment: {item.comment}</p>
-                        <p>/n</p>
-                    </>
-                    
-                </div>))}
-            </>
+
+      {/* Reviews Section */}
+      <div className="reviews-section">
+        <div className="reviews-header">
+          <h2>Reviews</h2>
+          <div className="average-rating">
+            {averageRating !== null ? (
+              <>
+                <span>Average User Rating: </span>
+                {renderStars(averageRating)}
+                <span className="rating-number">{averageRating}/5</span>
+                <span className="review-count">({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})</span>
+              </>
+            ) : (
+              <span>Average User Rating: N/A</span>
+            )}
+          </div>
+        </div>
+
+        {/* Submit Review Form */}
+        <div className="submit-review-form">
+          <h3>Leave a Review</h3>
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+          
+          <div className="rating-input">
+            <label>Your Rating:</label>
+            <div className="star-rating-input">
+              {renderStars(newReviewRating, true, setNewReviewRating, setHoverRating)}
+              {newReviewRating > 0 && <span className="rating-label">{newReviewRating}/5</span>}
             </div>
+          </div>
+
+          <textarea
+            className="review-text-input"
+            placeholder="Write your review here... (max 1000 characters)"
+            value={newReviewText}
+            onChange={(e) => setNewReviewText(e.target.value)}
+            maxLength={1000}
+          />
+          <div className="char-count">{newReviewText.length}/1000</div>
+
+          <button className="submit-review-btn" onClick={handleSubmitReview}>
+            Submit Review
+          </button>
+        </div>
+
+        {/* Reviews List */}
+        <div className="reviews-list">
+          {reviews.length === 0 ? (
+            <p className="no-reviews">No reviews yet. Be the first to review!</p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review._id} className="review-card">
+                {/* Review Header */}
+                <div className="review-header">
+                  <div className="review-user-info">
+                    <img 
+                      src={review.user.profilePicture} 
+                      alt={review.user.username}
+                      className="review-avatar"
+                    />
+                    <div>
+                      <div className="review-username">{review.user.username}</div>
+                      <div className="review-date">
+                        {review.updatedAt && review.updatedAt !== review.createdAt 
+                          ? `Edited ${formatReviewDate(review.updatedAt)}`
+                          : formatReviewDate(review.createdAt)
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Three Dots Menu for Own Reviews */}
+                  {currentUser && currentUser.id === review.user._id && (
+                    <div className="review-menu">
+                      <button 
+                        className="menu-dots"
+                        onClick={() => setShowMenu(showMenu === review._id ? null : review._id)}
+                      >
+                        ⋮
+                      </button>
+                      {showMenu === review._id && (
+                        <div className="menu-dropdown">
+                          <button onClick={() => {
+                            setEditingReviewId(review._id);
+                            setEditText(review.reviewText);
+                            setEditRating(review.rating);
+                            setShowMenu(null);
+                          }}>
+                            Edit
+                          </button>
+                          <button onClick={() => {
+                            setShowDeleteConfirm(review._id);
+                            setShowMenu(null);
+                          }}>
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Star Rating */}
+                <div className="review-rating">
+                  {renderStars(review.rating)}
+                  <span className="rating-number">{review.rating}/5</span>
+                </div>
+
+                {/* Review Text */}
+                {editingReviewId === review._id ? (
+                  <div className="edit-review-form">
+                    <div className="rating-input">
+                      <label>Update Rating:</label>
+                      <div className="star-rating-input">
+                        {renderStars(editRating, true, setEditRating, setEditHoverRating)}
+                        {editRating > 0 && <span className="rating-label">{editRating}/5</span>}
+                      </div>
+                    </div>
+                    <textarea
+                      className="review-text-input"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      maxLength={1000}
+                    />
+                    <div className="edit-actions">
+                      <button 
+                        className="save-btn"
+                        onClick={() => handleEditReview(review._id)}
+                      >
+                        Save
+                      </button>
+                      <button 
+                        className="cancel-btn"
+                        onClick={() => {
+                          setEditingReviewId(null);
+                          setEditText('');
+                          setEditRating(0);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="review-text">{review.reviewText}</p>
+                )}
+
+                {/* Vote Buttons */}
+                <div className="review-votes">
+                  <button 
+                    className={`vote-btn upvote ${currentUser && review.upvotedBy?.includes(currentUser.id) ? 'active' : ''}`}
+                    onClick={() => handleVote(review._id, 'upvote')}
+                    disabled={currentUser && currentUser.id === review.user._id}
+                    style={{ opacity: currentUser && currentUser.id === review.user._id ? 0.5 : 1, cursor: currentUser && currentUser.id === review.user._id ? 'not-allowed' : 'pointer' }}
+                  >
+                    ▲
+                  </button>
+                  <span className="vote-score">{review.score}</span>
+                  <button 
+                    className={`vote-btn downvote ${currentUser && review.downvotedBy?.includes(currentUser.id) ? 'active' : ''}`}
+                    onClick={() => handleVote(review._id, 'downvote')}
+                    disabled={currentUser && currentUser.id === review.user._id}
+                    style={{ opacity: currentUser && currentUser.id === review.user._id ? 0.5 : 1, cursor: currentUser && currentUser.id === review.user._id ? 'not-allowed' : 'pointer' }}
+                  >
+                    ▼
+                  </button>
+                </div>
+
+                {/* Delete Confirmation Modal */}
+                {showDeleteConfirm === review._id && (
+                  <div className="delete-modal">
+                    <div className="delete-modal-content">
+                      <p>Are you sure you want to delete this review?</p>
+                      <div className="delete-modal-actions">
+                        <button 
+                          className="confirm-delete-btn"
+                          onClick={() => handleDeleteReview(review._id)}
+                        >
+                          Yes, Delete
+                        </button>
+                        <button 
+                          className="cancel-delete-btn"
+                          onClick={() => setShowDeleteConfirm(null)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   </section>

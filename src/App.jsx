@@ -10,7 +10,6 @@ import VerifyEmail from "../Frontend/VerifyEmail.jsx";
 import "./styles.css";
 import PageTransition from "../Frontend/PageTransition.jsx";
 import GamePage from "../Frontend/GamePage.jsx"
-import ReviewModel from "../Frontend/Review.jsx";
 import SearchUsers from "../Frontend/SearchUsers.jsx";
 
 export default function App() {
@@ -37,24 +36,8 @@ export default function App() {
         <Route path="verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="game/:id" element={<PageTransition><GamePage /></PageTransition>} />
         <Route path="/search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
-        <Route path="review" element={<ReviewModel />} />
+        {/* <Route path="review" element={<ReviewModel />} /> */}
       </Route>
     </Routes>
   );
 }
-
-/*
-export default function List({ users }) {
-  return (
-    <div>
-      <h2>All Users</h2>
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>{u.name}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-*/
-
