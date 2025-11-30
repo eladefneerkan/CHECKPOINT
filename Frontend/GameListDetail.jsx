@@ -154,7 +154,15 @@ export default function GameListDetail({ listId, onBack }) {
     if (list && list.games && list.games.length > 0) {
       return list.games[0].background_image;
     }
-    return "/grass_bg.avif";
+    // Fallback to a default image if none exists
+    const defaultImages = [
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
+    ];
+    const randomIndex = Math.floor(Math.random() * defaultImages.length);
+    return defaultImages[randomIndex];
   };
 
   if (loading) {

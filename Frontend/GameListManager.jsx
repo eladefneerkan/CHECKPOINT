@@ -37,6 +37,16 @@ export default function GameListManager() {
       return;
     }
 
+    // Generate a default cover image
+    const defaultImages = [
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
+    ];
+    const randomIndex = Math.floor(Math.random() * defaultImages.length);
+    const defaultCoverImage = defaultImages[randomIndex];
+
     try {
       const response = await fetch("http://localhost:3000/gameLists", {
         method: "POST",
@@ -47,6 +57,7 @@ export default function GameListManager() {
         body: JSON.stringify({
           title: newListTitle,
           description: "",
+          coverImage: defaultCoverImage,
         }),
       });
       if (!response.ok) {
