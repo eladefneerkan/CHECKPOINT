@@ -1,104 +1,328 @@
 // Frontend/Profile.jsx
-// 
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./Auth";
+import LogoutButton from "./LogoutButton";
+import GameListManager from "./GameListManager";
+import Friends from "./Friends";
 
-import React, { useState } from 'react';
-function Profile() {
-    <h2>This is the Profile page</h2>
-  }
 
-const ProfilePictureUploader = () => {
-  // State to store the selected file object (for upload to server)
+export default function Profile() {
+  const { user: authUser, updateProfile, isLoading } = useAuth();
+  const [editMode, setEditMode] = useState(false);
+  const [email, setEmail] = useState("");
+  const [bio, setBio] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  // State to store the URL for the preview image
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [deletePassword, setDeletePassword] = useState("");
 
-  // Handler for when the user selects a file
+
+  // Sync local state with auth context when authUser changes
+  useEffect(() => {
+    if (authUser) {
+      setEmail(authUser.email);
+      setBio(authUser.bio);
+      setProfilePicture(authUser.profilePicture);
+    }
+  }, [authUser]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handler = () => setActiveTab("profile");
+    window.addEventListener("resetProfileToProfileTab", handler);
+    const listsHandler = () => setActiveTab("lists");
+    window.addEventListener("openProfileListsTab", listsHandler);
+    return () => {
+      window.removeEventListener("resetProfileToProfileTab", handler);
+      window.removeEventListener("openProfileListsTab", listsHandler);
+    };
+  }, []);
+
+  if (!authUser || isLoading)
+    return (
+      <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
+        <h2>Please log in to view your profile.</h2>
+        <div style={{ marginTop: 12 }}>
+          <button
+            onClick={() => navigate("/login")}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              border: "none",
+              cursor: "pointer",
+              background: "#2563eb",
+              color: "white",
+              fontWeight: 600,
+            }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      // 1. Store the file object in state
+    if (file && file.type.startsWith("image/")) {
       setImageFile(file);
-      
-      // 2. Create a temporary URL for the image preview
-      setPreviewUrl(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewUrl(e.target.result); // This is a base64 data URL
+      };
+      reader.readAsDataURL(file);
     } else {
-      // Clear states if the file is not an image or no file is selected
       setImageFile(null);
       setPreviewUrl(null);
-      alert('Please select an image file (e.g., JPEG, PNG).');
+      alert("Please select a valid image file.");
     }
   };
 
-  // Handler for the upload action (e.g., when a submit button is clicked)
-  const handleUpload = async () => {
-    if (!imageFile) {
-      alert('Please select an image first.');
-      return;
-    }
-
-    // 3. Prepare data for server upload using FormData
-    const formData = new FormData();
-    formData.append('profilePicture', imageFile); // 'profilePicture' is the field name your server expects
-
-    // 4. Send the file to your API endpoint
+  const handleSaveChanges = async () => {
     try {
-      // Replace '/api/upload-profile-picture' with your actual endpoint
-      const response = await fetch('/api/upload-profile-picture', {
-        method: 'POST',
-        body: formData,
-        // The browser automatically sets the correct 'Content-Type' header 
-        // (multipart/form-data) when a FormData object is passed as the body.
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:3000/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ email, bio, profilePicture: previewUrl ? previewUrl : profilePicture }),
       });
 
-      if (response.ok) {
-        // Handle success (e.g., show a success message, update user context)
-        console.log('File uploaded successfully!');
-      } else {
-        // Handle server errors
-        console.error('Upload failed with status:', response.status);
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Save failed:", res.status, text);
+        alert("Failed to save profile: " + (text || res.status));
+        return;
       }
-    } catch (error) {
-      // Handle network errors
-      console.error('Network error during upload:', error);
+
+      const updated = await res.json();
+      updateProfile(updated);
+      setEditMode(false);
+      setImageFile(null);
+      setPreviewUrl(null);
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Error saving profile: " + err.message);
     }
   };
 
+  const deleteAccount = async () => {
+    if (!deletePassword) {
+      alert("Please enter your password to delete your account.");
+      return;
+    }
+  
+    const res = await fetch("http://localhost:3000/users/me", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ password: deletePassword }),
+    });
+  
+    const data = await res.json();
+  
+    if (!res.ok) {
+      alert(data.error || "Delete failed");
+      return;
+    }
+  
+    localStorage.removeItem("token");
+    alert("Account deleted.");
+    navigate("/");
+  };
+  
+
+  const colors = { accent: "#2563eb", muted: "#9ca3af", success: "#10b981", teal: "#008080" };
+  const btnBase = { padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600 };
+
   return (
-    <div>
-      <div className= "tools" > 
-        <button className="toolButtons">lists</button>
-        <button className="toolButtons" onClick={() => window.location.href = "/review"}>reviews</button>
-        <button className="toolButtons">stats</button>
+    <div style={{ color: "white", maxWidth: 720, margin: "32px auto", padding: 16 }}>
+      {/* Nav */}
+      <div
+        className="potion-box"
+      >
+        <button
+          onClick={() => setActiveTab("lists")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "lists" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          My Game Lists
+        </button>
+
+        <button
+          onClick={() => (window.location.href = "/review")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "reviews" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Reviews
+        </button>
+
+        <button
+          onClick={() => alert("Stats coming soon")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "stats" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Stats
+        </button>
+        <button
+          onClick={() => setActiveTab("friends")}
+          style={{  
+            padding: "8px 14px",
+            borderRadius: 8,
+            background: activeTab === "friends" ? "rgba(255,255,255,0.08)" : "transparent",
+            color: "white",
+            border: "1px solid rgba(255,255,255,0.12)",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Friends
+        </button>
       </div>
-      <h1>This is the Profile page</h1>
-      <h2>Profile Picture</h2>
-      {/* Image Preview Area */}
-      {previewUrl ? (
-        <img 
-          src={previewUrl} 
-          alt="Profile Preview" 
-          style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }} 
-        />
-      ) : (
-        <div style={{ width: '150px', height: '150px', backgroundColor: '#ccc', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          No Image Selected
+
+      {activeTab !== "lists" && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <h1 style={{ margin: 0 }}>Welcome, {authUser.username}!</h1>
+
+          <img
+            src={previewUrl ? previewUrl : authUser.profilePicture}
+            alt="Profile"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://via.placeholder.com/140/008080/ffffff?text=User`;
+            }}
+            style={{ width: 140, height: 140, borderRadius: 12, objectFit: "cover", border: `2px solid ${colors.teal}` }}
+          />
+
+          <h2 style={{ margin: 0 }}>{authUser.username}</h2>
+          <p style={{ margin: "8px 0", color: colors.muted }}>{authUser.bio || "No bio yet"}</p>
+          <p style={{ margin: 0, color: colors.muted }}>{authUser.email}</p>
+
+          {!editMode && (
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button onClick={() => setEditMode(true)} style={{ ...btnBase, background: colors.teal, color: "white" }}>Edit Profile</button>
+              <LogoutButton />
+            </div>
+          )}
+
+        
+
+
+          {editMode && (
+            <>
+              <div style={{ width: "100%", marginTop: 12 }}>
+                <h3 style={{ marginTop: 0 }}>Edit Profile</h3>
+
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Choose new profile picture</label>
+                  <input type="file" accept="image/*" onChange={handleFileChange} />
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Email</label>
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%" }} />
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ display: "block", marginBottom: 6 }}>Bio</label>
+                  <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ width: "100%", minHeight: 100 }} />
+                </div>
+
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={handleSaveChanges} style={{ ...btnBase, background: colors.success, color: "white" }}>Save</button>
+                  <button
+                    onClick={() => { setEditMode(false); setPreviewUrl(null); setImageFile(null); }}
+                    style={{ ...btnBase, background: "transparent", border: `1px solid rgba(255,255,255,0.06)`, color: colors.muted }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 24, padding: 16, background: "#220000", borderRadius: 8 }}>
+                <h3 style={{ color: "#ff6b6b", marginTop: 0 }}>Delete Account</h3>
+
+                <p style={{ color: "#ddd" }}>Enter your password to permanently delete your account.</p>
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  style={{
+                    width: "100%",
+                    marginBottom: 8,
+                    padding: 8,
+                    borderRadius: 6,
+                    border: "1px solid #555",
+                  }}
+                />
+
+                <button
+                  onClick={deleteAccount}
+                  disabled={!deletePassword}
+                  style={{
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: deletePassword ? "#cc0000" : "#7a3b3b",
+                    color: "white",
+                    fontWeight: 600,
+                    cursor: deletePassword ? "pointer" : "not-allowed",
+                    width: "100%",
+                    opacity: deletePassword ? 1 : 0.6,
+                  }}
+                >
+                  Delete My Account
+                </button>
+              </div>
+            </>
+          )}
+
         </div>
       )}
 
-      {/* File Input for selection */}
-      <input 
-        type="file" 
-        accept="image/*" // Restricts the file selector to image types
-        onChange={handleFileChange} 
-        style={{ display: 'block', margin: '20px 0' }}
-      />
-      
-      {/* Upload Button */}
-      <button onClick={handleUpload} disabled={!imageFile}>
-        Upload Picture
-      </button>
+      {activeTab === "lists" && (
+        <div>
+          <h1 style={{ marginTop: 0 }}>My Game Lists</h1>
+          <div style={{ marginBottom: "12px" }}>
+            <button onClick={() => setActiveTab("profile")} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginBottom: "8px" }}>← Back to Profile</button>
+          </div>
+          <GameListManager />
+        </div>
+      )}
+
+      {activeTab === "friends" && (
+        <Friends token={localStorage.getItem("token")} />
+      )}
+
     </div>
   );
-};
-
-export default ProfilePictureUploader;
+}

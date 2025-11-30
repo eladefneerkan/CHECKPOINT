@@ -1,15 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './Auth';
 
-const LoginForm = ({ onSwitchToSignup, onClose }) => {
+const SignInPg = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     setError('');
-
     if (!username || !password) {
       setError('Please fill in all fields');
       return;
@@ -18,7 +19,11 @@ const LoginForm = ({ onSwitchToSignup, onClose }) => {
     const result = await login(username, password);
     if (!result.success) {
       setError(result.error || 'Login failed. Please try again.');
+      return;
     }
+
+    // success
+    navigate('/profile');
   };
 
   const handleKeyPress = (e) => {
@@ -28,11 +33,12 @@ const LoginForm = ({ onSwitchToSignup, onClose }) => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
-      <h2>Login</h2>
-      <div>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2 style={{ marginBottom: 12 }}>Login</h2>
+       <div>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="login-username" style={{ display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="login-username" style={{ display: 'block', marginBottom: '5px', color: 'white' }}>
             Username:
           </label>
           <input
@@ -48,7 +54,7 @@ const LoginForm = ({ onSwitchToSignup, onClose }) => {
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="login-password" style={{ display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="login-password" style={{ display: 'block', marginBottom: '5px', color: 'white' }}>
             Password:
           </label>
           <input
@@ -69,43 +75,20 @@ const LoginForm = ({ onSwitchToSignup, onClose }) => {
           </div>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            opacity: isLoading ? 0.6 : 1
-          }}
-        >
+        <button className="btn-primary" onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-      </div>
+        </div>
 
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <p style={{ fontSize: '14px' }}>
-          Don't have an account?{' '}
-          <button
-            onClick={onSwitchToSignup}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#007bff',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Sign up
+        {/* Sign up button placed below the fields */}
+        <div style={{ marginTop: 12 }}>
+          <button className="btn-secondary" onClick={() => navigate('/signup')}>
+            Create an account
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default SignInPg;

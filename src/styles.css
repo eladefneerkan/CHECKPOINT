@@ -1,3 +1,8 @@
+h1, h2, h3, h4, h5, h6 {
+  color: white;
+}
+
+
 html, body {
   margin: 0;
   padding: 0;
@@ -40,11 +45,20 @@ section {
 }
 @keyframes toolBar {
   from {
-    width: 10%;
+    width: 60%;
     
   }
   to {
-    width: 80%;
+    width: 99%;
+  }
+}
+@keyframes toolsInBar {
+  from {
+    padding: "0px 0px",
+    
+  }
+  to {
+    padding: "8px 14px",
   }
 }
 .tools{
@@ -54,6 +68,18 @@ section {
   width: 80%;
   text-align: left;
   justify-content: space-around;
+}
+.potion-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 8px;
+  animation: toolBar 1s ease-in;
+  background: #008080;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 .toolButtons{
   width: 50px;
@@ -66,7 +92,136 @@ section {
   animation: fadeIn 0.8s ease-out;
 }
 
-.review{
+
+.game-obj {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background-color: #161a1e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  padding: 15px;
+  width: 100%;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-obj:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+.game-obj-img-display {
+  flex-shrink: 0;
+  width: 200px;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: #0d1117;
+}
+
+.game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.game-obj-contents {
+  flex: 1;
+  justify-content: space-between;
+  padding: 0;
+  min-width: 0;
+}
+
+.game-obj-title {
+  margin: 0 0 10px 0;
+  font-size: 1.4em;
+  color: #ffffff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-obj-detail {
+  margin: 4px 0;
+  color: #8b949e;
+  font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-obj-detail strong {
+  color: #c9d1d9;
+  margin-right: 5px;
+}
+
+.rating-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #161a1e;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.rating-4 { background-color: #4CAF50; } 
+.rating-3 { background-color: #FFC107; } 
+.rating-2, .rating-1 { background-color: #F44336; } 
+.rating-0 { background-color: #9E9E9E; } 
+
+/* Auth pages */
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 160px);
+  padding: 20px;
+  background: linear-gradient(180deg, #071126 0%, #0b1220 100%);
+}
+
+.auth-card {
+  width: 420px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg,#2563eb,#06b6d4);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  color: #cbd5e1;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }.review{
   background-color: darkslateblue;
   color: cyan;
   width: 80%;
