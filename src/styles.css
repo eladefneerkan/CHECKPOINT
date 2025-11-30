@@ -45,11 +45,20 @@ section {
 }
 @keyframes toolBar {
   from {
-    width: 10%;
+    width: 60%;
     
   }
   to {
-    width: 80%;
+    width: 99%;
+  }
+}
+@keyframes toolsInBar {
+  from {
+    padding: "0px 0px",
+    
+  }
+  to {
+    padding: "8px 14px",
   }
 }
 .tools{
@@ -59,6 +68,18 @@ section {
   width: 80%;
   text-align: left;
   justify-content: space-around;
+}
+.potion-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 8px;
+  animation: toolBar 1s ease-in;
+  background: #008080;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 .toolButtons{
   width: 50px;
@@ -200,4 +221,46 @@ section {
   margin-top: 12px;
 }
 
-.btn-secondary:hover { background: rgba(255,255,255,0.05); }
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }.review{
+  background-color: darkslateblue;
+  color: cyan;
+  width: 80%;
+  
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.review-game-image{
+  vertical-align: bottom;
+  text-align: center;
+  float: left;
+  background-color: darkslateblue;
+  height: 50px;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.stars{
+  text-align: left;
+  text-align: top;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.reviewTxt{
+  min-height: 52px;
+  background-color: darkslateblue;
+  color: cyan;
+  width: 80%;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.no-flex {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#gamelist {
+  color: white;
+}

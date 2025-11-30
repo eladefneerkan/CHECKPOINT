@@ -137,7 +137,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
       padding: '20px' 
     }}>
       
-      <h1>Search for Games to add to your List!</h1>
+      <h1 id="bum"  >Search for Games to add to your List!</h1>
     
       <div style={{ position: 'relative', width: '650px', display: 'flex' }}> 
 
@@ -204,7 +204,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger }) {
           </div>
         )}
       </div>
-      
+
 
       <p style={{ marginTop: '20px' }}>{userSearch}</p>
 
