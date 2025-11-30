@@ -1,12 +1,13 @@
-// Frontend/SearchUsers.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "./Auth";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchUsers() {
   const { user: authUser } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const searchUsers = async () => {
     if (!query.trim()) {
@@ -34,7 +35,9 @@ export default function SearchUsers() {
     setLoading(false);
   };
 
-  const friendAction = async (url, method = "POST") => {
+  const friendAction = async (e, url, method = "POST") => {
+    e.stopPropagation();
+
     const token = localStorage.getItem("token");
     return fetch(url, {
       method,
@@ -49,133 +52,97 @@ export default function SearchUsers() {
     const me = authUser;
 
     if (me.friends?.some((f) => f._id === target._id)) return "friends";
-    if (me.friendRequestsSent?.some((id) => id === target._id)) return "sent";
-    if (me.friendRequestsReceived?.some((id) => id === target._id)) return "received";
+    if (me.friendRequestsSent?.includes(target._id)) return "sent";
+    if (me.friendRequestsReceived?.includes(target._id)) return "received";
 
     return "none";
   };
 
   return (
-    <section  style={{backgroundImage: "linear-gradient(to top, #000000ff, #003632ff)"}}>
-    <div style={{ color: "white", padding: "2rem" }}>
-      <h1>User Search</h1>
+    <section style={{ backgroundImage: "linear-gradient(to top, #000000ff, #003632ff)", minHeight: "100vh" }}>
+      <div style={{ color: "white", padding: "2rem" }}>
+        <h1>User Search</h1>
 
-      <input
-        type="text"
-        placeholder="Search usernames…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && searchUsers()}
-        style={{
-          width: "300px",
-          padding: "10px",
-          borderRadius: "6px",
-          border: "1px solid #555",
-          marginRight: "10px",
-        }}
-      />
+        <input
+          type="text"
+          placeholder="Search usernames…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && searchUsers()}
+          style={{
+            width: "300px",
+            padding: "10px",
+            borderRadius: "6px",
+            border: "1px solid #555",
+            marginRight: "10px",
+          }}
+        />
 
-      <button
-        onClick={searchUsers}
-        style={{
-          padding: "10px 14px",
-          borderRadius: "6px",
-          background: "#2563eb",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-          fontWeight: 600,
-        }}
-      >
-        Search
-      </button>
+        <button
+          onClick={searchUsers}
+          style={{
+            padding: "10px 14px",
+            borderRadius: "6px",
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          Search
+        </button>
 
-      <div style={{ marginTop: "2rem" }}>
-        {loading && <p>Searching...</p>}
+        <div style={{ marginTop: "2rem" }}>
+          {loading && <p>Searching...</p>}
 
-        {results.map((u) => {
-          const status = getStatus(u);
+          {results.map((u) => {
+            const status = getStatus(u);
 
-          return (
-            <div
-              key={u._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                background: "rgba(255,255,255,0.06)",
-                padding: "1rem",
-                borderRadius: "10px",
-                marginBottom: "1rem",
-                width: "400px",
-              }}
-            >
-              <img
-                src={u.profilePicture}
-                alt="pfp"
+            return (
+              <div
+                key={u._id}
+                onClick={() => navigate(`/user/${u._id}`)}
                 style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "2px solid white",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem",
+                  background: "rgba(255,255,255,0.06)",
+                  padding: "1rem",
+                  borderRadius: "10px",
+                  marginBottom: "1rem",
+                  width: "400px",
+                  cursor: "pointer",
+                  transition: "0.2s",
                 }}
-              />
-
-              <strong>{u.username}</strong>
-
-              {status === "none" && (
-                <button
-                  onClick={() =>
-                    friendAction(`/users/friends/request/${u._id}`).then(() =>
-                      alert("Friend request sent")
-                    )
-                  }
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+              >
+                <img
+                  src={u.profilePicture}
+                  alt="pfp"
                   style={{
-                    marginLeft: "auto",
-                    background: "#2563eb",
-                    color: "white",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
+                    width: 60,
+                    height: 60,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid white",
                   }}
-                >
-                  Add Friend
-                </button>
-              )}
+                />
 
-              {status === "sent" && (
-                <button
-                  onClick={() =>
-                    friendAction(`/users/friends/cancel/${u._id}`).then(() =>
-                      alert("Friend request canceled")
-                    )
-                  }
-                  style={{
-                    marginLeft: "auto",
-                    background: "#gray",
-                    color: "white",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel Request
-                </button>
-              )}
+                <strong>{u.username}</strong>
 
-              {status === "received" && (
-                <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem" }}>
+                {/* FRIEND BUTTONS */}
+                {status === "none" && (
                   <button
-                    onClick={() =>
-                      friendAction(`/users/friends/accept/${u._id}`).then(() =>
-                        alert("Friend request accepted")
+                    onClick={(e) =>
+                      friendAction(e, `/users/friends/request/${u._id}`).then(() =>
+                        alert("Friend request sent")
                       )
                     }
                     style={{
-                      background: "#10b981",
+                      marginLeft: "auto",
+                      background: "#2563eb",
                       color: "white",
                       border: "none",
                       padding: "8px 12px",
@@ -183,15 +150,80 @@ export default function SearchUsers() {
                       cursor: "pointer",
                     }}
                   >
-                    Accept
+                    Add Friend
                   </button>
+                )}
+
+                {status === "sent" && (
                   <button
-                    onClick={() =>
-                      friendAction(`/users/friends/reject/${u._id}`).then(() =>
-                        alert("Friend request rejected")
+                    onClick={(e) =>
+                      friendAction(e, `/users/friends/cancel/${u._id}`).then(() =>
+                        alert("Friend request canceled")
                       )
                     }
                     style={{
+                      marginLeft: "auto",
+                      background: "gray",
+                      color: "white",
+                      border: "none",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
+
+                {status === "received" && (
+                  <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem" }}>
+                    <button
+                      onClick={(e) =>
+                        friendAction(e, `/users/friends/accept/${u._id}`).then(() =>
+                          alert("Friend request accepted")
+                        )
+                      }
+                      style={{
+                        background: "#10b981",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Accept
+                    </button>
+
+                    <button
+                      onClick={(e) =>
+                        friendAction(e, `/users/friends/reject/${u._id}`).then(() =>
+                          alert("Friend request rejected")
+                        )
+                      }
+                      style={{
+                        background: "#cc0000",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
+
+                {status === "friends" && (
+                  <button
+                    onClick={(e) =>
+                      friendAction(e, `/users/friends/remove/${u._id}`, "DELETE").then(() =>
+                        alert("Friend removed")
+                      )
+                    }
+                    style={{
+                      marginLeft: "auto",
                       background: "#cc0000",
                       color: "white",
                       border: "none",
@@ -200,36 +232,14 @@ export default function SearchUsers() {
                       cursor: "pointer",
                     }}
                   >
-                    Reject
+                    Remove
                   </button>
-                </div>
-              )}
-
-              {status === "friends" && (
-                <button
-                  onClick={() =>
-                    friendAction(`/users/friends/remove/${u._id}`, "DELETE").then(() =>
-                      alert("Friend removed")
-                    )
-                  }
-                  style={{
-                    marginLeft: "auto",
-                    background: "#cc0000",
-                    color: "white",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Remove
-                </button>
-              )}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
   );
 }

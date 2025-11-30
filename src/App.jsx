@@ -11,6 +11,8 @@ import "./styles.css";
 import PageTransition from "../Frontend/PageTransition.jsx";
 import GamePage from "../Frontend/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
+import OtherUserProfile from "../Frontend/OtherUserProfile.jsx";
+
 
 export default function App() {
   const [users, setUsers] = useState([]);
@@ -36,6 +38,7 @@ export default function App() {
         <Route path="verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="game/:id" element={<PageTransition><GamePage /></PageTransition>} />
         <Route path="/search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
+        <Route path="/user/:id" element={<OtherUserProfile />} />
         {/* <Route path="review" element={<ReviewModel />} /> */}
       </Route>
     </Routes>
