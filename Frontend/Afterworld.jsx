@@ -16,7 +16,7 @@ function displayStars(star){
         return(count);
         
     }
-export default function ReviewModel() {
+export default function AW() {
     
     //mock review list
     const myReviews= [new ReviewClass(
@@ -30,18 +30,12 @@ export default function ReviewModel() {
         "Ok game!",             // comment
         3,                         // rating
         123                        // gameID
-    ),
-    new ReviewClass(
-        3,                         // ID
-        "Great game!",             // comment
-        4.5,                         // rating
-        123                        // gameID
     )];
     
     const items = ["a", "b"];
     return (
         <div className="review-page-container">
-            <h2 style={{ color: 'white'}}>This is the Review page</h2>
+            <h2 style={{ color: 'white'}}>Afterworld Page</h2>
             <> {myReviews.map((item) => (
                 <div >
                     <p className="review">Review ID: {item.ID} Stars: {displayStars(item.rating)}</p>

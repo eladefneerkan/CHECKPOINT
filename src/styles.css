@@ -221,4 +221,46 @@ section {
   margin-top: 12px;
 }
 
-.btn-secondary:hover { background: rgba(255,255,255,0.05); }
+.btn-secondary:hover { background: rgba(255,255,255,0.05); }.review{
+  background-color: darkslateblue;
+  color: cyan;
+  width: 80%;
+  
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.review-game-image{
+  vertical-align: bottom;
+  text-align: center;
+  float: left;
+  background-color: darkslateblue;
+  height: 50px;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.stars{
+  text-align: left;
+  text-align: top;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.reviewTxt{
+  min-height: 52px;
+  background-color: darkslateblue;
+  color: cyan;
+  width: 80%;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+}
+.no-flex {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#gamelist {
+  color: white;
+}
