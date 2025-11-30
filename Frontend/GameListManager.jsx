@@ -101,7 +101,7 @@ export default function GameListManager() {
         listId={selectedListId}
         onBack={() => {
           setSelectedListId(null);
-          fetchLists();
+          fetchLists(); // This will refresh the list with updated cover images
         }}
       />
     );

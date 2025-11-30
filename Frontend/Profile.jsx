@@ -41,7 +41,15 @@ export default function Profile() {
     };
   }, []);
 
-  if (!authUser || isLoading)
+  if (isLoading) {
+    return (
+      <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
+        <h2>Loading...</h2>
+      </div>
+    );
+  }
+
+  if (!authUser)
     return (
       <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
         <h2>Please log in to view your profile.</h2>

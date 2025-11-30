@@ -87,6 +87,7 @@ export default function GameListDetail({ listId, onBack }) {
 
       const updatedList = await response.json();
       setList(updatedList.list);
+      setEditCoverImage(updatedList.list.coverImage || "");
       setEditMode(false);
       setCoverImageFile(null);
       setCoverImagePreview("");

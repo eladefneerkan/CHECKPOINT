@@ -12,7 +12,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start as true to avoid flashing login prompt
 
   // on mount, try to load user from token
   useEffect(() => {
