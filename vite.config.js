@@ -8,7 +8,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/users": "http://localhost:3000",
-      "/search": "http://localhost:3000"
+      "/search": "http://localhost:3000",
+      "/gameLists": "http://localhost:3000",
+      "/reviews": "http://localhost:3000"
     },
   },
 });
