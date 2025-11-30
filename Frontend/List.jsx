@@ -505,9 +505,9 @@ if (!option || results.length === 0) return results;
       borderRadius: "8px",
       backgroundColor: "#f8f9fa"
     }}>
-      <h3 style={{ marginTop: 0 }}>Filters</h3>
+      <h3 style={{ marginTop: 0, color: "black" }}>Filters:</h3>
 
-      <h4 style={{ marginTop: "15px" }}>Genre</h4>
+      <h4 style={{ marginTop: "15px", color: "black" }}>Genre</h4>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
         {availableGenres.map(genre => (
           <label
@@ -536,7 +536,7 @@ if (!option || results.length === 0) return results;
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <h4>Rating Range</h4>
+        <h4 style={{ color: "black" }}>Rating Range:</h4>
         <div style={{ display: "flex", gap: "10px" }}>
           <input
             type="number"
@@ -562,7 +562,7 @@ if (!option || results.length === 0) return results;
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <h4>Sort By</h4>
+        <h4 style={{ color: "black" }}>Sort By:</h4>
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
