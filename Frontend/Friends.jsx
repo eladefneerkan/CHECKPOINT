@@ -29,7 +29,6 @@ export default function Friends({ token }) {
 
   return (
     <div style={{ color: "white", maxWidth: 600 }}>
-      <h2>Friends</h2>
 
       {/* friend lsit */}
       <div style={{ marginBottom: 24 }}>

@@ -13,7 +13,18 @@ export default function LogoutButton() {
   };
 
   return (
-    <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+    <button 
+      onClick={handleLogout} 
+      style={{ 
+        padding: "10px 14px",
+        borderRadius: 8,
+        border: "none",
+        background: "#8E4585",
+        color: "white",
+        fontWeight: 600,
+        cursor: "pointer",
+      }}
+    >
       Logout
     </button>
   );
