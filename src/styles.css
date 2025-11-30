@@ -264,3 +264,26 @@ section {
 #gamelist {
   color: white;
 }
+#reviewsOnGame {
+
+  margin: 50px;
+  border-radius: 10px;
+
+
+  min-height: 100px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+  background-color: plum;
+  color: rgb(195, 0, 0);
+}
+
+/* #gamePage {
+  margin: 0 auto !important;
+}
+@media (min-width: 1024px) {
+  #gamePage {
+    margin: 0 !important;
+    margin-left: 4% !important;
+    margin-right: auto !important;  aligns left
+    width: 800px;        optional fixed width 
+  }
+}*/

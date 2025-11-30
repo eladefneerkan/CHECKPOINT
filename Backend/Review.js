@@ -11,7 +11,19 @@ class ReviewClass{
             // for now we will just have this placeholder code
             this.gameIMG = 'https://sirstack.db-destiny.net/morphylogeny/408/OtBOtR001.JPG'
         }
-
+        displayStars(star){
+            var count = "";
+            while (star > 0.5){
+                
+                count = count.concat("☀️");
+                star = star -1;
+            }
+            if (star > 0){
+                count = count.concat("🔅");
+            }
+            return(count);
+                
+        }
        displayGameImage(){
             return this.gameIMG || 'https://placehold.co/150x200?text=Image+Missing' //temporary placehold image if image not found, we can replace w something else
        }

@@ -1,8 +1,30 @@
 import React from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import GameObj from './models/GameObj.js';
+import ReviewClass from '../Backend/Review.js'
 
 const GamePage = () => {
+  const myReviews= [new ReviewClass(
+        1,                         // ID
+        "Great game!a aaaasdfds fdsfdsafdsadsfd fdsa fdsf dsfadsf sdf sdf sdf sd afdasfdsaasdfsadfdasf dfdsa fdsa",             // comment
+        5,                         // rating
+        123                        // gameID
+    ),
+    new ReviewClass(
+        2,                         // ID
+        "Ok game!",             // comment
+        3,                         // rating
+        123                        // gameID
+    ),
+    new ReviewClass(
+        3,                         // ID
+        "Great game!",             // comment
+        4.5,                         // rating
+        123                        // gameID
+    )];
+    
+    const items = ["a", "b"];
+
   const location = useLocation();
   const navigate = useNavigate();
   const gameData = location.state?.game;
@@ -87,9 +109,10 @@ const GamePage = () => {
   };
 
   return (
-    <div className="fade-in" style={{ 
-      padding: '40px',
-      maxWidth: '900px',
+    <div id="gamePage" className="fade-in" style={{ 
+      
+      padding: '0px',
+      maxWidth: '800px',
       margin: '0 auto',
       minHeight: '100vh',
       backgroundColor: '#1a1a1a',
@@ -185,6 +208,27 @@ const GamePage = () => {
             {getFullDescription()}
           </p>
         </div>
+      </div>
+      <div id="reviewsOnGame">Reviews
+        <div className="review-page-container">
+            <h2 style={{ color: 'white'}}>This is the Review page</h2>
+            <> {myReviews.map((item) => (
+                <div >
+                    <p className="review">Review ID: {item.ID} Stars: {item.displayStars(item.rating)}</p>
+                    <>
+                        <img 
+                        src={item.displayGameImage()} 
+                        alt={`Image for Game ID ${item.gameID}`} 
+                        className="review-game-image"
+                        />
+                    
+                        <p className="reviewTxt">Comment: {item.comment}</p>
+                        <p>/n</p>
+                    </>
+                    
+                </div>))}
+            </>
+            </div>
       </div>
     </div>
   );
