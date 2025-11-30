@@ -142,6 +142,7 @@ export default function Profile() {
   const btnBase = { padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontWeight: 600 };
 
   return (
+    <section  style={{backgroundImage: "linear-gradient(to top, #002744ff, #00070aff)"}}>
     <div style={{ color: "white", maxWidth: 720, margin: "32px auto", padding: 16 }}>
       {/* Nav */}
       <div
@@ -324,5 +325,6 @@ export default function Profile() {
       )}
 
     </div>
+  </section>
   );
 }

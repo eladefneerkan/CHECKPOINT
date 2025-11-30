@@ -187,7 +187,7 @@ export default function GameListDetail({ listId, onBack }) {
       {successMessage && (
         <div
           style={{
-            backgroundColor: "#28a745",
+            backgroundColor: "#10b981",
             color: "white",
             padding: "10px",
             borderRadius: "4px",
@@ -255,7 +255,7 @@ export default function GameListDetail({ listId, onBack }) {
                 onClick={() => navigate(`/list?addToList=${listId}`)}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#28a745",
+                  backgroundColor: "#10b981",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
@@ -268,7 +268,7 @@ export default function GameListDetail({ listId, onBack }) {
                 onClick={() => setDeleteListConfirm(true)}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#dc3545",
+                  backgroundColor: "#e52f3eff",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
@@ -299,7 +299,7 @@ export default function GameListDetail({ listId, onBack }) {
                     <button
                       onClick={() => setDeleteConfirm(game.id)}
                       style={{
-                        backgroundColor: "#dc3545",
+                        backgroundColor: "#e52f3eff",
                         color: "white",
                         border: "none",
                         borderRadius: "6px",
@@ -394,7 +394,7 @@ export default function GameListDetail({ listId, onBack }) {
               onClick={handleSaveListChanges}
               style={{
                 padding: "10px 20px",
-                backgroundColor: "#28a745",
+                backgroundColor: "#10b981",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
@@ -476,7 +476,7 @@ export default function GameListDetail({ listId, onBack }) {
                 onClick={() => handleDeleteGame(deleteConfirm)}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#dc3545",
+                  backgroundColor: "#e52f3eff",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
@@ -541,7 +541,7 @@ export default function GameListDetail({ listId, onBack }) {
                 }}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#dc3545",
+                  backgroundColor: "#e52f3eff",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",

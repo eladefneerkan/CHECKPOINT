@@ -426,6 +426,7 @@ if (!option || results.length === 0) return results;
   const filterSelected = selectedGenres.length > 0 || minRating || maxRating || sortOption
 
   return (
+  <section  style={{backgroundImage: "linear-gradient(to top, #003632ff, #000000ff)"}}>
   <div 
     className="SearchRender"
     style={{
@@ -627,6 +628,7 @@ if (!option || results.length === 0) return results;
     )}
 
   </div>
+  </section>
   );
 }
 

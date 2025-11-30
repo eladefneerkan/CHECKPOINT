@@ -1,7 +1,7 @@
 import { Outlet, Link } from "react-router-dom";
 import { useAuth } from "../Frontend/Auth.jsx";
 import { useState } from "react";
-
+import Flag from '../assets/Flag.png';
 export default function GlobalUI() {
   const { user } = useAuth();
   const [showSearch, setShowSearch] = useState(false);
@@ -20,8 +20,16 @@ export default function GlobalUI() {
           boxShadow: "0 2px 8px rgba(0,0,0,0.6)",
         }}
       >
-        <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#ffffff" }}>
-          🎮 CHECKPOINT
+        
+      <h1 style={{ margin: 0, fontSize: "1.5rem", color: "#ffffff", display: "flex", alignItems: "center", }}>
+      <img src={Flag} alt="logo" style={{
+        width: 60,
+        height: 60,
+        margin: 0,
+        objectFit: "cover",    
+        float: "left"
+        }}/>
+          CHECKPOINT
         </h1>
 
         <nav style={{ display: "flex", gap: "2rem", alignItems: "center" }}>

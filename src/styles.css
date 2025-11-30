@@ -64,7 +64,7 @@ section {
 .tools{
   display:flex;
   background-color: teal;
-  animation: toolBar 1s ease-in-out;
+  animation: toolBar 0.8s ease-in-out;
   width: 80%;
   text-align: left;
   justify-content: space-around;
@@ -74,7 +74,7 @@ section {
   gap: 12px;
   margin-bottom: 18px;
   padding: 8px;
-  animation: toolBar 1s ease-in;
+  animation: toolBar 0.8s ease-in;
   background: #008080;
   border-radius: 12px;
   align-items: center;
@@ -169,9 +169,9 @@ section {
     text-align: center;
 }
 
-.rating-4 { background-color: #4CAF50; } 
-.rating-3 { background-color: #FFC107; } 
-.rating-2, .rating-1 { background-color: #F44336; } 
+.rating-4 { background-color: #10b981; } 
+.rating-3 { background-color: #d9ee1d; } 
+.rating-2, .rating-1 { background-color: #e52f3eff; } 
 .rating-0 { background-color: #9E9E9E; } 
 
 /* Auth pages */
@@ -268,12 +268,46 @@ section {
 
   margin: 50px;
   border-radius: 10px;
+  width: 90%;
 
 
+  padding: 50px;
   min-height: 100px;
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+  /*box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
   background-color: plum;
-  color: rgb(195, 0, 0);
+  color: rgb(195, 0, 0);*/
+}
+
+.bubble {
+  position: absolute;
+  bottom: -10px;
+  width: 6px;
+  height: 6px;
+  background: rgba(51, 0, 255, 0.46);
+  border-radius: 50%;
+  animation: rise 8s infinite ease-in;
+  box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.674);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 10px 2px rgba(51, 0, 181, 0.611);
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-90vh) scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-120vh) scale(1.2);
+    opacity: 0;
+  }
+
 }
 
 /* #gamePage {

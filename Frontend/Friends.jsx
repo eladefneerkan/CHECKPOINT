@@ -96,7 +96,7 @@ export default function Friends({ token }) {
                 style={{
                   padding: "4px 10px",
                   borderRadius: 6,
-                  background: "#b91c1c",
+                  background: "#e52f3eff",
                   color: "white",
                   border: "none",
                   cursor: "pointer",
@@ -126,7 +126,7 @@ export default function Friends({ token }) {
                 style={{
                   padding: "4px 10px",
                   borderRadius: 6,
-                  background: "#d97706",
+                  background: "#007bff",
                   color: "white",
                   border: "none",
                   cursor: "pointer",
