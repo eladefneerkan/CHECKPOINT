@@ -4,15 +4,19 @@ import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
 
 
-const fetchGamesByQuery = async (query, genres = []) => {
+const fetchGames = async (query = '', genres = [], minRating = '', maxRating = '', sortByRating = '', sortByDate = '') => {
     try {
+
         // Build URL with query and genres
         let url = '/search/Games?';
         const params = new URLSearchParams();
         
         if (query) params.append('q', query);
         if (genres.length > 0) params.append('genres', genres.join(','));
-        
+        if (minRating) params.append('minRating', minRating);
+        if (maxRating) params.append('maxRating', maxRating);
+        if (sortByRating) params.append('sortByRating', sortByRating);
+        if (sortByDate) params.append('sortByDate', sortByDate);
         url += params.toString();
         
         const response = await fetch(url);
@@ -214,6 +218,11 @@ function SearchRender() {
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [selectedGenres, setSelectedGenres] = useState([])
+  const [sortByRating, setSortByRating] = useState("")
+  const [sortByDate, setSortByDate] = useState("")
+  const [minRating, setMinRating] = useState("")
+  const [maxRating, setMaxRating] = useState("")
+  const [sortOption, setSortOption] = useState("")
 
   const token = localStorage.getItem("token")
 
@@ -232,19 +241,19 @@ function SearchRender() {
             return;
         }
         setIsLoading(true);
-        const results = await fetchGamesByQuery(query, selectedGenres);
+        const results = await fetchGames(query, selectedGenres, minRating, maxRating, sortByRating, sortByDate);
         setFinalSearchRes(results);
         setFilteredResults(results);
         setIsLoading(false);
     }
 
-  // When genres change, automatically trigger new search if there are already results
+  // When genres or other filters change, automatically trigger new search if there are already results
   useEffect(() => {
     if (finalSearchRes.length > 0) {
       const currentQuery = document.querySelector('input[type="search"]')?.value || '';
       handleFinalSearchRes(currentQuery);
     }
-  }, [selectedGenres])
+  }, [selectedGenres, minRating, maxRating, sortByRating, sortByDate])
 
   const handleGenreToggle = (genre) => {
     setSelectedGenres(prev => 
@@ -254,9 +263,29 @@ function SearchRender() {
     )
   }
 
-  const handleClearGenres = () => {
+  const handleClearFilters = () => {
     setSelectedGenres([])
+    setMinRating('')
+    setMaxRating('')
+    setSortByRating('')
+    setSortByDate('')
   }
+
+  const getSortLabel = () => {
+    const labels = [];
+    
+    if (sortByRating === 'desc') 
+      labels.push('Rating: High to Low')
+    else if (sortByRating === 'asc') 
+      labels.push('Rating: Low to High')
+    
+    if (sortByDate === 'desc') 
+      labels.push('Release: Newest to Oldest')
+    else if (sortByDate === 'asc') 
+      labels.push('Release: Oldest to Newest')
+    
+    return labels.length > 0 ? labels.join(' → ') : '';
+}
 
   const fetchUserLists = async () => {
     try {
@@ -360,185 +389,206 @@ function SearchRender() {
     }
   }
 
+  const filterSelected = selectedGenres.length > 0 || minRating || maxRating || sortByRating || sortByDate
+
   return (
-    <div className="SearchRender">
+  <div 
+    className="SearchRender"
+    style={{
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "20px",
+      padding: "20px"
+    }}>
+    <div style={{ flex: 1 }}>
+      <h1>Search</h1>
+      <SearchBar onFinalSearch={handleFinalSearchRes} selectedGenres={selectedGenres} />
+
       {successMessage && (
-        <div
-          style={{
-            backgroundColor: "#28a745",
-            color: "white",
-            padding: "10px",
-            borderRadius: "4px",
-            marginBottom: "20px",
-            textAlign: "center",
-            maxWidth: "650px",
-            margin: "0 auto 20px",
-          }}
-        >
+        <div style={{
+          backgroundColor: "#28a745",
+          color: "white",
+          padding: "10px",
+          borderRadius: "4px",
+          marginTop: "20px",
+          textAlign: "center"
+        }}>
           {successMessage}
         </div>
       )}
-      
+
       {errorMessage && (
-        <div
-          style={{
+        <div style={{
           backgroundColor: "#dc3545",
           color: "white",
           padding: "10px",
           borderRadius: "4px",
-          marginBottom: "20px",
-          textAlign: "center",
-          maxWidth: "650px",
-          margin: "0 auto 20px",
-        }}
-      >
-        {errorMessage}
-      </div>
-    )}
-
-      <h1>Search</h1>
-      <SearchBar onFinalSearch={handleFinalSearchRes} selectedGenres={selectedGenres}/> 
-
-      <div style={{
-        width: '650px',
-        margin: '20px auto',
-        padding: '15px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        backgroundColor: '#f8f9fa'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '10px'
+          marginTop: "20px",
+          textAlign: "center"
         }}>
-          <h3 style={{ margin: 0 }}>Filter by Genre</h3>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {selectedGenres.length > 0 && (
-              <>
-                <button
-                  onClick={() => handleFinalSearchRes('')}
-                  style={{
-                    padding: '5px 15px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  Search by Genre
-                </button>
-                <button
-                  onClick={handleClearGenres}
-                  style={{
-                    padding: '5px 10px',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px'
-                  }}
-                >
-                  Clear All
-                </button>
-              </>
-            )}
-          </div>
+          {errorMessage}
         </div>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px'
-          }}>
-            {availableGenres.map(genre => (
-              <label
-                key={genre}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '6px 12px',
-                  backgroundColor: selectedGenres.includes(genre) ? '#007bff' : 'white',
-                  color: selectedGenres.includes(genre) ? 'white' : '#333',
-                  border: '1px solid #ccc',
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  userSelect: 'none',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedGenres.includes(genre)}
-                  onChange={() => handleGenreToggle(genre)}
-                  style={{ marginRight: '6px' }}
-                />
-                {genre}
-              </label>
-            ))}
-          </div>
-        {selectedGenres.length > 0 && (
-          <p style={{ 
-            marginTop: '10px', 
-            marginBottom: '0',
-            fontSize: '14px',
-            color: '#666'
-          }}>
-            Active filters: <strong>{selectedGenres.join(', ')}</strong>
-          </p>
-        )}
-      </div>
-
-      <hr style={{ width: '650px', margin: '20px auto' }} />
+      )}
 
       {finalSearchRes.length > 0 && (
-        <h2>Number of Games Matched: ({filteredResults.length})</h2>
+        <h2 style={{ marginTop: "20px" }}>
+          Number of Games Matched: ({filteredResults.length})
+        </h2>
       )}
+
       {isLoading && <p>Loading games...</p>}
-      
+
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length === 0 && (
-          <p>No games found. Try searching above!</p>
+        <p>No games found. Try searching above!</p>
       )}
 
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length > 0 && (
-          <p>No games match the selected genres. Try different filters!</p>
+        <p>No games match the selected filters. Try different settings!</p>
       )}
 
       {!isLoading && filteredResults.length > 0 && (
-          <div style={{
-              display: 'flex',
-              flexDirection: 'column', 
-              gap: '15px', 
-              width: '650px', 
-              margin: '20px auto'}}>
-              {filteredResults.map((game, index) => ( 
-                <GameComp 
-                  key={game.id || game.slug || index} 
-                  game={game}
-                  onAddToList={handleAddToListClick}
-                /> 
-              ))}
-          </div>
-      )}
-
-      {showAddToListModal && selectedGameForList && (
-        <AddToListModal
-          lists={userLists}
-          game={selectedGameForList}
-          onClose={() => {
-            setShowAddToListModal(false)
-            setSelectedGameForList(null)
-          }}
-          onAddToLists={handleAddGameToLists}
-          onCreateNewList={handleCreateNewList}
-        />
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "15px",
+          marginTop: "20px"
+        }}>
+          {filteredResults.map((game, index) => (
+            <GameComp
+              key={game.id || game.slug || index}
+              game={game}
+              onAddToList={handleAddToListClick}
+            />
+          ))}
+        </div>
       )}
     </div>
+
+    <div style={{
+      width: "250px",
+      padding: "15px",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      backgroundColor: "#f8f9fa"
+    }}>
+      <h3 style={{ marginTop: 0 }}>Filters</h3>
+
+      <h4 style={{ marginTop: "15px" }}>Genre</h4>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {availableGenres.map(genre => (
+          <label
+            key={genre}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "6px 12px",
+              backgroundColor: selectedGenres.includes(genre) ? "#007bff" : "white",
+              color: selectedGenres.includes(genre) ? "white" : "#333",
+              border: "1px solid #ccc",
+              borderRadius: "20px",
+              cursor: "pointer",
+              fontSize: "14px"
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={selectedGenres.includes(genre)}
+              onChange={() => handleGenreToggle(genre)}
+              style={{ marginRight: "6px" }}
+            />
+            {genre}
+          </label>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <h4>Rating Range</h4>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <input
+            type="number"
+            placeholder="Min"
+            value={minRating}
+            onChange={(e) => setMinRating(e.target.value)}
+            min="0"
+            max="5"
+            step="0.1"
+            style={{ flex: 1, padding: "6px" }}
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            value={maxRating}
+            onChange={(e) => setMaxRating(e.target.value)}
+            min="0"
+            max="5"
+            step="0.1"
+            style={{ flex: 1, padding: "6px" }}
+          />
+        </div>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <h4>Sort By</h4>
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          style={{ width: "100%", padding: "6px" }}
+        >
+          <option value="">None</option>
+          <option value="released-desc">Release Date (Newest)</option>
+          <option value="released-asc">Release Date (Oldest)</option>
+          <option value="rating-desc">Rating (High → Low)</option>
+          <option value="rating-asc">Rating (Low → High)</option>
+        </select>
+      </div>
+
+      <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+        <button
+          onClick={() => handleFinalSearchRes("")}
+          style={{
+            padding: "6px 10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "12px",
+            fontWeight: "bold"
+          }}
+        >
+          Apply
+        </button>
+        <button
+          onClick={handleClearFilters}
+          style={{
+            padding: "6px 10px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "12px"
+          }}
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+
+    {showAddToListModal && selectedGameForList && (
+      <AddToListModal
+        lists={userLists}
+        game={selectedGameForList}
+        onClose={() => {
+          setShowAddToListModal(false);
+          setSelectedGameForList(null);
+        }}
+        onAddToLists={handleAddGameToLists}
+        onCreateNewList={handleCreateNewList}
+      />
+    )}
+
+  </div>
   );
 }
 
