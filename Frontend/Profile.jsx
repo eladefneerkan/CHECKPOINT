@@ -1,4 +1,5 @@
 // Frontend/Profile.jsx
+import FrogBanner from "../assets/ad_banner-blue.png";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./Auth";
@@ -152,6 +153,38 @@ export default function Profile() {
 
   return (
     <section  style={{backgroundImage: "linear-gradient(to top, #002744ff, #00070aff)"}}>
+
+      <div 
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+      <button
+        onClick={() => window.open("https://agsiddiqui.itch.io/afterworld", "_blank")}
+        style={{
+          border: "none",
+          background: "transparent",
+          padding: 0,
+          cursor: "pointer",
+        }}
+      >
+        <img 
+          src={FrogBanner}
+          alt="Frog Ad Banner"
+          style={{
+            width: "95%",
+            maxWidth: "850px",
+            borderRadius: "12px",
+            boxShadow: "0 0 20px rgba(0,0,0,0.4)",
+          }}
+        />
+      </button>
+    </div>
+
     <div style={{ color: "white", maxWidth: 720, margin: "32px auto", padding: 16 }}>
       {/* Nav */}
       <div

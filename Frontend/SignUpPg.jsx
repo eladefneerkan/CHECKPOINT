@@ -1,3 +1,4 @@
+import FrogBanner from "../assets/ad_banner_pink.png";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './Auth';
@@ -163,6 +164,37 @@ const SignupForm = () => {
           </button>
         </div>
 
+        <div 
+          style={{
+            marginTop: "2rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <button
+            onClick={() => window.open("https://agsiddiqui.itch.io/afterworld", "_blank")}
+            style={{
+              border: "none",
+              background: "transparent",
+              padding: 0,
+              cursor: "pointer",
+            }}
+          >
+            <img 
+              src={FrogBanner} 
+              alt="Frog Banner"
+              style={{
+                width: "100%",
+                maxWidth: "500px",
+                borderRadius: "10px",
+                boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+              }}
+            />
+          </button>
+        </div>
+
         {/* Login button placed below the fields */}
         <div style={{ marginTop: 12 }}>
           <button className="btn-secondary" onClick={() => navigate('/login')}>
@@ -171,6 +203,7 @@ const SignupForm = () => {
         </div>
       </div>
     </div>
+    
   );
 };
 
