@@ -1,4 +1,5 @@
 import grassBg from "../assets/grass_bg.avif";
+import FrogBanner from "../assets/ad_banner_green.png";
 import {useNavigate} from 'react-router-dom';
 import Flag from '../assets/Flag.png';
 function PotionBackground() {
@@ -74,6 +75,39 @@ export default function Home() {
           <li class="posteritem">AAA</li>
           <li class="posteritem">AAA</li>
         </ul>
+
+      <div 
+        style={{
+          marginTop: "2rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <button
+          onClick={() => window.open("https://agsiddiqui.itch.io/afterworld", "_blank")}
+          style={{
+            border: "none",
+            background: "transparent",
+            padding: 0,
+            cursor: "pointer",
+          }}
+        >
+          <img 
+            src={FrogBanner} 
+            alt="Frog Banner"
+            style={{
+              width: "90%",
+              maxWidth: "800px",
+              borderRadius: "10px",
+              boxShadow: "0 0 20px rgba(0,0,0,0.5)",
+            }}
+          />
+        </button>
+      </div>
+
+
        {/*<button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
         <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>    */   } 
       </div>
