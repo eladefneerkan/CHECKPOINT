@@ -4,17 +4,6 @@ import Flag from '../assets/Flag.png';
 function PotionBackground() {
   const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
-const [currentSlide, setCurrentSlide] = useState(0);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentSlide((prev) => (prev + 1) % 3);
-  }, 3000); // 3 seconds
-
-  return () => clearInterval(interval);
-}, []);
-
-
   return (
     <div className="potion-background">
       {bubbles.map((_, i) => (
@@ -85,60 +74,6 @@ export default function Home() {
           <li class="posteritem">AAA</li>
           <li class="posteritem">AAA</li>
         </ul>
-
-        {/* ⭐ IMAGE CAROUSEL ⭐ */}
-      <div
-        style={{
-          marginTop: "2rem",
-          width: "80%",
-          marginLeft: "auto",
-          marginRight: "auto",
-          position: "relative",
-          overflow: "hidden",
-          borderRadius: "12px",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.4)"
-        }}
-      >
-        <div
-          className="carousel-track"
-          style={{
-            display: "flex",
-            width: "300%",
-            transform: `translateX(-${currentSlide * 100}%)`,
-            transition: "transform 0.8s ease-in-out"
-          }}
-        >
-          <img
-            src="https://via.placeholder.com/1200x400/ff4444/ffffff?text=Banner+1"
-            alt="banner1"
-            style={{ width: "100%", objectFit: "cover" }}
-          />
-          <img
-            src="https://via.placeholder.com/1200x400/44ff44/ffffff?text=Banner+2"
-            alt="banner2"
-            style={{ width: "100%", objectFit: "cover" }}
-          />
-          <img
-            src="https://via.placeholder.com/1200x400/4444ff/ffffff?text=Banner+3"
-            alt="banner3"
-            style={{ width: "100%", objectFit: "cover" }}
-          />
-        </div>
-
-        <button
-          onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-          style={navBtnStyle}
-        >
-          ◀
-        </button>
-        <button
-          onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-          style={{ ...navBtnStyle, right: 0 }}
-        >
-          ▶
-        </button>
-      </div>
-
        {/*<button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
         <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>    */   } 
       </div>
