@@ -3,7 +3,7 @@ CS 35L
 
 # Authors
 Vaishnavi Sam 
-Ela Defne Erkan 
+Ela Defne Erkan - edefneerkan@gmail.com
 Anam Siddiqui
 Allison Gao
 Jeffrey Joseph - jjeffrey0022@gmail.com
