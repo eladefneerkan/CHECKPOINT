@@ -2,7 +2,7 @@
 
 ## Description
 
-**CHECKPOINT** is a full-stack web application for discovering, searching, and managing video games. Users can search a comprehensive database of games, view detailed information, create personalized game lists, and share reviews.
+**CHECKPOINT** is a social cataloging website for video game fans. Users can create profiles to track their “Played” and “To Play” lists of video games, rate video games, leave reviews, read other users’ reviews, and add other users as friends. It serves as an extensive database for users can browse information on video games and connect with other users interested in similar games. 
 
 ---
 
