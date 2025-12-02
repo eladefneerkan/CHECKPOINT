@@ -60,38 +60,26 @@ export default function SearchUsers() {
 
   return (
     <section style={{ backgroundImage: "linear-gradient(to top, #000000ff, #003632ff)", minHeight: "100vh" }}>
-      <div style={{ color: "white", padding: "2rem" }}>
+      <div style={{ alignItems: 'center', color: "white", padding: "2rem", display: 'flex', flexDirection: 'column' }}>
         <h1>User Search</h1>
+        
+        <div style={{ position: 'relative', width: '650px', display: 'flex' }}>
+          <input
+            type="text"
+            placeholder="Search usernames…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && searchUsers()}
+            className={`search-bar-base${results.length > 0 ? ' search-bar-active' : ''}`}
+          />
 
-        <input
-          type="text"
-          placeholder="Search usernames…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && searchUsers()}
-          style={{
-            width: "300px",
-            padding: "10px",
-            borderRadius: "6px",
-            border: "1px solid #555",
-            marginRight: "10px",
-          }}
-        />
-
-        <button
-          onClick={searchUsers}
-          style={{
-            padding: "10px 14px",
-            borderRadius: "6px",
-            background: "#2563eb",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          Search
-        </button>
+          <button
+            onClick={searchUsers}
+            className='search-button'
+          >
+            Search
+          </button>
+        </div>
 
         <div style={{ marginTop: "2rem" }}>
           {loading && <p>Searching...</p>}

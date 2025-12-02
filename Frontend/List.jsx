@@ -147,7 +147,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
       padding: '20px' 
     }}>
       
-      <h1 id="bum"  >Search for Games to add to your List!</h1>
+      <h1 id="bum"  >Search for Games to Add to Your List!</h1>
     
       <div style={{ position: 'relative', width: '650px', display: 'flex' }}> 
 
@@ -157,29 +157,12 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
           value={userSearch}    
           onChange={handleInputChange} 
           onKeyDown={handleUserEnter}
-          style={{ 
-            padding: '10px', 
-            borderRadius: '5px', 
-            border: '1px solid #ccc', 
-            width: '100%', 
-            borderBottomLeftRadius: matchedResults.length > 0 ? '0' : '5px',
-            borderBottomRightRadius: matchedResults.length > 0 ? '0' : '5px',
-            outline: 'none'
-          }}
+          className={`search-bar-base ${matchedResults.length > 0 ? 'search-bar-active' : ''}`}
         />
       
         <button
             onClick={() => handleSearchRes()}
-            style={{
-                padding: '10px 15px',
-                border: '1px solid #ccc',
-                backgroundColor: '#007bff',
-                color: 'white',
-                cursor: 'pointer',
-                borderRadius: '5px',
-                borderTopLeftRadius: '0',
-                borderBottomLeftRadius: '0',
-            }}>
+            className='search-button'>
             Search
         </button>
         {matchedResults.length > 0 && dropdownVisible && (
@@ -500,7 +483,6 @@ if (!option || results.length === 0) return results;
       padding: "20px"
     }}>
     <div style={{ flex: 1 }}>
-      <h1>Search</h1>
       <SearchBar onFinalSearch={handleFinalSearchRes} initialQuery={currentQuery} selectedGenres={selectedGenres} clearDropdownTrigger={clearSearchbarDropdown} />
 
       {successMessage && (
@@ -530,19 +512,19 @@ if (!option || results.length === 0) return results;
       )}
 
       {finalSearchRes.length > 0 && (
-        <h2 style={{ marginTop: "20px" }}>
+        <h2 style={{ marginTop: "5px", marginBottom: "5px", fontStyle: "italic", color: "white" }}>
           Number of Games Matched: ({filteredResults.length})
         </h2>
       )}
 
-      {isLoading && <p>Loading games...</p>}
+      {isLoading && <p className='search-load-msg'>Loading games...</p>}
 
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length === 0 && (
-        <p>No games found. Try searching above!</p>
+        <p className='search-load-msg'>No games found. Try searching above!</p>
       )}
 
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length > 0 && (
-        <p>No games match the selected filters. Try different settings!</p>
+        <p className='search-load-msg'>No games match the selected filters. Try different settings!</p>
       )}
 
       {!isLoading && filteredResults.length > 0 && (

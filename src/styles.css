@@ -776,3 +776,33 @@ section {
     flex-wrap: wrap;
     margin-left: -60px; /*math it out*/
 }
+
+.search-button {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.search-bar-base{
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  border-radius: 5px;
+  outline: none;
+}
+
+.search-bar-active{
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.search-load-msg{
+color: white; 
+font-style: italic;
+text-align: center;
+} 
