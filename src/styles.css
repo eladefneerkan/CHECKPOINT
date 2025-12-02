@@ -103,7 +103,7 @@ section {
   background-color: #161a1e;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   padding: 15px;
-  width: 100%;
+  width: 95%;
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
 }
