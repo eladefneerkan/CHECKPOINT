@@ -1,49 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameComp from './GameObj.jsx'
-import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
+import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApiHydration.js'
 import { useLocation, useNavigate } from 'react-router-dom'
-
-const fetchGames = async (query = '', genres = [], minRating = '', maxRating = '', sortOption = '') => {
-    try {
-
-        // Build URL with query and genres
-        let url = '/search/Games?';
-        const params = new URLSearchParams();
-        
-        if (query) params.append('q', query);
-        if (genres.length > 0) params.append('genres', genres.join(','));
-        if (minRating) params.append('minRating', minRating);
-        if (maxRating) params.append('maxRating', maxRating);
-        if (sortOption) params.append('sortOption', sortOption);
-        url += params.toString();
-        
-        const response = await fetch(url);
-        if (!response.ok) return [];
-        const data = await response.json();
-        
-        console.log("RAW API DATA:", JSON.stringify(data, null, 2));
-
-        const hydratedData = data.map(rawGame => {
-            return new GameObj(
-                rawGame.id, 
-                rawGame.name, 
-                rawGame.slug, 
-                rawGame.released, 
-                rawGame.rating, 
-                rawGame.description, 
-                rawGame.background_image, 
-                rawGame.genres
-            )
-        })
-        return hydratedData
-        
-    } 
-    catch (error) {
-        console.error('Error fetching final search results:', error);
-        return [];
-    }
-}
 
 function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initialQuery }) {
   const [userSearch, setUserSearch] = useState('')
@@ -82,32 +41,9 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
       try {
         // If user typed exactly one character, ask backend for games
         // that start with that character by sending a start-anchored regex.
-        const qParam = query.length === 1 && /^[a-z]$/i.test(query)
-          ? `^${query}`
-          : query;
-        
-        // Build URL with query and genres if any are selected
-        let url = `/search/Games?q=${encodeURIComponent(qParam)}`;
-        if (selectedGenres.length > 0) {
-          url += `&genres=${selectedGenres.join(',')}`;
-        }
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.error('Search request failed:', response.status);
-          return;
-        }
-        const data = await response.json();
-        setMatchedResults( data.map(rawGame => new GameObj(
-          rawGame.id,
-          rawGame.name,
-          rawGame.slug,
-          rawGame.released,
-          rawGame.rating,
-          rawGame.description,
-          rawGame.background_image,
-          rawGame.genres
-        )));  
+        const data = await fetchAutoCompleteGames(query, selectedGenres);
+        setMatchedResults(data);
+
       } catch (error) {
         console.error('Error fetching search results:', error);
       }
@@ -283,7 +219,7 @@ if (!option || results.length === 0) return results;
     setMaxRating(maxR);
     setSortOption(sortO);
 
-    const results = await fetchGames(query, genres, minR, maxR, sortO);
+    const results = await fetchFinalGames({query, genres, minRating: minR, maxRating: maxR});
     setFinalSearchRes(results);
     setFilteredResults(sortResults(results, sortO)); 
     setIsLoading(false);
