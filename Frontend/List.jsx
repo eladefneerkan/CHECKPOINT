@@ -468,7 +468,8 @@ if (!option || results.length === 0) return results;
           display: "flex",
           flexDirection: "column",
           gap: "15px",
-          marginTop: "20px"
+          marginTop: "20px",
+          backgroundImage: "linear-gradient(to top, #003632ff, #000000ff)",
         }}>
           {filteredResults.map((game, index) => (
             <GameComp
@@ -486,7 +487,7 @@ if (!option || results.length === 0) return results;
       padding: "15px",
       border: "1px solid #ddd",
       borderRadius: "8px",
-      backgroundImage: "linear-gradient(to top, #5c2affff, black)",
+      backgroundImage: "linear-gradient(to top, #37189eff, #0c0425ff)",
       backgroundSize: "cover",
       position: 'relative',
       overflow: 'hidden',
@@ -494,7 +495,7 @@ if (!option || results.length === 0) return results;
 
       
       <div style={{ position: 'relative', zIndex: 1, color: "#a9d4ff" }}>
-        <h3 style={{ marginTop: 0, color: "#a9d4ff" }}>Filters:</h3>
+        <h3 style={{ marginTop: 0, color: "#a9d4ff", textAlign: "center" }}>Filters</h3>
 
         <h4 style={{ marginTop: "15px", color: "#a9d4ff" }}>Genre:</h4>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -517,6 +518,7 @@ if (!option || results.length === 0) return results;
                 type="checkbox"
                 checked={selectedGenres.includes(genre)}
                 onChange={() => handleGenreToggle(genre)}
+                className="custom-checkbox"
                 style={{ marginRight: "6px" }}
               />
               {genre}

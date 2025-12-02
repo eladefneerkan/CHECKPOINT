@@ -806,3 +806,7 @@ color: white;
 font-style: italic;
 text-align: center;
 } 
+
+.custom-checkbox {
+  accent-color: #37189eff;
+}
