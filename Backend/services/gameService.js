@@ -36,7 +36,7 @@ const searchGames = async (
     
         // Handle name search 
         if (safeQuery) {
-            const escapedQuery = escapeRegex(safeQuery);
+            const escapedQuery = searchToRegex(safeQuery);
             const regex = new RegExp(escapedQuery, "i"); 
             searchCriteria.name = regex;
         }
