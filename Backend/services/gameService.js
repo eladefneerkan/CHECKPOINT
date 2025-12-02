@@ -2,9 +2,11 @@
 
 const Game = require("../models/Games"); 
 
-function escapeRegex(text) {
+// converts the user input into a valid regex expression for db search
+function searchToRegex(text) {
     let prefix = '';
     
+    // saves the ^ if present (for starts-with searches w/ one letter)
     if (text.startsWith('^')) {
         prefix = '^';
         text = text.substring(1);
@@ -35,15 +37,7 @@ const searchGames = async (
         // Handle name search 
         if (safeQuery) {
             const escapedQuery = escapeRegex(safeQuery);
-            let finalRegexString;
-
-            if (escapedQuery.startsWith('^')) {
-                finalRegexString = escapedQuery;
-            } else {
-                finalRegexString = '.*' + escapedQuery + '.*';
-            }
-
-            const regex = new RegExp(finalRegexString, "i"); 
+            const regex = new RegExp(escapedQuery, "i"); 
             searchCriteria.name = regex;
         }
 
