@@ -594,7 +594,17 @@ if (!option || results.length === 0) return results;
             Apply
           </button>
           <button
-            onClick={handleClearFilters}
+            onClick={() => {
+            handleClearFilters();
+            const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
+            handleFinalSearchRes(
+            queryFromInput, // keep the current search query
+            [], // to ensure filter reset, pass empty default values to bypass async state updates
+            '',
+            '',
+            '');
+            setClearSearchbarDropdown(prev => prev + 1);
+            }}
             style={{
               padding: "6px 10px",
               backgroundColor: "#6c757d",
