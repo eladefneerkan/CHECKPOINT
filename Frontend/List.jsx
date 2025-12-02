@@ -486,118 +486,126 @@ if (!option || results.length === 0) return results;
       padding: "15px",
       border: "1px solid #ddd",
       borderRadius: "8px",
-      backgroundColor: "#f8f9fa"
+      backgroundImage: "linear-gradient(to top, #5c2affff, black)",
+      backgroundSize: "cover",
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      <h3 style={{ marginTop: 0, color: "black" }}>Filters:</h3>
 
-      <h4 style={{ marginTop: "15px", color: "black" }}>Genre</h4>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-        {availableGenres.map(genre => (
-          <label
-            key={genre}
+      
+      <div style={{ position: 'relative', zIndex: 1, color: "#a9d4ff" }}>
+        <h3 style={{ marginTop: 0, color: "#a9d4ff" }}>Filters:</h3>
+
+        <h4 style={{ marginTop: "15px", color: "#a9d4ff" }}>Genre:</h4>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {availableGenres.map(genre => (
+            <label
+              key={genre}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "6px 12px",
+                backgroundColor: selectedGenres.includes(genre) ? "#a9d4ff" : "white",
+                color: /*selectedGenres.includes(genre) ? "white" :*/ "#333",
+                border: "1px solid #ccc",
+                borderRadius: "20px",
+                cursor: "pointer",
+                fontSize: "14px"
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={selectedGenres.includes(genre)}
+                onChange={() => handleGenreToggle(genre)}
+                style={{ marginRight: "6px" }}
+              />
+              {genre}
+            </label>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
+          <h4 style={{ color: "#a9d4ff" }}>Rating Range:</h4>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="number"
+              placeholder="Min"
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+              min="0"
+              max="5"
+              step="0.1"
+              style={{ flex: 1, padding: "6px" }}
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxRating}
+              onChange={(e) => setMaxRating(e.target.value)}
+              min="0"
+              max="5"
+              step="0.1"
+              style={{ flex: 1, padding: "6px" }}
+            />
+          </div>
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
+          <h4 style={{ color: "#a9d4ff" }}>Sort By:</h4>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            style={{ width: "100%", padding: "6px" }}
+          >
+            <option value="">None</option>
+            <option value="released-desc">Release Date (Newest)</option>
+            <option value="released-asc">Release Date (Oldest)</option>
+            <option value="rating-desc">Rating (High → Low)</option>
+            <option value="rating-asc">Rating (Low → High)</option>
+          </select>
+        </div>
+
+
+        <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => {
+            const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
+            handleFinalSearchRes(
+            queryFromInput, 
+            selectedGenres, 
+            minRating, 
+            maxRating, 
+            sortOption);
+            setClearSearchbarDropdown(prev => prev + 1);
+            }}
             style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "6px 12px",
-              backgroundColor: selectedGenres.includes(genre) ? "#007bff" : "white",
-              color: selectedGenres.includes(genre) ? "white" : "#333",
-              border: "1px solid #ccc",
-              borderRadius: "20px",
+              padding: "6px 10px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
               cursor: "pointer",
-              fontSize: "14px"
+              fontSize: "12px",
+              fontWeight: "bold"
             }}
           >
-            <input
-              type="checkbox"
-              checked={selectedGenres.includes(genre)}
-              onChange={() => handleGenreToggle(genre)}
-              style={{ marginRight: "6px" }}
-            />
-            {genre}
-          </label>
-        ))}
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <h4 style={{ color: "black" }}>Rating Range:</h4>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <input
-            type="number"
-            placeholder="Min"
-            value={minRating}
-            onChange={(e) => setMinRating(e.target.value)}
-            min="0"
-            max="5"
-            step="0.1"
-            style={{ flex: 1, padding: "6px" }}
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxRating}
-            onChange={(e) => setMaxRating(e.target.value)}
-            min="0"
-            max="5"
-            step="0.1"
-            style={{ flex: 1, padding: "6px" }}
-          />
+            Apply
+          </button>
+          <button
+            onClick={handleClearFilters}
+            style={{
+              padding: "6px 10px",
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px"
+            }}
+          >
+            Clear
+          </button>
         </div>
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <h4 style={{ color: "black" }}>Sort By:</h4>
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          style={{ width: "100%", padding: "6px" }}
-        >
-          <option value="">None</option>
-          <option value="released-desc">Release Date (Newest)</option>
-          <option value="released-asc">Release Date (Oldest)</option>
-          <option value="rating-desc">Rating (High → Low)</option>
-          <option value="rating-asc">Rating (Low → High)</option>
-        </select>
-      </div>
-
-      <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-        <button
-          onClick={() => {
-          const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
-          handleFinalSearchRes(
-          queryFromInput, 
-          selectedGenres, 
-          minRating, 
-          maxRating, 
-          sortOption);
-          setClearSearchbarDropdown(prev => prev + 1);
-          }}
-          style={{
-            padding: "6px 10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "12px",
-            fontWeight: "bold"
-          }}
-        >
-          Apply
-        </button>
-        <button
-          onClick={handleClearFilters}
-          style={{
-            padding: "6px 10px",
-            backgroundColor: "#6c757d",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "12px"
-          }}
-        >
-          Clear
-        </button>
       </div>
     </div>
 
