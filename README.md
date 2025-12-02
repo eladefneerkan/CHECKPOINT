@@ -146,10 +146,10 @@ EMAIL_PASS=your_email_password_or_app_specific_password
 
 ## Authors
 
-* Vaishnavi Sam
-* Ela Defne Erkan
-* Anam Siddiqui
-* Allison Gao
+* Vaishnavi Sam - [sam.vaishnavi@gmail.com]
+* Ela Defne Erkan - [edefneerkan@g.ucla.edu]
+* Anam Siddiqui - [anamgsiddiqui@gmail.com]
+* Allison Gao - [Scotoplane@g.ucla.edu]
 * Jeffrey Joseph - [jjeffrey0022@gmail.com]
 
 ---
