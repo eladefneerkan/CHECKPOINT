@@ -38,7 +38,7 @@ export default function App() {
         <Route path="verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="game/:id" element={<PageTransition><GamePage /></PageTransition>} />
         <Route path="/search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
-        <Route path="/user/:id" element={<OtherUserProfile />} />
+        <Route path="/user/:id" element={<PageTransition><OtherUserProfile /></PageTransition>} />
         {/* <Route path="review" element={<ReviewModel />} /> */}
       </Route>
     </Routes>
