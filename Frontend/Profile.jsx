@@ -19,6 +19,8 @@ export default function Profile() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [deletePassword, setDeletePassword] = useState("");
+  const [myLists, setMyLists] = useState([]);
+
 
 
   // Sync local state with auth context when authUser changes
@@ -31,6 +33,27 @@ export default function Profile() {
   }, [authUser]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function loadMyLists() {
+      if (!authUser?._id) return;
+  
+      try {
+        const res = await fetch(`http://localhost:3000/users/${authUser._id}/lists`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+  
+        const data = await res.json();
+        setMyLists(data.lists || []);
+      } catch (err) {
+        console.error("Error loading my lists:", err);
+        setMyLists([]);
+      }
+    }
+  
+    loadMyLists();
+  }, [authUser]);
+  
 
   useEffect(() => {
     const handler = () => setActiveTab("profile");
@@ -344,7 +367,8 @@ export default function Profile() {
           <div style={{ marginBottom: "12px" }}>
             <button onClick={() => setActiveTab("profile")} style={{ padding: "8px 12px", backgroundColor: "#6c757d", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", marginBottom: "8px" }}>← Back to Profile</button>
           </div>
-          <GameListManager />
+          <GameListManager lists={myLists} reloadLists={() => window.dispatchEvent(new Event("openProfileListsTab"))} />
+
         </div>
       )}
 

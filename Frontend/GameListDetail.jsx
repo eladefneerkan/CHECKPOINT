@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GameComp from "./GameObj.jsx";
 import GameObj from "./models/GameObj.js";
+import { useAuth } from "./Auth";
+import { useParams } from "react-router-dom";
 
-export default function GameListDetail({ listId, onBack }) {
+export default function GameListDetail({ onBack }) {
+  const { listId } = useParams();
   const [list, setList] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -16,12 +19,14 @@ export default function GameListDetail({ listId, onBack }) {
   const [deleteListConfirm, setDeleteListConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const { user: authUser } = useAuth();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchListDetail();
   }, [listId]);
+
 
   const fetchListDetail = async () => {
     try {
@@ -183,6 +188,8 @@ export default function GameListDetail({ listId, onBack }) {
     );
   }
 
+  const isOwner = authUser && list && list.userId === authUser._id;
+
   const gameObjects = (list?.games || []).map((game)=> {
     return new GameObj(
       game.id,
@@ -251,7 +258,8 @@ export default function GameListDetail({ listId, onBack }) {
               this list
             </p>
 
-            <div style={{ display: "flex", gap: "10px", alignItems: 'center' }}>
+            {isOwner && (
+              <div style={{ display: "flex", gap: "10px", alignItems: 'center' }}>
               <button
                 onClick={() => setEditMode(true)}
                 style={{
@@ -330,7 +338,8 @@ export default function GameListDetail({ listId, onBack }) {
               >
                 Delete List
               </button>
-            </div>
+              </div>
+            )}
           </div>
 
           <hr style={{ borderColor: "#444", margin: "30px 0" }} />
