@@ -58,6 +58,7 @@ export default function GameListManager() {
           title: newListTitle,
           description: "",
           coverImage: defaultCoverImage,
+          isPublic: false,
         }),
       });
       if (!response.ok) {

@@ -8,7 +8,7 @@ const Game = require("../models/Games");
 // POST: Create a new game list for the logged-in user
 router.post("/", auth, async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, isPublic } = req.body;
 
     if (!title || title.trim() === "") {
       return res.status(400).json({ error: "Title is required" });
@@ -18,6 +18,7 @@ router.post("/", auth, async (req, res) => {
       userId: req.user.id,
       title,
       description: description || "",
+      isPublic: isPublic ?? false,
       games: [],
     });
 
@@ -53,6 +54,21 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
+router.get("/public/user/:userId", async (req, res) => {
+  try {
+    const lists = await GameList.find({
+      userId: req.params.userId,
+      isPublic: true
+    })
+      .populate("games")
+      .sort({ updatedAt: -1 });
+
+    res.json(lists);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET: Fetch a specific list by ID (with populated games)
 router.get("/:listId", auth, async (req, res) => {
   try {
@@ -62,10 +78,15 @@ router.get("/:listId", auth, async (req, res) => {
       return res.status(404).json({ error: "List not found" });
     }
 
+    if (!list.isPublic && list.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: "List is private."})
+    }
+
+    /*
     // Check ownership
     if (list.userId.toString() !== req.user.id) {
       return res.status(403).json({ error: "Unauthorized" });
-    }
+    }*/
 
     res.json(list);
   } catch (err) {
@@ -239,6 +260,25 @@ router.delete("/:listId/games/:gameId", auth, async (req, res) => {
       message: "Game removed from list successfully",
       list: updatedList,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/:listId/privacy", auth, async (req, res) => {
+  try {
+    const { isPublic } = req.body;
+
+    const list = await GameList.findById(req.params.listId);
+    if (!list) return res.status(404).json({ error: "List not found" });
+
+    if (list.userId.toString() !== req.user.id)
+      return res.status(403).json({ error: "Unauthorized" });
+
+    list.isPublic = isPublic;
+    await list.save();
+
+    res.json({ message: "Privacy updated", isPublic });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
