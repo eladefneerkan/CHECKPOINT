@@ -34,6 +34,11 @@ export default function GameListDetail({ listId, onBack }) {
         }
       );
       const data = await response.json();
+      if (data.error) {
+        setList(null);
+        setLoading(false);
+        return;
+      }
       setList(data);
       setEditTitle(data.title);
       setEditDescription(data.description);
@@ -178,7 +183,7 @@ export default function GameListDetail({ listId, onBack }) {
     );
   }
 
-  const gameObjects = list.games.map((game) => {
+  const gameObjects = (list?.games || []).map((game)=> {
     return new GameObj(
       game.id,
       game.name,
