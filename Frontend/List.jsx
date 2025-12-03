@@ -1,49 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameComp from './GameObj.jsx'
-import GameObj from './models/GameObj.js'
 import AddToListModal from './AddToListModal.jsx'
+import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApiHydration.js'
 import { useLocation, useNavigate } from 'react-router-dom'
-
-const fetchGames = async (query = '', genres = [], minRating = '', maxRating = '', sortOption = '') => {
-    try {
-
-        // Build URL with query and genres
-        let url = '/search/Games?';
-        const params = new URLSearchParams();
-        
-        if (query) params.append('q', query);
-        if (genres.length > 0) params.append('genres', genres.join(','));
-        if (minRating) params.append('minRating', minRating);
-        if (maxRating) params.append('maxRating', maxRating);
-        if (sortOption) params.append('sortOption', sortOption);
-        url += params.toString();
-        
-        const response = await fetch(url);
-        if (!response.ok) return [];
-        const data = await response.json();
-        
-        console.log("RAW API DATA:", JSON.stringify(data, null, 2));
-
-        const hydratedData = data.map(rawGame => {
-            return new GameObj(
-                rawGame.id, 
-                rawGame.name, 
-                rawGame.slug, 
-                rawGame.released, 
-                rawGame.rating, 
-                rawGame.description, 
-                rawGame.background_image, 
-                rawGame.genres
-            )
-        })
-        return hydratedData
-        
-    } 
-    catch (error) {
-        console.error('Error fetching final search results:', error);
-        return [];
-    }
-}
 
 function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initialQuery }) {
   const [userSearch, setUserSearch] = useState('')
@@ -82,32 +41,9 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
       try {
         // If user typed exactly one character, ask backend for games
         // that start with that character by sending a start-anchored regex.
-        const qParam = query.length === 1 && /^[a-z]$/i.test(query)
-          ? `^${query}`
-          : query;
-        
-        // Build URL with query and genres if any are selected
-        let url = `/search/Games?q=${encodeURIComponent(qParam)}`;
-        if (selectedGenres.length > 0) {
-          url += `&genres=${selectedGenres.join(',')}`;
-        }
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.error('Search request failed:', response.status);
-          return;
-        }
-        const data = await response.json();
-        setMatchedResults( data.map(rawGame => new GameObj(
-          rawGame.id,
-          rawGame.name,
-          rawGame.slug,
-          rawGame.released,
-          rawGame.rating,
-          rawGame.description,
-          rawGame.background_image,
-          rawGame.genres
-        )));  
+        const data = await fetchAutoCompleteGames(query, selectedGenres);
+        setMatchedResults(data);
+
       } catch (error) {
         console.error('Error fetching search results:', error);
       }
@@ -147,7 +83,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
       padding: '20px' 
     }}>
       
-      <h1 id="bum"  >Search for Games to add to your List!</h1>
+      <h1 id="bum"  >Search for Games to Add to Your List!</h1>
     
       <div style={{ position: 'relative', width: '650px', display: 'flex' }}> 
 
@@ -157,29 +93,12 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
           value={userSearch}    
           onChange={handleInputChange} 
           onKeyDown={handleUserEnter}
-          style={{ 
-            padding: '10px', 
-            borderRadius: '5px', 
-            border: '1px solid #ccc', 
-            width: '100%', 
-            borderBottomLeftRadius: matchedResults.length > 0 ? '0' : '5px',
-            borderBottomRightRadius: matchedResults.length > 0 ? '0' : '5px',
-            outline: 'none'
-          }}
+          className={`search-bar-base ${matchedResults.length > 0 ? 'search-bar-active' : ''}`}
         />
       
         <button
             onClick={() => handleSearchRes()}
-            style={{
-                padding: '10px 15px',
-                border: '1px solid #ccc',
-                backgroundColor: '#007bff',
-                color: 'white',
-                cursor: 'pointer',
-                borderRadius: '5px',
-                borderTopLeftRadius: '0',
-                borderBottomLeftRadius: '0',
-            }}>
+            className='search-button'>
             Search
         </button>
         {matchedResults.length > 0 && dropdownVisible && (
@@ -300,7 +219,7 @@ if (!option || results.length === 0) return results;
     setMaxRating(maxR);
     setSortOption(sortO);
 
-    const results = await fetchGames(query, genres, minR, maxR, sortO);
+    const results = await fetchFinalGames({query, genres, minRating: minR, maxRating: maxR});
     setFinalSearchRes(results);
     setFilteredResults(sortResults(results, sortO)); 
     setIsLoading(false);
@@ -500,7 +419,6 @@ if (!option || results.length === 0) return results;
       padding: "20px"
     }}>
     <div style={{ flex: 1 }}>
-      <h1>Search</h1>
       <SearchBar onFinalSearch={handleFinalSearchRes} initialQuery={currentQuery} selectedGenres={selectedGenres} clearDropdownTrigger={clearSearchbarDropdown} />
 
       {successMessage && (
@@ -530,19 +448,19 @@ if (!option || results.length === 0) return results;
       )}
 
       {finalSearchRes.length > 0 && (
-        <h2 style={{ marginTop: "20px" }}>
+        <h2 style={{ marginTop: "5px", marginBottom: "5px", fontStyle: "italic", color: "white" }}>
           Number of Games Matched: ({filteredResults.length})
         </h2>
       )}
 
-      {isLoading && <p>Loading games...</p>}
+      {isLoading && <p className='search-load-msg'>Loading games...</p>}
 
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length === 0 && (
-        <p>No games found. Try searching above!</p>
+        <p className='search-load-msg'>No games found. Try searching above!</p>
       )}
 
       {!isLoading && filteredResults.length === 0 && finalSearchRes.length > 0 && (
-        <p>No games match the selected filters. Try different settings!</p>
+        <p className='search-load-msg'>No games match the selected filters. Try different settings!</p>
       )}
 
       {!isLoading && filteredResults.length > 0 && (
@@ -550,7 +468,8 @@ if (!option || results.length === 0) return results;
           display: "flex",
           flexDirection: "column",
           gap: "15px",
-          marginTop: "20px"
+          marginTop: "20px",
+          backgroundImage: "linear-gradient(to top, #003632ff, #000000ff)",
         }}>
           {filteredResults.map((game, index) => (
             <GameComp
@@ -568,118 +487,137 @@ if (!option || results.length === 0) return results;
       padding: "15px",
       border: "1px solid #ddd",
       borderRadius: "8px",
-      backgroundColor: "#f8f9fa"
+      backgroundImage: "linear-gradient(to top, #37189eff, #0c0425ff)",
+      backgroundSize: "cover",
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      <h3 style={{ marginTop: 0, color: "black" }}>Filters:</h3>
 
-      <h4 style={{ marginTop: "15px", color: "black" }}>Genre</h4>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-        {availableGenres.map(genre => (
-          <label
-            key={genre}
+      
+      <div style={{ position: 'relative', zIndex: 1, color: "#a9d4ff" }}>
+        <h3 style={{ marginTop: 0, color: "#a9d4ff", textAlign: "center" }}>Filters</h3>
+
+        <h4 style={{ marginTop: "15px", color: "#a9d4ff" }}>Genre:</h4>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          {availableGenres.map(genre => (
+            <label
+              key={genre}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "6px 12px",
+                backgroundColor: selectedGenres.includes(genre) ? "#a9d4ff" : "white",
+                color: /*selectedGenres.includes(genre) ? "white" :*/ "#333",
+                border: "1px solid #ccc",
+                borderRadius: "20px",
+                cursor: "pointer",
+                fontSize: "14px"
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={selectedGenres.includes(genre)}
+                onChange={() => handleGenreToggle(genre)}
+                className="custom-checkbox"
+                style={{ marginRight: "6px" }}
+              />
+              {genre}
+            </label>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
+          <h4 style={{ color: "#a9d4ff" }}>Rating Range:</h4>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="number"
+              placeholder="Min"
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+              min="0"
+              max="5"
+              step="0.1"
+              style={{ flex: 1, padding: "6px" }}
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              value={maxRating}
+              onChange={(e) => setMaxRating(e.target.value)}
+              min="0"
+              max="5"
+              step="0.1"
+              style={{ flex: 1, padding: "6px" }}
+            />
+          </div>
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
+          <h4 style={{ color: "#a9d4ff" }}>Sort By:</h4>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            style={{ width: "100%", padding: "6px" }}
+          >
+            <option value="">None</option>
+            <option value="released-desc">Release Date (Newest)</option>
+            <option value="released-asc">Release Date (Oldest)</option>
+            <option value="rating-desc">Rating (High → Low)</option>
+            <option value="rating-asc">Rating (Low → High)</option>
+          </select>
+        </div>
+
+
+        <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+          <button
+            onClick={() => {
+            const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
+            handleFinalSearchRes(
+            queryFromInput, 
+            selectedGenres, 
+            minRating, 
+            maxRating, 
+            sortOption);
+            setClearSearchbarDropdown(prev => prev + 1);
+            }}
             style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "6px 12px",
-              backgroundColor: selectedGenres.includes(genre) ? "#007bff" : "white",
-              color: selectedGenres.includes(genre) ? "white" : "#333",
-              border: "1px solid #ccc",
-              borderRadius: "20px",
+              padding: "6px 10px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
               cursor: "pointer",
-              fontSize: "14px"
+              fontSize: "12px",
+              fontWeight: "bold"
             }}
           >
-            <input
-              type="checkbox"
-              checked={selectedGenres.includes(genre)}
-              onChange={() => handleGenreToggle(genre)}
-              style={{ marginRight: "6px" }}
-            />
-            {genre}
-          </label>
-        ))}
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <h4 style={{ color: "black" }}>Rating Range:</h4>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <input
-            type="number"
-            placeholder="Min"
-            value={minRating}
-            onChange={(e) => setMinRating(e.target.value)}
-            min="0"
-            max="5"
-            step="0.1"
-            style={{ flex: 1, padding: "6px" }}
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxRating}
-            onChange={(e) => setMaxRating(e.target.value)}
-            min="0"
-            max="5"
-            step="0.1"
-            style={{ flex: 1, padding: "6px" }}
-          />
+            Apply
+          </button>
+          <button
+            onClick={() => {
+            handleClearFilters();
+            const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
+            handleFinalSearchRes(
+            queryFromInput, // keep the current search query
+            [], // to ensure filter reset, pass empty default values to bypass async state updates
+            '',
+            '',
+            '');
+            setClearSearchbarDropdown(prev => prev + 1);
+            }}
+            style={{
+              padding: "6px 10px",
+              backgroundColor: "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px"
+            }}
+          >
+            Clear
+          </button>
         </div>
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <h4 style={{ color: "black" }}>Sort By:</h4>
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          style={{ width: "100%", padding: "6px" }}
-        >
-          <option value="">None</option>
-          <option value="released-desc">Release Date (Newest)</option>
-          <option value="released-asc">Release Date (Oldest)</option>
-          <option value="rating-desc">Rating (High → Low)</option>
-          <option value="rating-asc">Rating (Low → High)</option>
-        </select>
-      </div>
-
-      <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-        <button
-          onClick={() => {
-          const queryFromInput = document.querySelector('input[type="search"]')?.value || '';
-          handleFinalSearchRes(
-          queryFromInput, 
-          selectedGenres, 
-          minRating, 
-          maxRating, 
-          sortOption);
-          setClearSearchbarDropdown(prev => prev + 1);
-          }}
-          style={{
-            padding: "6px 10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "12px",
-            fontWeight: "bold"
-          }}
-        >
-          Apply
-        </button>
-        <button
-          onClick={handleClearFilters}
-          style={{
-            padding: "6px 10px",
-            backgroundColor: "#6c757d",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            fontSize: "12px"
-          }}
-        >
-          Clear
-        </button>
       </div>
     </div>
 
