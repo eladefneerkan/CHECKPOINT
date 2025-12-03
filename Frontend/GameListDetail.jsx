@@ -34,6 +34,11 @@ export default function GameListDetail({ listId, onBack }) {
         }
       );
       const data = await response.json();
+      if (data.error) {
+        setList(null);
+        setLoading(false);
+        return;
+      }
       setList(data);
       setEditTitle(data.title);
       setEditDescription(data.description);
@@ -178,7 +183,7 @@ export default function GameListDetail({ listId, onBack }) {
     );
   }
 
-  const gameObjects = list.games.map((game) => {
+  const gameObjects = (list?.games || []).map((game)=> {
     return new GameObj(
       game.id,
       game.name,
@@ -272,6 +277,44 @@ export default function GameListDetail({ listId, onBack }) {
                 }}
               >
                 + Add Game
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `http://localhost:3000/gameLists/${listId}/privacy`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ isPublic: !list.isPublic }),
+                      }
+                    );
+
+                    const data = await response.json();
+                    setList({ ...list, isPublic: data.isPublic });
+
+                    setSuccessMessage(
+                      data.isPublic ? "List is now PUBLIC" : "List is now PRIVATE"
+                    );
+                    setTimeout(() => setSuccessMessage(""), 3000);
+
+                  } catch (err) {
+                    console.error("Error updating privacy:", err);
+                  }
+                }}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: list.isPublic ? "#e52f3eff" : "#22c55e",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {list.isPublic ? "Make Private" : "Make Public"}
               </button>
               <button
                 onClick={() => setDeleteListConfirm(true)}
