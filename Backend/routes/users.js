@@ -41,7 +41,6 @@ router.post("/signup", async (req, res) => {
       isVerified: false,
     });
 
-    // >>> ADD VERIFICATION CODE HERE <<<
     const generateCode = () =>
       Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -207,13 +206,6 @@ router.patch("/me", auth, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-//needed for test: profile picture upload route
-router.post("/upload-profile-picture", auth, async (req, res) => {
-  return res.json({ message: "Profile picture uploaded successfully!" });
-});
-
 
 
 //CHANGE PASSWORD
