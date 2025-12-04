@@ -336,20 +336,21 @@ function SearchRender() {
       const authErrors = []
       // Add game to backend first
       for (const listId of selectedListIds) {
+        try{
         const response = await addGameToList(listId, game.id, token);
         const list = userLists.find(l => l._id === listId);
 
-        if (response.ok)
-          listsToUpdate.push(list.title)
-        else {
-          const result = await response.json()
-          if (response.status === 401 || response.status === 403) {
+        listsToUpdate.push(list.title)
+        }
+        catch(err) {
+          const list = userLists.find(l => l._id === listId)
+          if (err.status === 401 || err.status === 403) {
             authErrors.push(list.title)
-          } else if (response.status === 400 && result.error?.includes("already")) {
+          } else if (err.status === 400 && err.message?.includes("already")) {
             listsWithDuplicates.push(list.title)
           } 
           else {
-            console.error("Error adding game to list", result.error || response.status)
+            console.error("Error adding game to list", err.message || err.status)
           }
         }
       }
@@ -395,7 +396,7 @@ function SearchRender() {
       if (err.status === 401 || err.status === 403) 
         alert("Please log in to create lists!")
       else
-        alert(err.error || "Failed to create new list")
+        alert(err.message || "Failed to create new list")
     }
   }
 
