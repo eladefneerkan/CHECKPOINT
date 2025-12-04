@@ -379,13 +379,30 @@ function SearchRender() {
         alert("Please log in to create lists!");
         return null;
       }
+
+    const defaultImages = [
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
+    ];
+    const randomIndex = Math.floor(Math.random() * defaultImages.length);
+    const defaultCoverImage = defaultImages[randomIndex];
     
     try {
 
-      const newList = await createNewList(title, token)
+      const result = await createNewList({
+        title,
+        description: "",
+        coverImage: defaultCoverImage,
+        isPublic: false,
+      }, token)
 
-      if(newList)
+      if(result)
       {
+        const newList = result.list || result
+        if(!newList.games)
+          newList.games = []
         setUserLists([newList, ...userLists])
         return newList
       }
