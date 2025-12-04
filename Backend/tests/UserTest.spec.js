@@ -92,6 +92,46 @@ test.describe('User Database Tests', () => {
     expect(foundUser?.bio).toBe('Specific test user');
   });
 
+  // test 3: failing test to find non-existant user
   test('failing test to find non-existent user', async () => 
+  {
+    const foundUser = await User.findOne({username: 'non_existent_user'});
+    expect(foundUser).toBeNull();
+  });
+
+  // test 4: add friend to user friends list
+  test('add friend to user friends list', async () => {
+  const testUser1 = await User.create({
+      username: 'testuser1',
+      password: 'Password123@',
+      email: 'testuser1@example.com',
+      bio: 'Test bio 1',
+      isVerified: true
+    });
+    console.log('Created testUser1:', testUser1._id);
+
+    const testUser2 = await User.create({
+      username: 'testuser2',
+      password: 'Password456@',
+      email: 'testuser2@example.com',
+      bio: 'Test bio 2',
+      isVerified: true
+    });
+    
+    // Find specific user by username
+    const foundUser1 = await User.findOne({ username: 'testuser1' });
+    const foundUser2 = await User.findOne({ username: 'testuser2' });
+
+    // Add testUser2 as a friend to testUser1
+    if (foundUser1 && foundUser2?._id) {
+      foundUser1.friends.push(foundUser2._id);
+      await foundUser1.save();
+    }
+
+    // Retrieve updated user1 and verify friend was added
+    const updatedUser1 = await User.findById(foundUser1?._id).populate('friends');
+    expect(updatedUser1?.friends.length).toBe(1);
+    expect(updatedUser1?.friends[0].id).toBe(foundUser2?._id.toString());
+  })
 
 });
