@@ -17,30 +17,21 @@ import GameListDetail from "../Frontend/GameListDetail.jsx";
 
 
 export default function App() {
-  const [users, setUsers] = useState([]);
   const location = useLocation();
-
-  useEffect(() => {
-    //http://localhost:3000/users
-    fetch("/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("Fetch error:", err));
-  }, []);
 
   return (
     <Routes location={location} key={location.pathname}>
       {/* GlobalUI provides shared layout, navbar, etc. */}
-      <Route path="/" element={<GlobalUI users={users} />}>
-        <Route index element={<PageTransition><Home users={users} /></PageTransition>} />
-        <Route path="list" element={<PageTransition><List users={users} /></PageTransition>} />
+      <Route path="/" element={<GlobalUI />}>
+        <Route index element={<PageTransition><Home /></PageTransition>} />
+        <Route path="list" element={<PageTransition><List /></PageTransition>} />
         <Route path="profile" element={<PageTransition><Profile /></PageTransition>} />
         <Route path="login" element={<PageTransition><SignInPg /></PageTransition>} />
         <Route path="signup" element={<PageTransition><SignUpPg /></PageTransition>} />
         <Route path="verify-email" element={<PageTransition><VerifyEmail /></PageTransition>} />
         <Route path="game/:id" element={<PageTransition><GamePage /></PageTransition>} />
-        <Route path="/search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
-        <Route path="/user/:id" element={<PageTransition><OtherUserProfile /></PageTransition>} />
+        <Route path="search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
+        <Route path="user/:id" element={<PageTransition><OtherUserProfile /></PageTransition>} />
         <Route path="lists/:listId" element={<PageTransition><GameListDetail /></PageTransition>} />
         {/* <Route path="review" element={<ReviewModel />} /> */}
       </Route>

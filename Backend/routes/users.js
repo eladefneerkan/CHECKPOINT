@@ -457,6 +457,29 @@ router.delete("/friends/remove/:id", auth, async (req, res) => {
 });
 
 
+router.get("/search", auth, async (req, res) => {
+  try {
+    const query = req.query.q || "";
+    
+    if (!query.trim()) {
+      return res.json([]);
+    }
+
+    const users = await User.find({
+      username: new RegExp(`^${query}`, "i"),
+      _id: { $ne: req.user.id }
+    })
+    .select("username profilePicture _id")
+    .limit(20)  // Reduced from 50 for faster loading
+    .lean();  // Much faster than full Mongoose documents
+
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // /users/:id (public profile)
 router.get("/:id", async (req, res) => {
   try {
