@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 export default function OtherUserProfile() {
   const { id } = useParams();
   const [user, setUser] = useState(null);
-  const [publicLists, setPublicLists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [publicLists, setPublicLists] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userRes = await fetch(`http://localhost:3000/users/${id}`);
-        const userData = await userRes.json();
-        setUser(userData);
-
-        const listRes = await fetch(`http://localhost:3000/gameLists/public/user/${id}`);
-        const listsData = await listRes.json();
+        const res = await fetch(`http://localhost:3000/users/${id}`);
+        const data = await res.json();
+        setUser(data);
+        const resLists = await fetch(`http://localhost:3000/gameLists/public/user/${id}`);
+        const listsData = await resLists.json();
         setPublicLists(listsData);
-
       } catch (err) {
-        console.error("Error loading user:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -29,40 +29,22 @@ export default function OtherUserProfile() {
     loadUser();
   }, [id]);
 
-  if (loading) {
-    return <h2 style={{ color: "white", textAlign: "center" }}>Loading...</h2>;
-  }
-
-  if (!user) {
-    return <h2 style={{ color: "white", textAlign: "center" }}>User not found.</h2>;
-  }
-
-  const defaultImages = [
-    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
-    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
-    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
-    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
-  ];
-
-  const getCoverImage = (list) => {
-    if (list.coverImage) return list.coverImage;
-    if (list.games?.length > 0) return list.games[0].background_image;
-
-    return defaultImages[Math.floor(Math.random() * defaultImages.length)];
-  };
+  if (loading) return <h2 style={{ color: "white" }}>Loading...</h2>;
+  if (!user) return <h2 style={{ color: "white" }}>User not found.</h2>;
 
   return (
     <div style={{ color: "white", textAlign: "center", marginTop: "2rem" }}>
       <img
         src={user.profilePicture}
-        alt=""
         style={{
           width: 140,
           height: 140,
           borderRadius: "12px",
           objectFit: "cover",
         }}
+        alt=""
       />
+
       <h1>{user.username}</h1>
       <p>{user.bio || "No bio"}</p>
 
@@ -93,19 +75,21 @@ export default function OtherUserProfile() {
               }}
             >
               <img
-                src={getCoverImage(list)}
-                alt=""
+                src={
+                  list.coverImage ||
+                  (list.games[0]?.background_image ?? 
+                    "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png")
+                }
                 style={{
                   width: "100%",
                   height: "180px",
                   objectFit: "cover",
                 }}
               />
-
               <div style={{ padding: "15px" }}>
                 <h3 style={{ margin: 0 }}>{list.title}</h3>
                 <p style={{ marginTop: "5px", color: "#bbb" }}>
-                  {list.games.length} game{list.games.length !== 1 ? "s" : ""}
+                  {list.games.length} games
                 </p>
               </div>
             </div>

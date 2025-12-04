@@ -41,6 +41,19 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+// GET: Fetch all lists for the logged-in user
+router.get("/", auth, async (req, res) => {
+  try {
+    const lists = await GameList.find({ userId: req.user.id })
+      .populate("games")
+      .sort({ createdAt: -1 });
+
+    res.json(lists);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get("/public/user/:userId", async (req, res) => {
   try {
     const lists = await GameList.find({
@@ -56,73 +69,30 @@ router.get("/public/user/:userId", async (req, res) => {
   }
 });
 
-router.get("/public/:listId", async (req, res) => {
-  try {
-    const list = await GameList.findOne({
-      _id: req.params.listId,
-      isPublic: true,
-    }).populate("games");
-
-    if (!list) {
-      return res.status(404).json({ error: "List not found or private" });
-    }
-
-    res.json({
-      ...list.toObject(),
-      userId: list.userId.toString(),
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-
-///////////////////////////////////////////////////
-
-// GET: Fetch all lists for the logged-in user
-router.get("/", auth, async (req, res) => {
-  try {
-    const lists = await GameList.find({ userId: req.user.id })
-      .populate("games")
-      .sort({ createdAt: -1 });
-
-    const formatted = lists.map((l) => ({
-      ...l.toObject(),
-      userId: l.userId.toString(),
-    }));
-      
-    res.json(formatted);
-       
-      
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
 // GET: Fetch a specific list by ID (with populated games)
 router.get("/:listId", auth, async (req, res) => {
   try {
     const list = await GameList.findById(req.params.listId).populate("games");
 
-    if (!list) return res.status(404).json({ error: "List not found" });
-
-    if (!list.isPublic && list.userId.toString() !== req.user.id) {
-      return res.status(403).json({ error: "List is private."});
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
     }
 
-    res.json({
-      ...list.toObject(),
-      userId: list.userId.toString(),
-    });
+    if (!list.isPublic && list.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: "List is private."})
+    }
 
+    /*
+    // Check ownership
+    if (list.userId.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }*/
+
+    res.json(list);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // PUT: Update list title, description, and/or cover image
 router.put("/:listId", auth, async (req, res) => {

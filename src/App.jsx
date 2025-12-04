@@ -13,7 +13,6 @@ import GamePage from "../Frontend/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
 import OtherUserProfile from "../Frontend/OtherUserProfile.jsx";
 import GameListDetail from "../Frontend/GameListDetail.jsx";
-import PublicListDetail from "../Frontend/PublicListDetail.jsx";
 
 
 
@@ -43,8 +42,6 @@ export default function App() {
         <Route path="/search-users" element={<PageTransition><SearchUsers /></PageTransition>} />
         <Route path="/user/:id" element={<PageTransition><OtherUserProfile /></PageTransition>} />
         <Route path="lists/:listId" element={<PageTransition><GameListDetail /></PageTransition>} />
-        <Route path="profile/lists/:listId" element={<PageTransition><PublicListDetail /></PageTransition>} />
-        
         {/* <Route path="review" element={<ReviewModel />} /> */}
       </Route>
     </Routes>

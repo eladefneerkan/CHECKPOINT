@@ -1,34 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "./Auth";
+import { useNavigate } from "react-router-dom";
 import GameComp from "./GameObj.jsx";
 import GameObj from "./models/GameObj.js";
 
-export default function GameListDetail() {
-  const { listId } = useParams();                 // ✅ FIXED — get from URL
-  const { user: authUser } = useAuth();           // ✅ current logged in user
-  const navigate = useNavigate();
-
+export default function GameListDetail({ listId, onBack }) {
   const [list, setList] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCoverImage, setEditCoverImage] = useState("");
-
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState("");
-
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleteListConfirm, setDeleteListConfirm] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState("");
 
   const token = localStorage.getItem("token");
-
-  // ✅ REAL OWNER CHECK
-  const isOwner = authUser && list && authUser._id === list.userId;
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchListDetail();
@@ -36,26 +25,27 @@ export default function GameListDetail() {
 
   const fetchListDetail = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/gameLists/${listId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
+      const response = await fetch(
+        `http://localhost:3000/gameLists/${listId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.error) {
         setList(null);
         setLoading(false);
         return;
       }
-
       setList(data);
       setEditTitle(data.title);
-      setEditDescription(data.description || "");
+      setEditDescription(data.description);
       setEditCoverImage(data.coverImage || "");
-
       setLoading(false);
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error fetching list detail:", err);
       setLoading(false);
     }
   };
@@ -65,8 +55,12 @@ export default function GameListDetail() {
     if (file && file.type.startsWith("image/")) {
       setCoverImageFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => setCoverImagePreview(reader.result);
+      reader.onloadend = () => {
+        setCoverImagePreview(reader.result);
+      };
       reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid image file");
     }
   };
 
@@ -77,122 +71,150 @@ export default function GameListDetail() {
         description: editDescription,
       };
 
-      if (coverImagePreview) updateData.coverImage = coverImagePreview;
-      else updateData.coverImage = editCoverImage;
+      // If a new cover image was selected, use it, otherwise use existing
+      if (coverImageFile) {
+        updateData.coverImage = coverImagePreview;
+      } else if (editCoverImage !== list.coverImage) {
+        updateData.coverImage = editCoverImage;
+      }
 
-      const res = await fetch(`http://localhost:3000/gameLists/${listId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updateData),
-      });
+      const response = await fetch(
+        `http://localhost:3000/gameLists/${listId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
 
-      const json = await res.json();
-      setList(json.list);
+      const updatedList = await response.json();
+      setList(updatedList.list);
+      setEditCoverImage(updatedList.list.coverImage || "");
       setEditMode(false);
       setCoverImageFile(null);
       setCoverImagePreview("");
-
-      setSuccessMessage("List updated!");
-      setTimeout(() => setSuccessMessage(""), 2000);
-
-    } catch (e) {
-      console.error(e);
+      setSuccessMessage("List updated successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      console.error("Error updating list:", err);
+      alert("Failed to update list");
     }
   };
 
   const handleDeleteGame = async (gameId) => {
     try {
-      const res = await fetch(
+      const response = await fetch(
         `http://localhost:3000/gameLists/${listId}/games/${gameId}`,
         {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      const json = await res.json();
-      setList(json.list);
-
-      setSuccessMessage("Game removed!");
-      setTimeout(() => setSuccessMessage(""), 2000);
-
-    } catch (e) {
-      console.error(e);
+      const updatedList = await response.json();
+      setList(updatedList.list);
+      setDeleteConfirm(null);
+      setSuccessMessage("Game removed from list!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      console.error("Error deleting game:", err);
+      alert("Failed to remove game");
     }
   };
 
   const handleDeleteList = async () => {
     try {
-      await fetch(`http://localhost:3000/gameLists/${listId}`, {
+      const response = await fetch(`http://localhost:3000/gameLists/${listId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      navigate("/profile");
-      setTimeout(() => window.dispatchEvent(new Event("openProfileListsTab")), 150);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || "Failed to delete list");
+      }
 
-    } catch (e) {
-      console.error(e);
+      // navigate back to lists page or call onBack
+      setSuccessMessage("List deleted");
+      setTimeout(() => setSuccessMessage(""), 2000);
+      if (onBack) onBack();
+      else {
+        navigate("/profile");
+        // give Profile a moment to mount, then request it open the lists tab
+        setTimeout(() => window.dispatchEvent(new Event("openProfileListsTab")), 120);
+      }
+    } catch (err) {
+      console.error("Error deleting list:", err);
+      alert("Failed to delete list");
     }
   };
 
   const getCoverImage = () => {
     if (coverImagePreview) return coverImagePreview;
     if (editCoverImage) return editCoverImage;
-
-    if (list?.games?.length > 0) {
+    if (list && list.games && list.games.length > 0) {
       return list.games[0].background_image;
     }
-
-    const defaults = [
+    // Fallback to a default image if none exists
+    const defaultImages = [
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
     ];
-    return defaults[Math.floor(Math.random() * defaults.length)];
+    const randomIndex = Math.floor(Math.random() * defaultImages.length);
+    return defaultImages[randomIndex];
   };
 
-  if (loading)
+  if (loading) {
     return <div style={{ color: "white", textAlign: "center" }}>Loading...</div>;
+  }
 
-  if (!list)
-    return <div style={{ color: "white", textAlign: "center" }}>List not found</div>;
+  if (!list) {
+    return (
+      <div style={{ color: "white", textAlign: "center" }}>
+        List not found
+      </div>
+    );
+  }
 
-  const gameObjects = (list.games || []).map((g) =>
-    new GameObj(
-      g.id,
-      g.name,
-      g.slug,
-      g.released,
-      g.rating,
-      g.description,
-      g.background_image,
-      g.genres
-    )
-  );
+  const gameObjects = (list?.games || []).map((game)=> {
+    return new GameObj(
+      game.id,
+      game.name,
+      game.slug,
+      game.released,
+      game.rating,
+      game.description,
+      game.background_image,
+      game.genres
+    );
+  });
 
   return (
     <div style={{ color: "white", maxWidth: "650px", margin: "auto" }}>
-
       {successMessage && (
-        <div style={{
-          backgroundColor: "#10b981",
-          color: "white",
-          padding: "10px",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          textAlign: "center",
-        }}>
+        <div
+          style={{
+            backgroundColor: "#10b981",
+            color: "white",
+            padding: "10px",
+            borderRadius: "4px",
+            marginBottom: "20px",
+            textAlign: "center",
+          }}
+        >
           {successMessage}
         </div>
       )}
 
       <button
-        onClick={() => navigate("/profile")}
+        onClick={onBack}
         style={{
           padding: "10px 20px",
           marginBottom: "20px",
@@ -203,50 +225,225 @@ export default function GameListDetail() {
           cursor: "pointer",
         }}
       >
-        ← Back
+        ← Back to Lists
       </button>
 
-      {/* ---------------------- OWNER VIEW ---------------------- */}
-      {!editMode && isOwner && (
+      {!editMode ? (
         <>
-          <img
-            src={getCoverImage()}
-            alt="List cover"
-            style={{
-              width: "100%",
-              height: "300px",
-              objectFit: "cover",
-              borderRadius: "8px",
-              marginBottom: "15px",
-            }}
-          />
-
-          <h1>{list.title}</h1>
-          <p style={{ fontSize: "16px", color: "#bbb" }}>
-            {list.description || "No description"}
-          </p>
-
-          <p style={{ fontSize: "14px", color: "#999" }}>
-            {list.games.length} game{list.games.length !== 1 ? "s" : ""}
-          </p>
-
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-            <button
-              onClick={() => setEditMode(true)}
+          <div style={{ marginBottom: "20px" }}>
+            <img
+              src={getCoverImage()}
+              alt="List cover"
               style={{
-                padding: "10px 20px",
-                backgroundColor: "#007bff",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
+                width: "100%",
+                height: "300px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "15px",
               }}
-            >
-              Edit List
-            </button>
+            />
+            <h1 style={{ marginTop: 0 }}>{list.title}</h1>
+            <p style={{ fontSize: "16px", color: "#bbb" }}>
+              {list.description || "No description"}
+            </p>
+            <p style={{ fontSize: "14px", color: "#999" }}>
+              {list.games.length} game{list.games.length !== 1 ? "s" : ""} in
+              this list
+            </p>
 
+            <div style={{ display: "flex", gap: "10px", alignItems: 'center' }}>
+              <button
+                onClick={() => setEditMode(true)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Edit List
+              </button>
+              <button
+                onClick={() => navigate(`/list?addToList=${listId}`)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#10b981",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                + Add Game
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `http://localhost:3000/gameLists/${listId}/privacy`,
+                      {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ isPublic: !list.isPublic }),
+                      }
+                    );
+
+                    const data = await response.json();
+                    setList({ ...list, isPublic: data.isPublic });
+
+                    setSuccessMessage(
+                      data.isPublic ? "List is now PUBLIC" : "List is now PRIVATE"
+                    );
+                    setTimeout(() => setSuccessMessage(""), 3000);
+
+                  } catch (err) {
+                    console.error("Error updating privacy:", err);
+                  }
+                }}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: list.isPublic ? "#e52f3eff" : "#22c55e",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                {list.isPublic ? "Make Private" : "Make Public"}
+              </button>
+              <button
+                onClick={() => setDeleteListConfirm(true)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#e52f3eff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  marginLeft: '8px'
+                }}
+              >
+                Delete List
+              </button>
+            </div>
+          </div>
+
+          <hr style={{ borderColor: "#444", margin: "30px 0" }} />
+
+          <h2>Games in this list</h2>
+          {gameObjects.length === 0 ? (
+            <p style={{ color: "#999" }}>
+              No games in this list yet. Click "Add Game" to get started!
+            </p>
+          ) : (
+            <div style={{gap: "15px" }}>
+              {gameObjects.map((game) => (
+                <div key={game.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 8px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', width: '100%' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <GameComp game={game} />
+                  </div>
+                  <div style={{ marginLeft: '12px' }}>
+                    <button
+                      onClick={() => setDeleteConfirm(game.id)}
+                      style={{
+                        backgroundColor: "#e52f3eff",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        width: "36px",
+                        height: "36px",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}
+                      title="Remove game"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <div style={{ marginBottom: "20px" }}>
+          <h2>Edit List</h2>
+
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", marginBottom: "10px" }}>
+              Cover Image:
+            </label>
+            <img
+              src={getCoverImage()}
+              alt="Cover preview"
+              style={{
+                width: "100%",
+                height: "200px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "10px",
+              }}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageChange}
+              style={{ marginBottom: "15px" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Title:
+            </label>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #444",
+                borderRadius: "4px",
+                backgroundColor: "#333",
+                color: "white",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "5px" }}>
+              Description:
+            </label>
+            <textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #444",
+                borderRadius: "4px",
+                backgroundColor: "#333",
+                color: "white",
+                boxSizing: "border-box",
+                minHeight: "100px",
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "10px" }}>
             <button
-              onClick={() => navigate(`/list?addToList=${listId}`)}
+              onClick={handleSaveListChanges}
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#10b981",
@@ -256,111 +453,32 @@ export default function GameListDetail() {
                 cursor: "pointer",
               }}
             >
-              + Add Game
+              Save Changes
             </button>
-
             <button
-              onClick={async () => {
-                const res = await fetch(
-                  `http://localhost:3000/gameLists/${listId}/privacy`,
-                  {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ isPublic: !list.isPublic }),
-                  }
-                );
-
-                const json = await res.json();
-                setList({ ...list, isPublic: json.isPublic });
-
-                setSuccessMessage(
-                  json.isPublic ? "List is now PUBLIC" : "List is now PRIVATE"
-                );
-                setTimeout(() => setSuccessMessage(""), 2000);
+              onClick={() => {
+                setEditMode(false);
+                setCoverImageFile(null);
+                setCoverImagePreview("");
+                setEditTitle(list.title);
+                setEditDescription(list.description);
+                setEditCoverImage(list.coverImage);
               }}
               style={{
                 padding: "10px 20px",
-                backgroundColor: list.isPublic ? "#e52f3e" : "#22c55e",
+                backgroundColor: "#6c757d",
                 color: "white",
                 border: "none",
                 borderRadius: "4px",
                 cursor: "pointer",
               }}
             >
-              {list.isPublic ? "Make Private" : "Make Public"}
-            </button>
-
-            <button
-              onClick={() => setDeleteListConfirm(true)}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#e52f3e",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
-            >
-              Delete List
+              Cancel
             </button>
           </div>
-        </>
-      )}
-
-      {/* ---------------------- GAMES ---------------------- */}
-      <hr style={{ borderColor: "#444", margin: "30px 0" }} />
-
-      <h2>Games in this list</h2>
-
-      {gameObjects.length === 0 ? (
-        <p style={{ color: "#999" }}>No games in this list.</p>
-      ) : (
-        <div style={{ gap: "15px" }}>
-          {gameObjects.map((game) => (
-            <div
-              key={game.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "0 8px",
-                borderRadius: 8,
-                background: "rgba(255,255,255,0.02)",
-                width: "100%",
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <GameComp game={game} />
-              </div>
-
-              {/* DELETE BUTTON ONLY IF OWNER */}
-              {isOwner && (
-                <button
-                  onClick={() => setDeleteConfirm(game.id)}
-                  style={{
-                    backgroundColor: "#e52f3e",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    width: "36px",
-                    height: "36px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          ))}
         </div>
       )}
 
-      {/* ---------------------- DELETE GAME MODAL ---------------------- */}
       {deleteConfirm && (
         <div
           style={{
@@ -384,13 +502,15 @@ export default function GameListDetail() {
               padding: "30px",
               maxWidth: "400px",
               textAlign: "center",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ color: "white" }}>Delete Game?</h2>
-            <p style={{ color: "#bbb" }}>Remove this game from your list?</p>
-
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <h2 style={{ color: "white", marginTop: 0 }}>Delete Game?</h2>
+            <p style={{ color: "#bbb" }}>
+              Do you want to delete this game from your list?
+            </p>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button
                 onClick={() => setDeleteConfirm(null)}
                 style={{
@@ -399,19 +519,20 @@ export default function GameListDetail() {
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
+                  cursor: "pointer",
                 }}
               >
                 No
               </button>
-
               <button
                 onClick={() => handleDeleteGame(deleteConfirm)}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#e52f3e",
+                  backgroundColor: "#e52f3eff",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
+                  cursor: "pointer",
                 }}
               >
                 Yes, Delete
@@ -420,8 +541,6 @@ export default function GameListDetail() {
           </div>
         </div>
       )}
-
-      {/* ---------------------- DELETE LIST MODAL ---------------------- */}
       {deleteListConfirm && (
         <div
           style={{
@@ -445,14 +564,14 @@ export default function GameListDetail() {
               padding: "30px",
               maxWidth: "420px",
               textAlign: "center",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ color: "white" }}>Delete List?</h2>
+            <h2 style={{ color: "white", marginTop: 0 }}>Delete List?</h2>
             <p style={{ color: "#bbb" }}>
-              This will permanently delete the list. Are you sure?
+              This will permanently delete the whole list and its associations. Are you sure?
             </p>
-
             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
               <button
                 onClick={() => setDeleteListConfirm(false)}
@@ -462,19 +581,23 @@ export default function GameListDetail() {
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
+                  cursor: "pointer",
                 }}
               >
                 No
               </button>
-
               <button
-                onClick={() => handleDeleteList()}
+                onClick={() => {
+                  setDeleteListConfirm(false);
+                  handleDeleteList();
+                }}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: "#e52f3e",
+                  backgroundColor: "#e52f3eff",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
+                  cursor: "pointer",
                 }}
               >
                 Yes, Delete
@@ -483,7 +606,6 @@ export default function GameListDetail() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
