@@ -47,7 +47,7 @@ export const getFullDescription = (game) => {
 
 // converts raw game data from API into GameObj instances
 export const hydrateGame = (rawGame) => {
-    return new GameObj(
+    const gameObj = new GameObj(
         rawGame.id,
         rawGame.name,
         rawGame.slug,
@@ -57,5 +57,12 @@ export const hydrateGame = (rawGame) => {
         rawGame.background_image,
         rawGame.genres
     )
+
+    //saves mongodb_id if it exists
+    if (rawGame._id) {
+        gameObj._id = rawGame._id;
+    }
+    
+    return gameObj;
 }
 
