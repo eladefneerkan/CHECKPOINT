@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchGamesByIds } from './services/gameApi.js'
 
 
-
+//component that returns the bubble potion effect in the background
 function PotionBackground() {
   const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
@@ -30,19 +30,21 @@ function PotionBackground() {
     </div>
   );
 }
+
 export default function Home() {
-  
+  //review call states
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [reviewsError, setReviewsError] = useState(null);
+  //game call states
   const [games, setGames] = useState([]);
   const [loadingGames, setLoadingGames] = useState(false);
   const [gamesError, setGamesError] = useState(null);
 
   useEffect(() => {
     //limit determines how many reviews will be read in
-    let mounted = true;
-    async function loadReviews(limit = 4) {
+    let mounted = true; //mounted variable to prevent state updates on unmounted component
+    async function loadReviews(limit = 6) {
       try {
         setLoadingReviews(true);
         setReviewsError(null);
@@ -64,9 +66,9 @@ export default function Home() {
           }
         } catch (gErr) {
           console.error('Failed to load games for reviews:', gErr);
-          if (mounted) setGamesError(String(gErr));
+          setGamesError(String(gErr));
         } finally {
-          if (mounted) setLoadingGames(false);
+          setLoadingGames(false);
         }
       } catch (err) {
         console.error("Failed to load reviews:", err);
@@ -78,12 +80,10 @@ export default function Home() {
     loadReviews();
     return () => { mounted = false; };
   }, []);
+  
   const loading = loadingReviews || loadingGames;
   const error = reviewsError || gamesError;
 
-  if (loading) return <div>Loading reviews...</div>;
-  if (error) return <div>Error: {error}</div>;
-    
   return (
     
     <section
@@ -113,7 +113,7 @@ export default function Home() {
           Track, share, and discover your <i>new</i> favorite games
         </p>
         <h2 className='section-heading'>New reviews...</h2>
-        <ul className="poster-list -p70 -grid">
+       {/*} <ul className="poster-list -p70 -grid">
           <li className="posteritem"> <img src={Flag} className="posterimg"/></li>
           <li className="posteritem">AAA</li>
           <li className="posteritem">AAA</li>
@@ -122,7 +122,7 @@ export default function Home() {
           <li className="posteritem">AAA</li>
           <li className="posteritem">AAA</li>
           <li className="posteritem">AAA</li>
-        </ul>
+        </ul>*/}
   <PosterList reviews={reviews} games={games} loading={loading} error={error} />
       <div 
         style={{
@@ -165,21 +165,21 @@ export default function Home() {
     </section>
   );
 }
-
+//component returns multiple recent review objects named PosterCard
 function PosterList({ reviews = [], games = [], loading, error }){
-  if (loading) return <div>Loading reviews...</div>;
+  if (loading) return <div>Loading reviews...</div>; 
   if (error) return <div>Error loading reviews: {error}</div>;
   if (!reviews.length) return <div>No recent reviews yet.</div>;
+
   return (
-    <div className="poster-list -p70 -grid" style={{width: '100%', background: 'white', height: '500px', position: 'relative', margin: 'auto'}}>
-      <div className="posteritem" style={{width: '100%', background: 'white', margin: 'auto', display: 'flex', flexDirection: 'row'}}>
+    <div className= "posterList" >
+
         {reviews.map((r) => {
           const game = games.find(g => Number(g.id) === Number(r.gameId));
           return (
-            <PosterCard key={r._id} user={r.user} game={game} gameName={r.gameName} rating={r.rating} reviewText={r.reviewText}/>
+            <PosterCard game={game} gameName={r.gameName} rating={r.rating} reviewText={r.reviewText}/>
           );
         })}
-      </div>
     </div>
   );
 }
@@ -188,7 +188,7 @@ function PosterList({ reviews = [], games = [], loading, error }){
 function PosterCard({ game, gameName, rating, reviewText }) {
 //we track whether the mouse is over it and that will determine if we show the review box
   const [isHovered, setIsHovered] = useState(false);
- // const imageUrl = game.getImageDisplay()
+ 
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -196,29 +196,32 @@ function PosterCard({ game, gameName, rating, reviewText }) {
     setIsHovered(false);
   };
 
-
+  
   return (
+    <section>
     <div
       className="poster-card-container" style={{position: 'relative'}}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-    
+    {/*takes image from game object passed in */}
   <img
-    src={(game && typeof game.getImageDisplay === 'function' ? game.getImageDisplay() : game?.background_image) || Flag}
+    src={(game ? game.getImageDisplay() :  Flag)}
     alt={gameName}
-    className="poster-image"
-    style={{width: 160, height: 240, objectFit: 'cover'}}
+    className="posterImg"
+    style={{}}
     onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = Flag; }}
   />
 
-      {/* 2. This code actually renders the review box */}
-      {isHovered && (
-        <div className="reviews-section dark-gray-background" style={{width:'200%', position: 'absolute', top: '100%'}}>
+      {/*This code actually renders the review box */}
+      
+    </div>
+    {isHovered && (
+        <div className="posterReview" >
           <h5>{gameName}: {rating}★</h5>
           <p>{reviewText}</p>
         </div>)}
-    </div>
+  </section>
   );
 }
 

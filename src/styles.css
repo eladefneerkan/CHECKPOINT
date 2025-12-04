@@ -269,6 +269,45 @@ section {
   font-style: italic;
 }
 
+.posterList {
+  width: 100%;
+  height: 450px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: auto;
+}
+
+.posterImg{
+  width: 160px; 
+  height: 240px;
+  object-fit: cover;
+}
+
+.poster-card-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 160px; 
+  height: 240px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.poster-card-container:hover {
+  transform: translateY(-10px); 
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); 
+}
+.posterReview {
+  width: 20%;
+  background: rgba(72, 61, 139, 0.25);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 10px;
+  position: absolute;
+
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+}
 /* Submit Review Form */
 .submit-review-form {
   background: rgba(72, 61, 139, 0.3);
@@ -737,18 +776,6 @@ section {
 
 }
 
-/* #gamePage {
-  margin: 0 auto !important;
-}
-@media (min-width: 1024px) {
-  #gamePage {
-    margin: 0 !important;
-    margin-left: 4% !important;
-    margin-right: auto !important;  aligns left
-    width: 800px;        optional fixed width 
-  }
-}*/
-
 .section-heading:not(.-omitdivider) {
     --divider-thickness: 1px;
     --divider-color: rgb(0 127 255);
@@ -765,25 +792,6 @@ section {
     --content-color: #9ab;
     color: #a9d4ff;
 }
-.poster-list.-grid>.posteritem {
- 
-  height: 150px;
-  width: 100px;
-  display: block;
-  margin: 0 0 10px 10px;
-  background-color: #000000;
-}
-.posterimg{
-  width: 100%;
-  height: 100%;
-}
-.poster-list.-grid {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-left: -60px; /*math it out*/
-}
-
 
 .carousel-item {
   min-width: 100%;       /* important: each slide takes full width */
@@ -834,39 +842,4 @@ text-align: center;
 }
 
 
-/* Layout for the overall row */
-.poster-row-display {
-  display: flex;
-  gap: 30px; 
-  padding: 50px 20px; /* Added more padding to prevent the lifted poster from hitting the edge */
-  overflow-x: auto; 
-}
 
-/* Base style for the poster container */
-.poster-card-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 200px; 
-  
-  /* 💡 Key Step 1: Add transition for smooth animation */
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-
-/* Style to apply ONLY when the poster is hovered */
-.poster-card-container:hover {
-  /* 💡 Key Step 2: Lift the poster up by 10 pixels */
-  transform: translateY(-10px); 
-  
-  /* 💡 Key Step 3: Apply a larger, more prominent shadow */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); 
-}
-
-/* Poster Image (Optional: Ensure the image itself doesn't have conflicting styles) */
-.poster-image {
-  width: 100%;
-  height: auto;
-  display: block;
-  /* Add a small default shadow for depth */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-}
