@@ -15,7 +15,6 @@ test("existing user can login and see dashboard", async ({ page }) => {
   //Submit login form
   await page.click("button.btn-primary");
 
-
   //Expect dashboard to be visible
   await expect(page.getByText(/my game lists/i)).toBeVisible();
 });
