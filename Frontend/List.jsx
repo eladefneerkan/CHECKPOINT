@@ -199,8 +199,15 @@ function SearchRender() {
   sorted.sort((a, b) => {
     switch (option) {
       case 'released-desc': 
+        // if statements handle null/undef cases where release is undefined
+        if (!a.released && !b.released) return 0;
+        if (!a.released) return 1; 
+        if (!b.released) return -1;
         return b.released.localeCompare(a.released)
       case 'released-asc': 
+        if (!a.released && !b.released) return 0;
+        if (!a.released) return 1; 
+        if (!b.released) return -1;
         return a.released.localeCompare(b.released)
       case 'rating-desc':
         return b.rating - a.rating;
