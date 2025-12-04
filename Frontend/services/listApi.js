@@ -52,7 +52,7 @@ const apiCall = async (endpoint, method = "GET", token, body = null) => {
     return response.json()
 }
 
-
+//fetch all lists for the logged-in user
 export const fetchUserLists = async (token) => {
     try {
         const data = await apiCall(URL_BASE, "GET", token)
@@ -63,27 +63,78 @@ export const fetchUserLists = async (token) => {
     }
 }
 
+//add a game to a specific list
 export const addGameToList = async (listId, gameId, token) => {
     const response = await apiCall(`${URL_BASE}/${listId}/games`, "POST", token, { gameId })
     return response
 }
 
-export const createNewList = async (title, token) => {
-
-    try{
-        const response = await apiCall(URL_BASE, "POST", token, {
-            title,
-            description: "",
-        })
+//create a new list
+export const createNewList = async (listData, token) => {
+    try {
+        const response = await apiCall(URL_BASE, "POST", token, listData)
         return response
-    }
-    catch(err){
-        //catch the error thrwon by apiCall and
+    } catch (err) {
+        //catch the error thrown by apiCall and
         //rethrow as a structured object for frontend component to handle
         throw {
-            status: err.message.includes("401") ? 401 : 500,
+            status: err.status || 500,
             error: err.message || 'Failed to create new list'
         }
     }
 }
 
+//fetch a single list by ID with full details
+export const fetchListDetail = async (listId, token) => {
+    try {
+        const data = await apiCall(`${URL_BASE}/${listId}`, "GET", token)
+        return data
+    } catch (err) {
+        console.error("Error fetching list detail:", err)
+        throw err
+    }
+}
+
+//update list details (i.e. title, description, coverImage)
+export const updateList = async (listId, updateData, token) => {
+    try {
+        const response = await apiCall(`${URL_BASE}/${listId}`, "PUT", token, updateData)
+        return response
+    } catch (err) {
+        console.error("Error updating list:", err)
+        throw err
+    }
+}
+
+//update list privacy (isPublic)
+export const updateListPrivacy = async (listId, isPublic, token) => {
+    try {
+        const response = await apiCall(`${URL_BASE}/${listId}/privacy`, "PUT", token, { isPublic })
+        return response
+    } catch (err) {
+        console.error("Error updating list privacy:", err)
+        throw err
+    }
+}
+
+//remove a game from a list
+export const removeGameFromList = async (listId, gameId, token) => {
+    try {
+        const response = await apiCall(`${URL_BASE}/${listId}/games/${gameId}`, "DELETE", token)
+        return response
+    } catch (err) {
+        console.error("Error removing game from list:", err)
+        throw err
+    }
+}
+
+//delete a list completely
+export const deleteList = async (listId, token) => {
+    try {
+        const response = await apiCall(`${URL_BASE}/${listId}`, "DELETE", token)
+        return response
+    } catch (err) {
+        console.error("Error deleting list:", err)
+        throw err
+    }
+}
