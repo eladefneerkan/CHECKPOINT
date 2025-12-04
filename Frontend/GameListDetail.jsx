@@ -249,7 +249,7 @@ export default function GameListDetail({ listId, onBack }) {
                 onClick={handlePrivacyToggle}
                 style={{
                   padding: "10px 20px",
-                  backgroundColor: list.isPublic ? "#e52f3eff" : "#22c55e",
+                  backgroundColor: list.isPublic ? "#81007F" : "#8963C6",
                   color: "white",
                   border: "none",
                   borderRadius: "4px",
