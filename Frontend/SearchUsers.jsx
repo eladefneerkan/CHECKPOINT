@@ -7,29 +7,40 @@ export default function SearchUsers() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const navigate = useNavigate();
 
   const searchUsers = async () => {
+    if (!authUser) {
+      return;
+    }
+
     if (!query.trim()) {
       setResults([]);
+      setHasSearched(false);
       return;
     }
 
     setLoading(true);
+    setHasSearched(true);
 
     try {
-      const res = await fetch("/users");
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/users/search?q=${encodeURIComponent(query.trim())}`, {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error("Search failed");
+      }
+      
       const data = await res.json();
-
-      const filtered = data.filter(
-        (u) =>
-          u.username.toLowerCase().includes(query.toLowerCase()) &&
-          u.username !== authUser.username
-      );
-
-      setResults(filtered);
+      setResults(data);
     } catch (err) {
       console.error("Search error:", err);
+      setResults([]);
     }
 
     setLoading(false);
@@ -50,6 +61,8 @@ export default function SearchUsers() {
 
   const getStatus = (target) => {
     const me = authUser;
+
+    if (!me) return "none";
 
     if (me.friends?.some((f) => f._id === target._id)) return "friends";
     if (me.friendRequestsSent?.includes(target._id)) return "sent";
@@ -82,7 +95,17 @@ export default function SearchUsers() {
         </div>
 
         <div style={{ marginTop: "2rem" }}>
+          {!authUser && (
+            <p style={{ color: "#cccccc", fontSize: "1.1rem", marginTop: "1rem" }}>
+              Please log in to search users.
+            </p>
+          )}
+
           {loading && <p>Searching...</p>}
+
+          {authUser && !loading && hasSearched && results.length === 0 && (
+            <p style={{ color: "#cccccc", fontSize: "1.1rem" }}>No results</p>
+          )}
 
           {results.map((u) => {
             const status = getStatus(u);

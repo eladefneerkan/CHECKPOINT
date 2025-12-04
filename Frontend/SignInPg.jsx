@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './Auth';
 
@@ -6,8 +6,15 @@ const SignInPg = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !isLoading) {
+      navigate('/profile');
+    }
+  }, [user, isLoading, navigate]);
 
   const handleSubmit = async () => {
     setError('');

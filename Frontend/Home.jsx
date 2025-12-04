@@ -113,15 +113,15 @@ export default function Home() {
           Track, share, and discover your <i>new</i> favorite games
         </p>
         <h2 className='section-heading'>New reviews...</h2>
-        <ul class="poster-list -p70 -grid">
-          <li class="posteritem"> <img src={Flag} class="posterimg"/></li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
+        <ul className="poster-list -p70 -grid">
+          <li className="posteritem"> <img src={Flag} className="posterimg"/></li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
+          <li className="posteritem">AAA</li>
         </ul>
   <PosterList reviews={reviews} games={games} loading={loading} error={error} />
       <div 
