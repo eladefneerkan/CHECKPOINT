@@ -192,7 +192,8 @@ export default function GameListDetail({ listId, onBack }) {
       game.rating,
       game.description,
       game.background_image,
-      game.genres
+      game.genres,
+      game._id
     );
   });
 
@@ -266,7 +267,7 @@ export default function GameListDetail({ listId, onBack }) {
                 Edit List
               </button>
               <button
-                onClick={() => navigate(`/list?addToList=${listId}`)}
+                onClick={() => navigate(`/gameSearch?addToList=${listId}`)}
                 style={{
                   padding: "10px 20px",
                   backgroundColor: "#10b981",
@@ -349,7 +350,7 @@ export default function GameListDetail({ listId, onBack }) {
                   </div>
                   <div style={{ marginLeft: '12px' }}>
                     <button
-                      onClick={() => setDeleteConfirm(game.id)}
+                      onClick={() => setDeleteConfirm(game._id || game.id)}
                       style={{
                         backgroundColor: "#e52f3eff",
                         color: "white",

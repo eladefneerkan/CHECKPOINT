@@ -1,8 +1,9 @@
 
 export default class GameObj{
 
-        constructor(id, name, slug, released, rating, description, background_image, genres)
+        constructor(id, name, slug, released, rating, description, background_image, genres, _id = null)
         {
+            this._id = _id // MongoDB ObjectId for database operations
             this.id = id //we can get a game ID from the db, helps keep track of the games
             this.name = name
             this.slug = slug
