@@ -1,4 +1,4 @@
-import { hydrateGame } from './gameHydration.js';
+import { hydrateGame } from './gameUtil.js';
 
 
 // API call to fetch final search results based on user query & selected filters

@@ -1,4 +1,4 @@
-import GameObj from '../../Backend/models/GameObj.js';
+import GameObj from '../models/GameObj.js';
 // contains utility functions for game operations on the frontend
 
 // Date formatting
