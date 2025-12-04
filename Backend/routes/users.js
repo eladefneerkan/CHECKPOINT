@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const User = require("../models/User");
 const jwt = require("jsonwebtoken"); 
+const User = require("../models/User");
 const auth = require("../middleware/authorize");
-
+const GameList = require("../models/GameList");
+const Review = require("../models/review");
 
 // POST signup
 router.post("/signup", async (req, res) => {
@@ -268,6 +269,52 @@ router.delete("/me", auth, async (req, res) => {
       return res.status(401).json({ error: "Incorrect password" });
     }
 
+    // ------ COMPREHENSIVE ACCOUNT CLEANUP -----
+    // 1) Delete all lists made by this user
+    await GameList.deleteMany({ userId: req.user.id });
+
+    // 2) Delete all reviews made by this user
+    await Review.deleteMany( { user: req.user.id });
+
+    // 3) Remove all this user's review upvotes/downvotes
+    await Review.updateMany(
+      {
+        $or: [
+          {upvotedBy: req.user.id },
+          { downvotedBy: req.user.id }
+        ]
+      },
+      {
+        $pull: {
+          upvotedBy: req.user.id,
+          downvotedBy: req.user.id
+        }
+      }
+    );
+
+    // 4) Remove this user from their friends' arrays
+    await User.updateMany(
+      { friends: req.user.id },
+      { $pull: { friends: req.user.id } }
+    );
+
+    // 5) Remove this user from sent/received friend requests
+    await User.updateMany(
+      { 
+        $or: [
+          { friendRequestsSent: req.user.id },
+          { friendRequestsReceived: req.user.id }
+        ]
+      },
+      {
+        $pull: {
+          friendRequestsSent: req.user.id,
+          friendRequestsReceived: req.user.id
+        }
+      }
+    );
+
+    // 6) Delete user object from database
     await User.findByIdAndDelete(req.user.id);
 
     res.json({ message: "Account permanently deleted" });
