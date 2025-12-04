@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import GameObj from './models/GameObj.js';
 import {parseDate, formatGenres, hydrateGame, getFullDescription} from './services/gameUtil';
 
 const GamePage = () => {
