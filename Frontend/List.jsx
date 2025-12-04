@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameComp from './GameObj.jsx'
 import AddToListModal from './AddToListModal.jsx'
-import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApiHydration.js'
+import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApi.js'
+import {fetchUserLists, createNewList, addGameToList } from './services/listApi.js'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initialQuery }) {
@@ -171,12 +172,28 @@ function SearchRender() {
 
   const token = localStorage.getItem("token")
 
+  useEffect(() => {
+    const loadUserLists = async () => {
+      if (!token) {
+        setUserLists([]);
+        return;
+      }
+      try {
+        const listData = await fetchUserLists(token);
+        setUserLists(listData);
+      } catch (err) {
+        console.error("Error fetching lists:", err);
+      }
+    };
+    loadUserLists();
+  }, [token])
+
   const handleSortChange = (value) => {
   setSortOption(value)
   }
 
-  const sortResults = (results, option) => {
-if (!option || results.length === 0) return results;
+  const sortResults = useCallback((results, option) => {
+  if (!option || results.length === 0) return results;
   const sorted = [...results]; // Create a shallow copy
 
   sorted.sort((a, b) => {
@@ -194,7 +211,8 @@ if (!option || results.length === 0) return results;
         }
     })
     return sorted;  
-  }
+  }, [])
+
   // Common genres for filtering
   const availableGenres = [
     "Action", "Adventure", "RPG", "Strategy", "Shooter", 
@@ -237,7 +255,7 @@ if (!option || results.length === 0) return results;
     if (query && finalSearchRes.length === 0) { 
         handleFinalSearchRes(query, genres, minR, maxR, sortO);
     }
-  }, [location.search, handleFinalSearchRes, finalSearchRes.length]);
+  }, [location.search]);
 
   const handleGenreToggle = (genre) => {
     setSelectedGenres(prev => 
@@ -278,23 +296,24 @@ if (!option || results.length === 0) return results;
     return labels.length > 0 ? labels.join(' → ') : '';
 }
 
-  const fetchUserLists = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/gameLists", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      const data = await response.json()
-      setUserLists(data)
-    } catch (err) {
-      console.error("Error fetching lists:", err)
+  const getUserLists = async () => {
+    if (!token) {
+    console.log("No token found, cannot fetch user lists.")
+    setUserLists([])
+    return;
     }
+
+    try {
+      const listData = await fetchUserLists(token);
+      setUserLists(listData);
+    } catch (err) {
+      console.error("Error fetching lists:", err); 
+ }
   }
 
   const handleAddToListClick = (game) => {
     setSelectedGameForList(game)
-    fetchUserLists()
+    getUserLists()
     setShowAddToListModal(true)
   }
 
@@ -305,31 +324,12 @@ if (!option || results.length === 0) return results;
         return;
       }
 
-      const gameToAdd = {
-        _id: game.id,
-        name: game.name,
-        slug: game.slug,
-        released: game.released,
-        rating: game.rating,
-        description: game.description,
-        background_image: game.background_image,
-        genres: game.genres,
-      }
-
       const listsToUpdate = []
       const listsWithDuplicates = []
       const authErrors = []
       // Add game to backend first
       for (const listId of selectedListIds) {
-        const response = await fetch(`http://localhost:3000/gameLists/${listId}/games`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ gameId: game.id }),
-        })
-
+        const response = await addGameToList(listId, game.id, token);
         const list = userLists.find(l => l._id === listId);
 
         if (response.ok)
@@ -342,7 +342,7 @@ if (!option || results.length === 0) return results;
             listsWithDuplicates.push(list.title)
           } 
           else {
-            console.error("Error adding game to list")
+            console.error("Error adding game to list", result.error || response.status)
           }
         }
       }
@@ -367,42 +367,28 @@ if (!option || results.length === 0) return results;
   }
 
   const handleCreateNewList = async (title) => {
-    try {
-      if (!token) {
+    if (!token) {
         alert("Please log in to create lists!");
         return null;
       }
+    
+    try {
 
-      const response = await fetch("http://localhost:3000/gameLists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title,
-          description: "",
-        }),
-      })
+      const newList = await createNewList(title, token)
 
-      if (!response.ok) {
-        const result = await response.json();
-        if (response.status === 401 || response.status === 403) {
-          alert("Please log in to create lists!");
-        } else {
-          alert(result.error || "Failed to create list");
-        }
-        return null;
+      if(newList)
+      {
+        setUserLists([newList, ...userLists])
+        return newList
       }
+      return null 
 
-      const result = await response.json()
-      const newList = result.list
-      setUserLists([newList, ...userLists])
-      return newList
     } catch (err) {
       console.error("Error creating list:", err)
-      alert("Failed to create list")
-      return null
+      if (err.status === 401 || err.status === 403) 
+        alert("Please log in to create lists!")
+      else
+        alert(err.error || "Failed to create new list")
     }
   }
 
