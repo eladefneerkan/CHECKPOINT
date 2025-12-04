@@ -1,4 +1,4 @@
-import GameObj from '../../Backend/models/GameObj.js';
+import GameObj from '../models/GameObj.js';
 
 // converts raw game data from API into GameObj instances
 export const hydrateGame = (rawGame) => {
