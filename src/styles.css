@@ -832,3 +832,41 @@ text-align: center;
 .custom-checkbox {
   accent-color: #37189eff;
 }
+
+
+/* Layout for the overall row */
+.poster-row-display {
+  display: flex;
+  gap: 30px; 
+  padding: 50px 20px; /* Added more padding to prevent the lifted poster from hitting the edge */
+  overflow-x: auto; 
+}
+
+/* Base style for the poster container */
+.poster-card-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 200px; 
+  
+  /* 💡 Key Step 1: Add transition for smooth animation */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Style to apply ONLY when the poster is hovered */
+.poster-card-container:hover {
+  /* 💡 Key Step 2: Lift the poster up by 10 pixels */
+  transform: translateY(-10px); 
+  
+  /* 💡 Key Step 3: Apply a larger, more prominent shadow */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); 
+}
+
+/* Poster Image (Optional: Ensure the image itself doesn't have conflicting styles) */
+.poster-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* Add a small default shadow for depth */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}

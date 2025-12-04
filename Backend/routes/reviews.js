@@ -18,6 +18,35 @@ router.get("/game/:gameId", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+//get top score reviews, then sort by most recent
+/*router.get("/reviews", async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 20;
+    const reviews = await Review.find()
+      .sort({ score: -1, createdAt: -1 })
+      .limit(limit)
+      .populate("user");
+
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});*/
+// GET recent reviews (newest first). Mounted at /reviews in server.js, so use root path here.
+router.get("/", async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 10; // default to 50 recent reviews
+    const reviews = await Review.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+   
+
+    res.json(reviews);
+  } catch (err) {
+    console.error("Error in GET /reviews:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // GET average rating for a specific game
 router.get("/game/:gameId/average", async (req, res) => {
