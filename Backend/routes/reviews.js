@@ -233,13 +233,9 @@ router.post("/:reviewId/upvote", auth, async (req, res) => {
     }
 
     await review.save();
+    await review.populate("user", "username profilePicture");
 
-    res.json({ 
-      _id: review._id, 
-      score: review.score,
-      upvotedBy: review.upvotedBy,
-      downvotedBy: review.downvotedBy 
-    });
+    res.json(review);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -278,13 +274,9 @@ router.post("/:reviewId/downvote", auth, async (req, res) => {
     }
 
     await review.save();
+    await review.populate("user", "username profilePicture");
 
-    res.json({ 
-      _id: review._id, 
-      score: review.score,
-      upvotedBy: review.upvotedBy,
-      downvotedBy: review.downvotedBy 
-    });
+    res.json(review);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
