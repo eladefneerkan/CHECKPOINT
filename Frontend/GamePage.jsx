@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import GameObj from './models/GameObj.js';
-import {parseDate, formatGenres} from './services/gameUtil';
+import {parseDate, formatGenres, hydrateGame, getFullDescription} from './services/gameUtil';
 
 const GamePage = () => {
   const location = useLocation();
@@ -24,16 +24,8 @@ const GamePage = () => {
   const [success, setSuccess] = useState('');
   const gameData = location.state?.game;
 
-  const game = gameData ? new GameObj(
-    gameData.id,
-    gameData.name,
-    gameData.slug,
-    gameData.released,
-    gameData.rating,
-    gameData.description,
-    gameData.background_image,
-    gameData.genres
-  ) : null;
+  // hydrates the game from location state
+  const game = hydrateGame(location.state?.game)
 
   if (!game) {
     return (
@@ -66,11 +58,7 @@ const GamePage = () => {
 
   const imageUrl = game.getImageDisplay();
   const genreList = formatGenres(game.genres);
-
-  const getFullDescription = () => {
-    if (!game.description) return 'No description available.';
-    return game.description.replace(/<[^>]*>/g, '');
-  };
+  const description = getFullDescription(game);
 
   // Get token and user info
   const getToken = () => localStorage.getItem('token');
@@ -405,7 +393,7 @@ const GamePage = () => {
             color: '#e0e0e0',
             whiteSpace: 'pre-wrap'
           }}>
-            {getFullDescription()}
+            {description}
           </p>
         </div>
       </div>
