@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import GameListDetail from "./GameListDetail.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function GameListManager() {
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedListId, setSelectedListId] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListTitle, setNewListTitle] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchLists();
@@ -18,10 +18,9 @@ export default function GameListManager() {
   const fetchLists = async () => {
     try {
       const response = await fetch("http://localhost:3000/gameLists", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await response.json();
       setLists(data);
       setLoading(false);
@@ -37,7 +36,6 @@ export default function GameListManager() {
       return;
     }
 
-    // Generate a default cover image
     const defaultImages = [
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
@@ -45,7 +43,6 @@ export default function GameListManager() {
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
     ];
     const randomIndex = Math.floor(Math.random() * defaultImages.length);
-    const defaultCoverImage = defaultImages[randomIndex];
 
     try {
       const response = await fetch("http://localhost:3000/gameLists", {
@@ -57,10 +54,11 @@ export default function GameListManager() {
         body: JSON.stringify({
           title: newListTitle,
           description: "",
-          coverImage: defaultCoverImage,
+          coverImage: defaultImages[randomIndex],
           isPublic: false,
         }),
       });
+
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         alert(err.error || err.message || "Failed to create list");
@@ -71,42 +69,26 @@ export default function GameListManager() {
       setLists([result.list, ...lists]);
       setNewListTitle("");
       setShowCreateForm(false);
+
       setSuccessMessage("List created successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error("Error creating list:", err);
-      alert("Failed to create list");
     }
   };
 
   const getListCoverImage = (list) => {
     if (list.coverImage) return list.coverImage;
-    if (list.games && list.games.length > 0) {
-      return list.games[0].background_image;
-    }
+    if (list.games?.length > 0) return list.games[0].background_image;
+
     const defaultImages = [
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
       "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
     ];
-  
-    const randomIndex = Math.floor(Math.random() * defaultImages.length);
-    return defaultImages[randomIndex];
+    return defaultImages[Math.floor(Math.random() * defaultImages.length)];
   };
-  
-
-  if (selectedListId) {
-    return (
-      <GameListDetail
-        listId={selectedListId}
-        onBack={() => {
-          setSelectedListId(null);
-          fetchLists(); // This will refresh the list with updated cover images
-        }}
-      />
-    );
-  }
 
   if (loading) {
     return <div style={{ color: "white", textAlign: "center" }}>Loading lists...</div>;
@@ -156,29 +138,25 @@ export default function GameListManager() {
           }}
         >
           <h2 style={{ marginTop: 0 }}>Create a New List</h2>
+
           <input
             type="text"
-            placeholder="Enter list name (e.g., Favorites, Completed, Wishlist)"
+            placeholder="Enter list name..."
             value={newListTitle}
             onChange={(e) => setNewListTitle(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleCreateList();
-              }
-            }}
+            onKeyDown={(e) => e.key === "Enter" && handleCreateList()}
+            autoFocus
             style={{
               width: "100%",
               padding: "10px",
               marginBottom: "15px",
+              backgroundColor: "#222",
               border: "1px solid #555",
               borderRadius: "4px",
-              backgroundColor: "#222",
               color: "white",
-              boxSizing: "border-box",
-              fontSize: "14px",
             }}
-            autoFocus
           />
+
           <div style={{ display: "flex", gap: "10px" }}>
             <button
               onClick={handleCreateList}
@@ -193,6 +171,7 @@ export default function GameListManager() {
             >
               Create
             </button>
+
             <button
               onClick={() => {
                 setShowCreateForm(false);
@@ -228,7 +207,7 @@ export default function GameListManager() {
           {lists.map((list) => (
             <div
               key={list._id}
-              onClick={() => setSelectedListId(list._id)}
+              onClick={() => navigate(`/lists/${list._id}`)}
               style={{
                 backgroundColor: "#2a2a2a",
                 borderRadius: "8px",
@@ -256,16 +235,8 @@ export default function GameListManager() {
                 }}
               />
               <div style={{ padding: "15px" }}>
-                <h3 style={{ marginTop: 0, marginBottom: "5px" }}>
-                  {list.title}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "#999",
-                    fontSize: "14px",
-                  }}
-                >
+                <h3 style={{ marginTop: 0 }}>{list.title}</h3>
+                <p style={{ color: "#999", fontSize: "14px" }}>
                   {list.games.length} game{list.games.length !== 1 ? "s" : ""}
                 </p>
               </div>
