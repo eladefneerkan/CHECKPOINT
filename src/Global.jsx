@@ -62,7 +62,7 @@ export default function GlobalUI() {
                 }}
               >
                 <Link
-                  to="/list"
+                  to="/gameSearch"
                   style={{
                     color: "white",
                     textDecoration: "none",
@@ -74,7 +74,7 @@ export default function GlobalUI() {
                 </Link>
 
                 <Link
-                  to="/search-users"
+                  to="/searchUsers"
                   style={{
                     color: "white",
                     textDecoration: "none",
