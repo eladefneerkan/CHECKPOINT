@@ -1,18 +1,5 @@
-import GameObj from '../../Backend/models/GameObj.js';
+import { hydrateGame } from './gameHydration.js';
 
-// converts raw game data from API into GameObj instances
-const hydrateGame = (rawGame) => {
-    return new GameObj(
-        rawGame.id,
-        rawGame.name,
-        rawGame.slug,
-        rawGame.released,
-        rawGame.rating,
-        rawGame.description,
-        rawGame.background_image,
-        rawGame.genres
-    )
-}
 
 // API call to fetch final search results based on user query & selected filters
 export const fetchFinalGames = async ({ query = '', genres = [], minRating = '', maxRating = ''}) => {
