@@ -2,12 +2,12 @@ import grassBg from "../assets/grass_bg.avif";
 import FrogBanner from "../assets/ad_banner_green.png";
 import {useNavigate} from 'react-router-dom';
 import Flag from '../assets/Flag.png';
-import GameComp from "./GameObj.jsx";
 import GameObj from "./models/GameObj.js";
 import React, { useState, useEffect } from 'react';
+import { fetchGamesByIds } from './services/gameApi.js'
 
 
-
+//component that returns the bubble potion effect in the background
 function PotionBackground() {
   const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
@@ -30,14 +30,21 @@ function PotionBackground() {
     </div>
   );
 }
+
 export default function Home() {
+  //review call states
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [reviewsError, setReviewsError] = useState(null);
+  //game call states
+  const [games, setGames] = useState([]);
+  const [loadingGames, setLoadingGames] = useState(false);
+  const [gamesError, setGamesError] = useState(null);
 
   useEffect(() => {
-    let mounted = true; //limit determines how many reviews will be read in
-    async function loadReviews(limit = 4) {
+    //limit determines how many reviews will be read in
+    let mounted = true; //mounted variable to prevent state updates on unmounted component
+    async function loadReviews(limit = 6) {
       try {
         setLoadingReviews(true);
         setReviewsError(null);
@@ -45,19 +52,38 @@ export default function Home() {
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
         const data = await res.json();
         if (mounted) setReviews(data);
+
+        // extract unique numeric game ids from reviews and fetch corresponding games
+        try {
+          const ids = Array.from(new Set(data.map(r => Number(r.gameId)).filter(id => !Number.isNaN(id))));
+          if (ids.length > 0) {
+            setLoadingGames(true);
+            setGamesError(null);
+            const gameResults = await fetchGamesByIds(ids);
+            if (mounted) setGames(gameResults);
+          } else {
+            if (mounted) setGames([]);
+          }
+        } catch (gErr) {
+          console.error('Failed to load games for reviews:', gErr);
+          setGamesError(String(gErr));
+        } finally {
+          setLoadingGames(false);
+        }
       } catch (err) {
         console.error("Failed to load reviews:", err);
-        if (mounted) setReviewsError(err.message);
+        setReviewsError(err.message);
       } finally {
-        if (mounted) setLoadingReviews(false);
+        setLoadingReviews(false);
       }
     }
     loadReviews();
     return () => { mounted = false; };
   }, []);
-  if (loadingReviews) return <div>Loading reviews...</div>;
-  if (reviewsError) return <div>Error: {reviewsError}</div>;
-    
+  
+  const loading = loadingReviews || loadingGames;
+  const error = reviewsError || gamesError;
+
   return (
     
     <section
@@ -87,17 +113,8 @@ export default function Home() {
           Track, share, and discover your <i>new</i> favorite games
         </p>
         <h2 className='section-heading'>New reviews...</h2>
-        <ul class="poster-list -p70 -grid">
-          <li class="posteritem"> <img src={Flag} class="posterimg"/></li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-          <li class="posteritem">AAA</li>
-        </ul>
-        <PosterList reviews={reviews} loading={loadingReviews} error={reviewsError} />
+
+  <PosterList reviews={reviews} games={games} loading={loading} error={error} />
       <div 
         style={{
           marginTop: "2rem",
@@ -139,27 +156,30 @@ export default function Home() {
     </section>
   );
 }
-
-function PosterList({ reviews = [], loading, error }){
-  if (loading) return <div>Loading reviews...</div>;
+//component returns multiple recent review objects named PosterCard
+function PosterList({ reviews = [], games = [], loading, error }){
+  if (loading) return <div>Loading reviews...</div>; 
   if (error) return <div>Error loading reviews: {error}</div>;
   if (!reviews.length) return <div>No recent reviews yet.</div>;
+
   return (
-    <div class="poster-list -p70 -grid" style={{width: '100%', background: 'white', height: '500px', position: 'relative', margin: 'auto'}}>
-      <div class="posteritem" style={{width: '100%', background: 'white', margin: 'auto', display: 'flex', flexDirection: 'row'}}>
-        {reviews.map((r) => (
-          <PosterCard user={r.user} gameName={r.gameName} rating={r.rating} reviewText={r.reviewText}/>
-        ))}
-      </div>
+    <div className= "posterList" >
+
+        {reviews.map((r) => {
+          const game = games.find(g => Number(g.id) === Number(r.gameId));
+          return (
+            <PosterCard game={game} gameName={r.gameName} rating={r.rating} reviewText={r.reviewText}/>
+          );
+        })}
     </div>
   );
 }
 
 // This component represents a single poster and its review box.
-function PosterCard({ user, gameName, rating, reviewText }) {
+function PosterCard({ game, gameName, rating, reviewText }) {
 //we track whether the mouse is over it and that will determine if we show the review box
   const [isHovered, setIsHovered] = useState(false);
- // const imageUrl = game.getImageDisplay()
+ 
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -167,193 +187,32 @@ function PosterCard({ user, gameName, rating, reviewText }) {
     setIsHovered(false);
   };
 
-
+  
   return (
+    <section>
     <div
       className="poster-card-container" style={{position: 'relative'}}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-    
-      <img src={Flag} alt={gameName} className="poster-image" />
+    {/*takes image from game object passed in */}
+  <img
+    src={(game ? game.getImageDisplay() :  Flag)}
+    alt={gameName}
+    className="posterImg"
+    style={{}}
+    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = Flag; }}
+  />
 
-      {/* 2. This code actually renders the review box */}
-      {isHovered && (
-        <div className="reviews-section dark-gray-background" style={{width:'200%', position: 'absolute', top: '100%'}}>
-          <h5>{user}: {rating}★</h5>
+      {/*This code actually renders the review box */}
+      
+    </div>
+    {isHovered && (
+        <div className="posterReview" >
+          <h5>{gameName}: {rating}★</h5>
           <p>{reviewText}</p>
         </div>)}
-    </div>
+  </section>
   );
 }
 
-
-
-/*
-<ul >
-            {reviews.map((review) => (
-              <li >{review}</li>
-            ))}
-          </ul>
-import { useNavigate } from "react-router-dom";
-import Flag from "../assets/Flag.png";
-import { useState, useEffect } from "react";
-
-
-
-export default function Home() {
-  const navButtonToPage = useNavigate();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const navBtnStyle = {
-    position: "absolute",
-    top: "50%",
-    transform: "translateY(-50%)",
-    left: 0,
-    background: "rgba(0,0,0,0.4)",
-    color: "white",
-    border: "none",
-    fontSize: "2rem",
-    padding: "0.3rem 0.6rem",
-    cursor: "pointer",
-    borderRadius: "6px",
-    transition: "0.2s",
-    zIndex: 10
-  };
-
-  return (
-    <section
-      className="fade-in"
-      style={{
-        backgroundImage: "linear-gradient(to top, #5c2affff, black)",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        color: "white",
-        textAlign: "center",
-        position: "relative",
-        width: "100vw",
-      }}
-    >
-      <PotionBackground />
-
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-        }}
-      ></div>
-
-      <div style={{ position: "relative", zIndex: 1 }}>
-        <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>CHECKPOINT</h1>
-        <p style={{ fontSize: "1.5rem" }}>
-          Track, share, and discover your <i>new</i> favorite games
-        </p>
-
-        <h2 className="section-heading">Rising games...</h2>
-        <ul className="poster-list -p70 -grid">
-          <li className="posteritem">
-            <img src={Flag} className="posterimg" />
-          </li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-          <li className="posteritem">AAA</li>
-        </ul>
-
-        <div
-          style={{
-            marginTop: "2rem",
-            width: "80%",
-            marginLeft: "auto",
-            marginRight: "auto",
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: "12px",
-            boxShadow: "0 6px 20px rgba(0,0,0,0.4)"
-          }}
-        >
-          <div
-            className="carousel-track"
-            style={{
-              flexWrap: 'nowrap',
-              justifyContent: 'space-between',
-              display: "flex",
-              
-              width: "300%",
-              transform: `translateX(-${currentSlide * 100}%)`,
-              transition: "transform 2s ease-in-out",
-            }}
-          >
-            <img
-              src="https://i.pinimg.com/736x/1b/f0/76/1bf0764da001f8914823615777ddce90.jpg"
-              alt="b1"
-              style={{ width: '50px', objectFit: "cover" }}
-            />
-            <img
-              src="https://i.pinimg.com/736x/1b/f0/76/1bf0764da001f8914823615777ddce90.jpg"
-              alt="b2"
-              style={{ width: '50px', objectFit: "cover" }}
-            />
-            <img
-              src="https://i.pinimg.com/736x/1b/f0/76/1bf0764da001f8914823615777ddce90.jpg"
-              alt="b3"
-              style={{ width: '50px', objectFit: "cover" }}
-            />
-          </div>
-
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-            style={navBtnStyle}
-          >
-            ◀
-          </button>
-
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-            style={{ ...navBtnStyle, right: 0 }}
-          >
-            ▶
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PotionBackground() {
-  const bubbles = Array.from({ length: 10 }, () => 10 + Math.random() * 10);
-
-  return (
-    <div className="potion-background">
-      {bubbles.map((size, i) => (
-        <div
-          key={i}
-          className="bubble"
-          style={{
-            left: `${Math.random() * 100}%`,
-            width: `${size}px`,
-            height: `${size}px`,
-            animationDuration: `${10 + Math.random() * 15}s`,
-            animationDelay: `${Math.random() * 3}s`,
-          }}
-        ></div>
-      ))}
-    </div>
-  );
-}*/

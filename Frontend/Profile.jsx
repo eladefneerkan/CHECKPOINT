@@ -10,7 +10,7 @@ import UserReviews from "./UserReviews";
 
 
 export default function Profile() {
-  const { user: authUser, updateProfile, isLoading } = useAuth();
+  const { user: authUser, updateProfile, logout, isLoading } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
@@ -142,9 +142,11 @@ export default function Profile() {
       return;
     }
   
-    localStorage.removeItem("token");
-    alert("Account deleted.");
-    navigate("/");
+    // Call logout to clear auth context state
+    logout();
+    alert("Account permanently deleted. You will now be logged out.");
+    // Redirect to login page
+    navigate("/login");
   };
   
 

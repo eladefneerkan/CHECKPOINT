@@ -1,3 +1,4 @@
+import GameObj from '../models/GameObj.js';
 // contains utility functions for game operations on the frontend
 
 // Date formatting
@@ -37,3 +38,31 @@ export const formatGenres = (genres) => {
     }
     return genreList;
 }
+
+// get full description of a game without HTML tags
+export const getFullDescription = (game) => {
+    if (!game || !game.description) return 'No description available.';
+    return game.description.replace(/<[^>]*>/g, '');
+}
+
+// converts raw game data from API into GameObj instances
+export const hydrateGame = (rawGame) => {
+    const gameObj = new GameObj(
+        rawGame.id,
+        rawGame.name,
+        rawGame.slug,
+        rawGame.released,
+        rawGame.rating,
+        rawGame.description,
+        rawGame.background_image,
+        rawGame.genres
+    )
+
+    //saves mongodb_id if it exists
+    if (rawGame._id) {
+        gameObj._id = rawGame._id;
+    }
+    
+    return gameObj;
+}
+

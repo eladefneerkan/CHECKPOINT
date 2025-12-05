@@ -77,3 +77,34 @@ const searchGames = async (
 };
 
 module.exports = { searchGames };
+
+// Fetch multiple games by their numeric 'id' field (e.g. RAWG ids)
+const getGamesByIds = async (ids = []) => {
+    if (!Array.isArray(ids) || ids.length === 0) return [];
+
+    try {
+        // ensure ids are numbers when searching the numeric 'id' field
+        const numericIds = ids.map(i => Number(i)).filter(i => !Number.isNaN(i));
+        if (numericIds.length === 0) return [];
+
+        const results = await Game.find(
+            { id: { $in: numericIds } },
+            {
+                id: 1,
+                name: 1,
+                slug: 1,
+                released: 1,
+                rating: 1,
+                description: 1,
+                background_image: 1,
+                genres: 1,
+            }
+        );
+
+        return results;
+    } catch (error) {
+        throw new Error(`Failed to fetch games by ids. Details: ${error.message}`);
+    }
+};
+
+module.exports = { searchGames, getGamesByIds };

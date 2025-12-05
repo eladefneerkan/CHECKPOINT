@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GameListDetail from "./GameListDetail.jsx";
+import { fetchUserLists, createNewList } from './services/listApi.js';
 
 export default function GameListManager() {
   const [lists, setLists] = useState([]);
@@ -17,12 +18,7 @@ export default function GameListManager() {
 
   const fetchLists = async () => {
     try {
-      const response = await fetch("http://localhost:3000/gameLists", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
+      const data = await fetchUserLists(token);
       setLists(data);
       setLoading(false);
     } catch (err) {
@@ -48,26 +44,13 @@ export default function GameListManager() {
     const defaultCoverImage = defaultImages[randomIndex];
 
     try {
-      const response = await fetch("http://localhost:3000/gameLists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: newListTitle,
-          description: "",
-          coverImage: defaultCoverImage,
-          isPublic: false,
-        }),
-      });
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        alert(err.error || err.message || "Failed to create list");
-        return;
-      }
+      const result = await createNewList({
+        title: newListTitle,
+        description: "",
+        coverImage: defaultCoverImage,
+        isPublic: false,
+      }, token);
 
-      const result = await response.json();
       setLists([result.list, ...lists]);
       setNewListTitle("");
       setShowCreateForm(false);
@@ -75,7 +58,7 @@ export default function GameListManager() {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error("Error creating list:", err);
-      alert("Failed to create list");
+      alert(err.error || err.message || "Failed to create list");
     }
   };
 

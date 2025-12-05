@@ -336,20 +336,21 @@ function SearchRender() {
       const authErrors = []
       // Add game to backend first
       for (const listId of selectedListIds) {
+        try{
         const response = await addGameToList(listId, game.id, token);
         const list = userLists.find(l => l._id === listId);
 
-        if (response.ok)
-          listsToUpdate.push(list.title)
-        else {
-          const result = await response.json()
-          if (response.status === 401 || response.status === 403) {
+        listsToUpdate.push(list.title)
+        }
+        catch(err) {
+          const list = userLists.find(l => l._id === listId)
+          if (err.status === 401 || err.status === 403) {
             authErrors.push(list.title)
-          } else if (response.status === 400 && result.error?.includes("already")) {
+          } else if (err.status === 400 && err.message?.includes("already")) {
             listsWithDuplicates.push(list.title)
           } 
           else {
-            console.error("Error adding game to list", result.error || response.status)
+            console.error("Error adding game to list", err.message || err.status)
           }
         }
       }
@@ -378,13 +379,30 @@ function SearchRender() {
         alert("Please log in to create lists!");
         return null;
       }
+
+    const defaultImages = [
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_blue.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_green.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_purple.png",
+      "https://raw.githubusercontent.com/eladefneerkan/CHECKPOINT/main/assets/list_header_default_red.png",
+    ];
+    const randomIndex = Math.floor(Math.random() * defaultImages.length);
+    const defaultCoverImage = defaultImages[randomIndex];
     
     try {
 
-      const newList = await createNewList(title, token)
+      const result = await createNewList({
+        title,
+        description: "",
+        coverImage: defaultCoverImage,
+        isPublic: false,
+      }, token)
 
-      if(newList)
+      if(result)
       {
+        const newList = result.list || result
+        if(!newList.games)
+          newList.games = []
         setUserLists([newList, ...userLists])
         return newList
       }
@@ -395,7 +413,7 @@ function SearchRender() {
       if (err.status === 401 || err.status === 403) 
         alert("Please log in to create lists!")
       else
-        alert(err.error || "Failed to create new list")
+        alert(err.message || "Failed to create new list")
     }
   }
 

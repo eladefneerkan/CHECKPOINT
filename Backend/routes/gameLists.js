@@ -244,9 +244,32 @@ router.delete("/:listId/games/:gameId", auth, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
-    // Remove game from list
+    // Try to find the game to remove by MongoDB _id or numeric id
+    let gameToRemove = null;
+    const gameIdParam = req.params.gameId;
+    
+    // First, try to match by MongoDB ObjectId
+    try {
+      gameToRemove = await Game.findById(gameIdParam);
+    } catch (e) {
+      // Not a valid ObjectId, continue
+    }
+    
+    // If not found by _id, try to find by numeric id field
+    if (!gameToRemove) {
+      const numericId = Number(gameIdParam);
+      if (!Number.isNaN(numericId)) {
+        gameToRemove = await Game.findOne({ id: numericId });
+      }
+    }
+    
+    if (!gameToRemove) {
+      return res.status(404).json({ error: "Game not found" });
+    }
+
+    // Remove game from list using the MongoDB _id
     list.games = list.games.filter(
-      (id) => id.toString() !== req.params.gameId
+      (id) => id.toString() !== gameToRemove._id.toString()
     );
     list.updatedAt = Date.now();
 

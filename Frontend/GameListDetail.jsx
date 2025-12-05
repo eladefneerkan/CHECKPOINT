@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GameComp from "./GameObj.jsx";
-import GameObj from "./models/GameObj.js";
+import { hydrateGame } from "./services/gameUtil.js";
+import { fetchListDetail, updateList, removeGameFromList,
+  updateListPrivacy, deleteList } from './services/listApi.js';
 
 export default function GameListDetail({ listId, onBack }) {
   const [list, setList] = useState(null);
@@ -20,21 +22,13 @@ export default function GameListDetail({ listId, onBack }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchListDetail();
+    getListDetail();
   }, [listId]);
 
-  const fetchListDetail = async () => {
+  const getListDetail = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/gameLists/${listId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (data.error) {
+      const data = await fetchListDetail(listId, token);
+      if (!data || data.error) {
         setList(null);
         setLoading(false);
         return;
@@ -78,19 +72,7 @@ export default function GameListDetail({ listId, onBack }) {
         updateData.coverImage = editCoverImage;
       }
 
-      const response = await fetch(
-        `http://localhost:3000/gameLists/${listId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updateData),
-        }
-      );
-
-      const updatedList = await response.json();
+      const updatedList = await updateList(listId, updateData, token);
       setList(updatedList.list);
       setEditCoverImage(updatedList.list.coverImage || "");
       setEditMode(false);
@@ -106,17 +88,7 @@ export default function GameListDetail({ listId, onBack }) {
 
   const handleDeleteGame = async (gameId) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/gameLists/${listId}/games/${gameId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const updatedList = await response.json();
+      const updatedList = await removeGameFromList(listId, gameId, token);
       setList(updatedList.list);
       setDeleteConfirm(null);
       setSuccessMessage("Game removed from list!");
@@ -129,15 +101,7 @@ export default function GameListDetail({ listId, onBack }) {
 
   const handleDeleteList = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/gameLists/${listId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(errText || "Failed to delete list");
-      }
+      await deleteList(listId, token);
 
       // navigate back to lists page or call onBack
       setSuccessMessage("List deleted");
@@ -150,9 +114,23 @@ export default function GameListDetail({ listId, onBack }) {
       }
     } catch (err) {
       console.error("Error deleting list:", err);
-      alert("Failed to delete list");
+      alert(err.message || "Failed to delete list");
     }
   };
+
+  const handlePrivacyToggle = async () => {
+    try {
+      const data = await updateListPrivacy(listId, !list.isPublic, token);
+      setList({ ...list, isPublic: data.isPublic });
+      setSuccessMessage(
+        data.isPublic ? "List is now PUBLIC" : "List is now PRIVATE"
+      );
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      console.error("Error updating privacy:", err);
+      alert("Failed to update privacy");
+    }
+  }
 
   const getCoverImage = () => {
     if (coverImagePreview) return coverImagePreview;
@@ -183,18 +161,7 @@ export default function GameListDetail({ listId, onBack }) {
     );
   }
 
-  const gameObjects = (list?.games || []).map((game)=> {
-    return new GameObj(
-      game.id,
-      game.name,
-      game.slug,
-      game.released,
-      game.rating,
-      game.description,
-      game.background_image,
-      game.genres
-    );
-  });
+  const gameObjects = (list?.games || []).map((game) => hydrateGame(game));
 
   return (
     <div style={{ color: "white", maxWidth: "650px", margin: "auto" }}>
@@ -266,7 +233,7 @@ export default function GameListDetail({ listId, onBack }) {
                 Edit List
               </button>
               <button
-                onClick={() => navigate(`/list?addToList=${listId}`)}
+                onClick={() => navigate(`/gameSearch?addToList=${listId}`)}
                 style={{
                   padding: "10px 20px",
                   backgroundColor: "#10b981",
@@ -279,32 +246,7 @@ export default function GameListDetail({ listId, onBack }) {
                 + Add Game
               </button>
               <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch(
-                      `http://localhost:3000/gameLists/${listId}/privacy`,
-                      {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ isPublic: !list.isPublic }),
-                      }
-                    );
-
-                    const data = await response.json();
-                    setList({ ...list, isPublic: data.isPublic });
-
-                    setSuccessMessage(
-                      data.isPublic ? "List is now PUBLIC" : "List is now PRIVATE"
-                    );
-                    setTimeout(() => setSuccessMessage(""), 3000);
-
-                  } catch (err) {
-                    console.error("Error updating privacy:", err);
-                  }
-                }}
+                onClick={handlePrivacyToggle}
                 style={{
                   padding: "10px 20px",
                   backgroundColor: list.isPublic ? "#e52f3eff" : "#22c55e",
@@ -349,7 +291,7 @@ export default function GameListDetail({ listId, onBack }) {
                   </div>
                   <div style={{ marginLeft: '12px' }}>
                     <button
-                      onClick={() => setDeleteConfirm(game.id)}
+                      onClick={() => setDeleteConfirm(game._id || game.id)}
                       style={{
                         backgroundColor: "#e52f3eff",
                         color: "white",

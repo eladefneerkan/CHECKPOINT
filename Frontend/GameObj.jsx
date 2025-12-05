@@ -6,7 +6,6 @@ const GameComp = ({game, onAddToList}) =>{
 
     const navigate = useNavigate();
     const imageUrl = game.getImageDisplay()
-    //some games don't have genres, so use if/else to see if the games.genre exists
     const genreList = formatGenres(game.genres)
 
     const handleGameClick = () => {

@@ -65,13 +65,10 @@ export default function OtherUserProfile() {
           {publicLists.map((list) => (
             <div
               key={list._id}
-              onClick={() => navigate(`/lists/${list._id}`)}
               style={{
                 backgroundColor: "#2a2a2a",
                 borderRadius: "8px",
                 overflow: "hidden",
-                cursor: "pointer",
-                transition: "0.3s",
               }}
             >
               <img

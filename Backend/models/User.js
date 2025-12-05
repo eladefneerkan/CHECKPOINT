@@ -24,4 +24,7 @@ const UserSchema = new mongoose.Schema({
 
 });
 
+// Add index on username for faster searches
+UserSchema.index({ username: 1 });
+
 module.exports = mongoose.model("User", UserSchema);
