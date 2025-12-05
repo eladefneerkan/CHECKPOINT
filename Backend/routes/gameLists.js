@@ -36,7 +36,7 @@ router.post("/", auth, async (req, res) => {
       list: newList,
     });
   } catch (err) {
-    console.error("Server Error:", err); // THIS will show you the real bug
+    console.error("Server Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
