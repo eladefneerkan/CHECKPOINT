@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import GameComp from "./components/globalUI/molecules/GameObj.jsx";
+import GameComp from "./components/globalUI/molecules/GameComp.jsx";
 import { hydrateGame } from "./services/gameUtil.js";
 import { fetchListDetail, updateList, removeGameFromList,
   updateListPrivacy, deleteList } from './services/listApi.js';

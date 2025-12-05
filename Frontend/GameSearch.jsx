@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import GameComp from './components/globalUI/molecules/GameObj.jsx'
+import GameComp from './components/globalUI/molecules/GameComp.jsx'
 import AddToListModal from './AddToListModal.jsx'
 import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApi.js'
 import {fetchUserLists, createNewList, addGameToList } from './services/listApi.js'
