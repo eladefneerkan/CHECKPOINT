@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authorize");
-const gameListController = require("../middleware/gameListController");
+const gameListController = require("../controller/gameListController");
 
 // Game list routes
 router.post("/", auth, gameListController.createGameList);

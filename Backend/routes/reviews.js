@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authorize");
-const reviewController = require("../middleware/reviewController");
+const reviewController = require("../controller/reviewController");
 
 // Review routes
 router.get("/game/:gameId", reviewController.getReviewsByGame);
