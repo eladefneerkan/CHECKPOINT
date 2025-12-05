@@ -10,7 +10,7 @@ const reviewService = {
     },
 
     // Get recent reviews with optional limit
-    async getRecentReviews(limit = 10) {
+    async getRecentReviews(limit = 6) {
         const reviews = await Review.find()
             .sort({ createdAt: -1 })
             .limit(limit);
