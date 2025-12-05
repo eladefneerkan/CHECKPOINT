@@ -270,36 +270,17 @@ router.delete("/me", auth, async (req, res) => {
     }
 
     // ------ COMPREHENSIVE ACCOUNT CLEANUP -----
-    // 1) Delete all lists made by this user
-    await GameList.deleteMany({ userId: req.user.id });
+    //no more data leaks <3
+    await GameList.deleteMany({ userId: req.user.id }); //delete their game lists
 
-    // 2) Delete all reviews made by this user
-    await Review.deleteMany( { user: req.user.id });
+    await Review.deleteMany( { user: req.user.id }); //delete all their reviews
 
-    // 3) Remove all this user's review upvotes/downvotes
-    await Review.updateMany(
-      {
-        $or: [
-          {upvotedBy: req.user.id },
-          { downvotedBy: req.user.id }
-        ]
-      },
-      {
-        $pull: {
-          upvotedBy: req.user.id,
-          downvotedBy: req.user.id
-        }
-      }
-    );
-
-    // 4) Remove this user from their friends' arrays
-    await User.updateMany(
+    await User.updateMany( //remove the user from their friends' arrays
       { friends: req.user.id },
       { $pull: { friends: req.user.id } }
     );
 
-    // 5) Remove this user from sent/received friend requests
-    await User.updateMany(
+    await User.updateMany( //remove this user from sent/received friend requests
       { 
         $or: [
           { friendRequestsSent: req.user.id },
@@ -314,8 +295,7 @@ router.delete("/me", auth, async (req, res) => {
       }
     );
 
-    // 6) Delete user object from database
-    await User.findByIdAndDelete(req.user.id);
+    await User.findByIdAndDelete(req.user.id); //actually delete the user from the database
 
     res.json({ message: "Account permanently deleted" });
 
