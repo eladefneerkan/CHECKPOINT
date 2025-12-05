@@ -140,7 +140,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
 
     </div>
   )
-}
+} //refactor this into game section
 
 function SearchRender() {
   const navigate = useNavigate()
@@ -649,5 +649,6 @@ function SearchRender() {
   </section>
   );
 }
+
 
 export default SearchRender;

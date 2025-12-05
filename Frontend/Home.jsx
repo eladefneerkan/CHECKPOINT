@@ -1,35 +1,10 @@
-import grassBg from "../assets/grass_bg.avif";
-import FrogBanner from "../assets/ad_banner_green.png";
-import {useNavigate} from 'react-router-dom';
-import Flag from '../assets/Flag.png';
-import GameObj from "./models/GameObj.js";
 import React, { useState, useEffect } from 'react';
 import { fetchGamesByIds } from './services/gameApi.js'
 
+//component imports
+import { PotionBubbles, PosterList, Advertisement } from './components';
 
-//component that returns the bubble potion effect in the background
-function PotionBackground() {
-  const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 
-  return (
-    <div className="potion-background">
-      {bubbles.map((_, i) => (
-        <div
-
-          key={i}
-          className="bubble"
-          style={{
-            left: `${Math.random() * 100}%`,
-            width: `${bubbles[i]}px`,
-            height: `${bubbles[i]}px`,
-            animationDuration: `${10 + Math.random() *15}s`,
-            animationDelay: `${Math.random() * 3}s`,
-          }}
-        ></div>
-      ))}
-    </div>
-  );
-}
 
 export default function Home() {
   //review call states
@@ -103,7 +78,7 @@ export default function Home() {
         width: "100%"
       }}
     >
-      <PotionBackground />
+    <PotionBubbles />
 
       <div style={{ position: "relative", zIndex: 1 }}>
         <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>
@@ -114,105 +89,10 @@ export default function Home() {
         </p>
         <h2 className='section-heading'>New reviews...</h2>
 
-  <PosterList reviews={reviews} games={games} loading={loading} error={error} />
-      <div 
-        style={{
-          marginTop: "2rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        
-        <button
-          onClick={() => window.open("https://agsiddiqui.itch.io/afterworld", "_blank")}
-          style={{
-            border: "none",
-            background: "transparent",
-            padding: 0,
-            cursor: "pointer",
-          }}
-        >
-     
-          <img 
-            src={FrogBanner} 
-            alt="Frog Banner"
-            style={{
-              width: "90%",
-              maxWidth: "800px",
-              borderRadius: "10px",
-              boxShadow: "0 0 20px rgba(0,0,0,0.5)",
-            }}
-          />
-        </button>
-        
-      </div>
-         
+    <PosterList reviews={reviews} games={games} loading={loading} error={error} />
 
-       {/*<button className="btn-secondary"  onClick={() => navButtonToPage('/login')}>LOGIN</button>
-        <button className="btn-secondary" onClick={() => navButtonToPage('/signup')}>SIGN UP</button>    */   } 
-      </div>
+    <Advertisement num={3}/>
+    </div>
     </section>
   );
 }
-//component returns multiple recent review objects named PosterCard
-function PosterList({ reviews = [], games = [], loading, error }){
-  if (loading) return <div>Loading reviews...</div>; 
-  if (error) return <div>Error loading reviews: {error}</div>;
-  if (!reviews.length) return <div>No recent reviews yet.</div>;
-
-  return (
-    <div className= "posterList" >
-
-        {reviews.map((r) => {
-          const game = games.find(g => Number(g.id) === Number(r.gameId));
-          return (
-            <PosterCard game={game} gameName={r.gameName} rating={r.rating} reviewText={r.reviewText}/>
-          );
-        })}
-    </div>
-  );
-}
-
-// This component represents a single poster and its review box.
-function PosterCard({ game, gameName, rating, reviewText }) {
-//we track whether the mouse is over it and that will determine if we show the review box
-  const [isHovered, setIsHovered] = useState(false);
- 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
-  
-  return (
-    <section>
-    <div
-      className="poster-card-container" style={{position: 'relative'}}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-    {/*takes image from game object passed in */}
-  <img
-    src={(game ? game.getImageDisplay() :  Flag)}
-    alt={gameName}
-    className="posterImg"
-    style={{}}
-    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = Flag; }}
-  />
-
-      {/*This code actually renders the review box */}
-      
-    </div>
-    {isHovered && (
-        <div className="posterReview" >
-          <h5>{gameName}: {rating}★</h5>
-          <p>{reviewText}</p>
-        </div>)}
-  </section>
-  );
-}
-
