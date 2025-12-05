@@ -25,6 +25,7 @@ router.post("/friends/cancel/:id", auth, userController.cancelFriendRequest);
 router.delete("/friends/remove/:id", auth, userController.removeFriend);
 
 // Public routes
+router.get("/search", auth, userController.searchUsers);
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getPublicProfile);
 

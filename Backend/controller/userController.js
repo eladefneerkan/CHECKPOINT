@@ -73,6 +73,17 @@ const userController = {
     }
   },
 
+  // Search users by username
+  async searchUsers(req, res) {
+    try {
+      const query = req.query.q;
+      const users = await userService.searchUsers(query);
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
   // Update user profile
   async updateProfile(req, res) {
     try {

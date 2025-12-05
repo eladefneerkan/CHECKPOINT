@@ -1,3 +1,5 @@
+
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -106,6 +108,19 @@ const userService = {
   // Get all users
   async getAllUsers() {
     return await User.find();
+  },
+
+  // Search users by username
+  async searchUsers(query) {
+    if (!query || !query.trim()) {
+      return [];
+    }
+    
+    const users = await User.find({
+      username: { $regex: query.trim(), $options: "i" }
+    }).select("username profilePicture bio friends friendRequestsSent friendRequestsReceived");
+    
+    return users;
   },
 
   // Update user profile
