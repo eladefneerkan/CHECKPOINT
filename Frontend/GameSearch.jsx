@@ -140,7 +140,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
 
     </div>
   )
-} //refactor this into game section
+}
 
 function SearchRender() {
   const navigate = useNavigate()
@@ -153,7 +153,7 @@ function SearchRender() {
   const [selectedGameForList, setSelectedGameForList] = useState(null)
   const [userLists, setUserLists] = useState([])
   const [successMessage, setSuccessMessage] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
+  const [duplicateMessage, setDuplicateMessage] = useState("")
 
   const urlParams = new URLSearchParams(location.search)
 
@@ -363,8 +363,8 @@ function SearchRender() {
       setTimeout(() => setSuccessMessage(""), 3000)
       }
       if (listsWithDuplicates.length > 0) {
-        setErrorMessage(`"${game.name}" is already in ${listsWithDuplicates.join(", ")}`)
-        setTimeout(() => setErrorMessage(""), 3000)
+        setDuplicateMessage(`"${game.name}" is already in ${listsWithDuplicates.join(", ")}`)
+        setTimeout(() => setDuplicateMessage(""), 3000)
       }
       setShowAddToListModal(false)
       setSelectedGameForList(null)
@@ -445,7 +445,7 @@ function SearchRender() {
         </div>
       )}
 
-      {errorMessage && (
+      {duplicateMessage && (
         <div style={{
           backgroundColor: "#dc3545",
           color: "white",
@@ -454,7 +454,7 @@ function SearchRender() {
           marginTop: "20px",
           textAlign: "center"
         }}>
-          {errorMessage}
+          {duplicateMessage}
         </div>
       )}
 
