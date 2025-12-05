@@ -1,4 +1,4 @@
-import FrogBanner from "../assets/ad_banner_pink.png";
+import FrogBanner from "../../assets/ad_banner_pink.png";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './Auth';
