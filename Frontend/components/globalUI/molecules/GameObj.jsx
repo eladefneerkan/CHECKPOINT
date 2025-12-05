@@ -1,6 +1,6 @@
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
-import {parseDate, formatGenres} from './services/gameUtil'
+import {parseDate, formatGenres} from '../../../services/gameUtil'
 
 const GameComp = ({game, onAddToList}) =>{
 
