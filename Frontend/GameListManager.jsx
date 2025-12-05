@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GameListDetail from "./GameListDetail.jsx";
+import GameList from "./GameList.jsx";
 import { fetchUserLists, createNewList } from './services/listApi.js';
 
 export default function GameListManager() {
@@ -81,7 +81,7 @@ export default function GameListManager() {
 
   if (selectedListId) {
     return (
-      <GameListDetail
+      <GameList
         listId={selectedListId}
         onBack={() => {
           setSelectedListId(null);

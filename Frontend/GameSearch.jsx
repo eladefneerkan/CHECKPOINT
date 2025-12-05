@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import GameComp from './components/globalUI/molecules/GameComp.jsx'
-import AddToListModal from './AddToListModal.jsx'
+import AddGameToListPopup from './AddGameToListPopup.jsx'
 import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApi.js'
 import {fetchUserLists, createNewList, addGameToList } from './services/listApi.js'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -149,7 +149,7 @@ function SearchRender() {
   const [finalSearchRes, setFinalSearchRes] = useState([])
   const [filteredResults, setFilteredResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [showAddToListModal, setShowAddToListModal] = useState(false)
+  const [showAddGameToListPopup, setShowAddGameToListPopup] = useState(false)
   const [selectedGameForList, setSelectedGameForList] = useState(null)
   const [userLists, setUserLists] = useState([])
   const [successMessage, setSuccessMessage] = useState("")
@@ -321,7 +321,7 @@ function SearchRender() {
   const handleAddToListClick = (game) => {
     setSelectedGameForList(game)
     getUserLists()
-    setShowAddToListModal(true)
+    setShowAddGameToListPopup(true)
   }
 
   const handleAddGameToLists = async (selectedListIds, game) => {
@@ -366,7 +366,7 @@ function SearchRender() {
         setDuplicateMessage(`"${game.name}" is already in ${listsWithDuplicates.join(", ")}`)
         setTimeout(() => setDuplicateMessage(""), 3000)
       }
-      setShowAddToListModal(false)
+      setShowAddGameToListPopup(false)
       setSelectedGameForList(null)
     } catch (err) {
       console.error("Error adding game to lists:", err)
@@ -632,12 +632,12 @@ function SearchRender() {
       </div>
     </div>
 
-    {showAddToListModal && selectedGameForList && (
-      <AddToListModal
+    {showAddGameToListPopup && selectedGameForList && (
+      <AddGameToListPopup
         lists={userLists}
         game={selectedGameForList}
         onClose={() => {
-          setShowAddToListModal(false);
+          setShowAddGameToListPopup(false);
           setSelectedGameForList(null);
         }}
         onAddToLists={handleAddGameToLists}
