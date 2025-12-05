@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import GlobalUI from "./Global.jsx";
 import Home from "../Frontend/Home.jsx";
 import GameSearch from "../Frontend/GameSearch.jsx";
-import Profile from "../Frontend/Profile.jsx";
+import Profile from "../Frontend/Profile/Profile.jsx";
 import SignInPg from "../Frontend/SignInPg.jsx";
 import SignUpPg from "../Frontend/SignUpPg.jsx";
 import VerifyEmail from "../Frontend/VerifyEmail.jsx";
