@@ -11,7 +11,7 @@ import "./styles.css";
 import { PageTransition } from "../Frontend/components";
 import GamePage from "../Frontend/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
-import OtherUserProfile from "../Frontend/OtherUserProfile.jsx";
+import OtherUserProfile from "../Frontend/OtherUserProfile/OtherUserProfile.jsx";
 import GameListDetail from "../Frontend/GameList.jsx";
 
 
