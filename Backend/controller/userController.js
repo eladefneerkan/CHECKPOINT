@@ -144,6 +144,7 @@ const userController = {
   },
 
   // Delete account
+  //(plus game lists, reviews, friend connections & requests)
   async deleteAccount(req, res) {
     try {
       const { password } = req.body;
@@ -151,6 +152,25 @@ const userController = {
       if (!password) {
         return res.status(400).json({ error: "Password is required to delete the account" });
       }
+      await GameList.deleteMany({ userId: req.user.id });
+      await Review.deleteMany( { user: req.user.id });
+      await User.updateMany(
+        { friends: req.user.id },
+        { $pull: { friends: req.user.id } }
+      );
+      await User.updateMany(
+        { $or: [
+          { friendRequestsSent: req.user.id },
+          { friendRequestsReceived: req.user.id }
+        ]},
+        { $pull: { 
+          friendRequestsSent: req.user.id,
+          friendRequestsReceived: req.user.id
+        }}
+      );
+    await User.findByIdAndDelete(req.user.id);
+
+    res.json({ message: "Account permanently deleted" });
 
       await userService.deleteUser(req.user.id, password);
 
