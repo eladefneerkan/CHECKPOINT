@@ -9,7 +9,6 @@ const apiCall = async (endpoint, method = "GET", token, body = null) => {
     }
 
     //body carries data for POST/PUT requests
-    //null by default, since it's not used in every request
     if(body){
         headers["Content-Type"] = "application/json"
     }
@@ -23,12 +22,10 @@ const apiCall = async (endpoint, method = "GET", token, body = null) => {
 
     const response = await fetch(endpoint, opts)
 
-    //handle not found response
     if (response.status === 404){
         return null
     }
 
-    //handle other errors
     if(!response.ok){
         let errData = {}
         try{
