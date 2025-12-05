@@ -1,5 +1,5 @@
 //let's the user logout
-import LogoutButton from "../LogoutButton";
+import { LogoutButton } from "../components";
 
 export default function ProfileView({ authUser, previewUrl, setEditMode }) {
   return (

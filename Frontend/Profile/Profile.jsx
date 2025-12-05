@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import FrogBanner from "../../assets/ad_banner-blue.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/Auth";
-import LogoutButton from "../LogoutButton";
+import { LogoutButton } from "../components";
 import GameListManager from "../GameListManager";
 import Friends from "../Friends";
 import UserReviews from "../UserReviews";

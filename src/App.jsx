@@ -8,7 +8,7 @@ import SignInPg from "../Frontend/auth/SignInPg.jsx";
 import SignUpPg from "../Frontend/auth/SignUpPg.jsx";
 import VerifyEmail from "../Frontend/auth/VerifyEmail.jsx";
 import "./styles.css";
-import PageTransition from "../Frontend/components/PageTransition.jsx";
+import { PageTransition } from "../Frontend/components";
 import GamePage from "../Frontend/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
 import OtherUserProfile from "../Frontend/OtherUserProfile.jsx";
