@@ -7,29 +7,9 @@ import React, { useState, useEffect } from 'react';
 import { fetchGamesByIds } from './services/gameApi.js'
 
 
+import { PotionBubbles } from './components';
+
 //component that returns the bubble potion effect in the background
-function PotionBackground() {
-  const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
-
-  return (
-    <div className="potion-background">
-      {bubbles.map((_, i) => (
-        <div
-
-          key={i}
-          className="bubble"
-          style={{
-            left: `${Math.random() * 100}%`,
-            width: `${bubbles[i]}px`,
-            height: `${bubbles[i]}px`,
-            animationDuration: `${10 + Math.random() *15}s`,
-            animationDelay: `${Math.random() * 3}s`,
-          }}
-        ></div>
-      ))}
-    </div>
-  );
-}
 
 export default function Home() {
   //review call states
@@ -103,7 +83,7 @@ export default function Home() {
         width: "100%"
       }}
     >
-      <PotionBackground />
+      <PotionBubbles />
 
       <div style={{ position: "relative", zIndex: 1 }}>
         <h1 style={{ fontSize: "3rem", marginBottom: "1rem" }}>
