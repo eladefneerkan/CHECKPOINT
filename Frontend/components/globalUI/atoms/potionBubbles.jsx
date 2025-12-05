@@ -1,5 +1,5 @@
-import React from 'react';
 
+//component that returns the bubble potion effect in the background
 export default function PotionBubbles() {
   const bubbles = Array.from({ length: 10 }, (_, i) => 10 + Math.random() * 10);
 

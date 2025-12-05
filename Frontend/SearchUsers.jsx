@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "./Auth";
+import { useAuth } from "./auth/Auth";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchUsers() {

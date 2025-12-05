@@ -1,5 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
-import { useAuth } from "../Frontend/Auth.jsx";
+import { useAuth } from "../Frontend/auth/Auth.jsx";
 import { useState } from "react";
 import Flag from '../assets/Flag.png';
 export default function GlobalUI() {

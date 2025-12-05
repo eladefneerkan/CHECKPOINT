@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import GameComp from './GameObj.jsx'
+import GameComp from './components/globalUI/molecules/GameComp.jsx'
 import AddToListModal from './AddToListModal.jsx'
 import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApi.js'
 import {fetchUserLists, createNewList, addGameToList } from './services/listApi.js'
@@ -140,7 +140,7 @@ function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initia
 
     </div>
   )
-}
+} //refactor this into game section
 
 function SearchRender() {
   const navigate = useNavigate()
@@ -649,5 +649,6 @@ function SearchRender() {
   </section>
   );
 }
+
 
 export default SearchRender;
