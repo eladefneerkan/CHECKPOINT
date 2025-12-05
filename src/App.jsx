@@ -6,9 +6,9 @@ import GameSearch from "../Frontend/GameSearch.jsx";
 import Profile from "../Frontend/Profile/Profile.jsx";
 import SignInPg from "../Frontend/auth/SignInPg.jsx";
 import SignUpPg from "../Frontend/auth/SignUpPg.jsx";
-import VerifyEmail from "../Frontend/VerifyEmail.jsx";
+import VerifyEmail from "../Frontend/auth/VerifyEmail.jsx";
 import "./styles.css";
-import PageTransition from "../Frontend/PageTransition.jsx";
+import PageTransition from "../Frontend/components/PageTransition.jsx";
 import GamePage from "../Frontend/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
 import OtherUserProfile from "../Frontend/OtherUserProfile.jsx";
