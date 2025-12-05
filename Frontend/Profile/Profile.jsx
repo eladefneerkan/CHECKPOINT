@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import FrogBanner from "../../assets/ad_banner-blue.png";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../Auth";
+import { useAuth } from "../auth/Auth";
 import LogoutButton from "../LogoutButton";
 import GameListManager from "../GameListManager";
 import Friends from "../Friends";
