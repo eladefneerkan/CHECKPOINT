@@ -2,12 +2,14 @@
 
 ## Description
 
-# Authors
-Vaishnavi Sam 
-Ela Defne Erkan - edefneerkan@gmail.com
-Anam Siddiqui
-Allison Gao
-Jeffrey Joseph - jjeffrey0022@gmail.com
+## Authors
+
+* Vaishnavi Sam - [sam.vaishnavi@gmail.com]
+* Ela Defne Erkan - [edefneerkan@g.ucla.edu]
+* Anam Siddiqui - [anamgsiddiqui@gmail.com]
+* Allison Gao - [Scotoplane@g.ucla.edu]
+* Jeffrey Joseph - [jjeffrey0022@gmail.com]
+
 
 **CHECKPOINT** is a social cataloging website for video game fans. Users can create profiles to track their “Played” and “To Play” lists of video games, rate video games, leave reviews, read other users’ reviews, and add other users as friends. It serves as an extensive database for users can browse information on video games and connect with other users interested in similar games. 
 
@@ -144,15 +146,7 @@ EMAIL_PASS=your_email_password_or_app_specific_password
 * todo
 ---
 
-## Authors
 
-* Vaishnavi Sam - [sam.vaishnavi@gmail.com]
-* Ela Defne Erkan - [edefneerkan@g.ucla.edu]
-* Anam Siddiqui - [anamgsiddiqui@gmail.com]
-* Allison Gao - [Scotoplane@g.ucla.edu]
-* Jeffrey Joseph - [jjeffrey0022@gmail.com]
-
----
 
 ## License
 
