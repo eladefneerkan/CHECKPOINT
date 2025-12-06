@@ -1,4 +1,4 @@
-//component returns multiple recent review objects named PosterCard
+//component returns multiple recent review objects named PosterCard from an array of game obj and review obj
 import PosterCard from '../atoms/PosterCard.jsx';
 
 export default function PosterList({ reviews = [], games = [], loading, error }){
