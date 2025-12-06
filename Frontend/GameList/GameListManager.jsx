@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GameList from "./GameList.jsx";
-import { fetchUserLists, createNewList } from './services/listApi.js';
+import { fetchUserLists, createNewList } from '../services/listApi.js';
 
 export default function GameListManager() {
   const [lists, setLists] = useState([]);

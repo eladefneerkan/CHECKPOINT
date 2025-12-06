@@ -4,7 +4,7 @@ import FrogBanner from "../../assets/ad_banner-blue.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/Auth";
 import { LogoutButton } from "../components";
-import GameListManager from "../GameListManager";
+import GameListManager from "../GameList/GameListManager.jsx";
 import Friends from "./Friends";
 import UserReviews from "../components/containerFetch/UserReviews";
 
