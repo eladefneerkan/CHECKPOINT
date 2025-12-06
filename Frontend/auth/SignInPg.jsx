@@ -99,3 +99,6 @@ const SignInPg = () => {
 };
 
 export default SignInPg;
+
+//skeleton for this code was initially AI generated but significantly changed later on. 
+// commit of skeleton: 172bd2d176e9f667a097481f43801cf842cd1c61
