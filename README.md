@@ -116,37 +116,58 @@ EMAIL_PASS=your_email_password_or_app_specific_password
 ## Database Schema
 
 ### Games Collection
-
-* `id`: Unique game ID
-* `name`: Game title
-* `slug`: URL-friendly identifier
-* `rating`: Average rating
-* `released`: Release date
-* `background_image`: Cover image URL
+* `_id`: MongoDB ObjectId
+* `id`: Unique game ID int
+* `name`: Game title string
+* `slug`: URL-friendly identifier string
+* `rating`: Average rating int
+* `released`: Release date year-month-day format string
+* `background_image`: Cover image URL 
 * `genres`: Array of genre objects
-* `description`: Game description text
+* `description`: Game description string
+* `__v`: version key for MongoDB
+
+### Gamelists Collection
+* `_id`: MongoDB ObjectId
+* `userId`: MongoDB ObjectId for user who created list
+* `title`: list title string
+* `coverImage`: base64 image data 
+* `games`: Array of game IDs in the list
+* `isPublic`: if others can see list bool
+* `createdAt`: ISO 8601 date of when created
+* `updatedAt`: ISO 8601 date of when updated
+* `__v`: version key for MongoDB
+
+### Reviews Collection
+* `_id`: MongoDB ObjectId
+* `gameId`: Unique game ID int (same as Games's id field)
+* `gameName`: Game title string (same as Games's name field)
+* `rating`: 1-5 scoring int
+* `reviewText`: review for game string
+* `background_image`: Cover image URL 
+* `upvotedBy`: Array of userId that have upvoted
+* `downvotedBy`: Array of userId that have downvoted
+* `createdAt`: ISO 8601 date of when created
+* `__v`: version key for MongoDB
 
 ### Users Collection
-
-* `username`: Unique username
-* `email`: Unique email address
-* `password`: Hashed password using bcrypt
-* `bio`: User profile biography (optional)
+* `_id`: MongoDB ObjectId
+* `username`: Unique username string
+* `email`: Unique email address string
+* `password`: Hashed password using bcrypt string
+* `bio`: User profile biography string (optional)
+* `profilePicture`: base64 image data 
 * `friends`: Array of user IDs representing connected friends
-* `gameLists`: Array of game IDs in user's custom lists
-* `favorites`: Array of favorited game IDs
-* `reviews`: Array of review objects containing game references and review text
-* `createdAt`: Account creation timestamp
-* `updatedAt`: Last profile update timestamp
+* `lists`: Array of gamelist object IDs
+* `isVerified`: whether the user is verified bool
+* `emailVerificationCode`: code for email verfication (null after verified)
+* `emailVerificationExpiry`: ISO 8601 date for email verfication expiration (null after verified)
+* `friendRequestsReceived`: Array of user objectIds who have requested to be friends
+* `friendRequestsSent`: Array of user objectIds that this user sent friend requests to
+* `friends`: Array of user objectIds that are friends with this user
+* `createdAt`: Account creation ISO 8601
 
 ---
-
-## Development Notes
-
-* todo
----
-
-
 
 ## License
 
