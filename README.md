@@ -1,7 +1,5 @@
 # CHECKPOINT
 
-## Description
-
 ## Authors
 
 * Vaishnavi Sam - [sam.vaishnavi@gmail.com]
@@ -10,9 +8,9 @@
 * Allison Gao - [Scotoplane@g.ucla.edu]
 * Jeffrey Joseph - [jjeffrey0022@gmail.com]
 
+## Description
 
-**CHECKPOINT** is a social cataloging website for video game fans. Users can create profiles to track their “Played” and “To Play” lists of video games, rate video games, leave reviews, read other users’ reviews, and add other users as friends. It serves as an extensive database for users can browse information on video games and connect with other users interested in similar games. 
-
+**CHECKPOINT** is a social cataloging website for video game fans. Users can create profiles to track anything from wishlists to favorite games; create lists of video games for any topic. Rate video games, leave reviews, read and vote on other users’ reviews, and add others as friends. It serves as an extensive database for users to browse information on video games and connect with other users. 
 ---
 
 ## Features
@@ -21,6 +19,8 @@
 
   * Single-letter search shows all games starting with that letter
   * Multi-character search shows substring matches
+  * Filter through genres and rating as well.
+    
 * **Game Database**: Powered by RAWG API
 
   * Batch fetching and pagination for comprehensive data
@@ -74,7 +74,7 @@
 3. Start the development server:
 
    ```bash
-   npm run dev
+   npm start
    ```
 
 ### Frontend Setup
