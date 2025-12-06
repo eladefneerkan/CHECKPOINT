@@ -112,6 +112,73 @@ test.describe('User E2E tests with list.', () => {
         console.log('Deleted testUser1 successfully.');
 
     });
+
+    test('create user, create list, add game then delete list, add accepted friend requests, delete users', async () => {
+        // Create a test user
+        const testUser = await User.create({
+            username: 'testuser1',
+            password: 'Password123@',
+            email: 'testuser1@example.com',
+            bio: 'Test bio 1',
+            isVerified: true
+        });
+        console.log('Created testUser1:', testUser._id);
+
+        // create a game list associated with the user
+        const gameList = await list.create({
+            userId: testUser._id,  // Changed from 'user' to 'userId'
+            title: 'My Test Game List',  // Added required title field
+            description: 'A test game list',  // Optional description
+            games: []  // Games should be ObjectIds, leaving empty for now
+        });
+        console.log('Created game list for testUser1:', gameList._id);
+
+        // add games to the list
+        const gameId1 = new mongoose.Types.ObjectId();
+
+        gameList?.games.push(gameId1);
+        await gameList?.save();
+        console.log('Added a game to the list:', gameList?.games);
+
+        // delete the list
+        await list.findByIdAndDelete(gameList?._id);
+
+        // verify the list was deleted
+        const deletedList = await list.findById(gameList?._id);
+        expect(deletedList).toBeNull();
+        console.log('Deleted the game list successfully.');
+
+        // add accepted friend requests
+        const friendUser = await User.create({
+            username: 'frienduser',
+            password: 'FriendPass123@',
+            email: 'frienduser@example.com',
+            bio: 'Friend user bio',
+            isVerified: true
+        });
+        console.log('Created friendUser:', friendUser._id);
+
+        // simulate accepted friend request
+        testUser.friends.push(friendUser._id);
+        await testUser.save();
+        console.log('Added friendUser as a friend to testUser1');
+
+        // verify friend was added
+        const updatedUser = await User.findById(testUser._id);
+        expect(updatedUser).not.toBeNull();
+        expect(updatedUser?.friends).toContainEqual(friendUser._id);
+        console.log('Verified friendUser is in testUser1 friends list');
+
+        // delete the user
+        await User.findByIdAndDelete(testUser._id);
+        await User.findByIdAndDelete(friendUser._id);
+
+        // verify the user was deleted
+        const deletedUser = await User.findById(testUser._id);
+        expect(deletedUser).toBeNull();
+        console.log('Deleted testUser1 and friendUser successfully.');
+
+    });     
 });
 
 
