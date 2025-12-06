@@ -9,6 +9,7 @@ dotenv.config();
 // import needed models
 const User = require('../models/User.js');
 const list = require('../models/GameList.js');
+const Review = require('../models/Review.js');
 
 const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/checkpoint_db.test_users";
 
@@ -56,10 +57,10 @@ test.describe('User E2E tests with list.', () => {
 
         // create a game list associated with the user
         const gameList = await list.create({
-            userId: testUser._id,  // Changed from 'user' to 'userId'
-            title: 'My Test Game List',  // Added required title field
-            description: 'A test game list',  // Optional description
-            games: []  // Games should be ObjectIds, leaving empty for now
+            userId: testUser._id, 
+            title: 'My Test Game List', 
+            description: 'A test game list', 
+            games: []  
         });
         console.log('Created game list for testUser1:', gameList._id);
 
@@ -113,7 +114,7 @@ test.describe('User E2E tests with list.', () => {
 
     });
 
-    test('create user, create list, add game then delete list, add accepted friend requests, delete users', async () => {
+    test('create user, create list add game, make review, delete review and list, accepted friend requests, delete users', async () => {
         // Create a test user
         const testUser = await User.create({
             username: 'testuser1',
@@ -126,10 +127,10 @@ test.describe('User E2E tests with list.', () => {
 
         // create a game list associated with the user
         const gameList = await list.create({
-            userId: testUser._id,  // Changed from 'user' to 'userId'
-            title: 'My Test Game List',  // Added required title field
-            description: 'A test game list',  // Optional description
-            games: []  // Games should be ObjectIds, leaving empty for now
+            userId: testUser._id, 
+            title: 'My Test Game List', 
+            description: 'A test game list',  
+            games: []  
         });
         console.log('Created game list for testUser1:', gameList._id);
 
@@ -140,11 +141,35 @@ test.describe('User E2E tests with list.', () => {
         await gameList?.save();
         console.log('Added a game to the list:', gameList?.games);
 
-        // delete the list
+        // make review
+        const review = await Review.create({
+            user: testUser._id,
+            gameId: 12345, 
+            gameName: 'Test Game',  
+            reviewText: 'This is a test review',
+            rating: 4,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        });
+        console.log('Created review for testUser1:', review._id);
+        
+        // verify review was created
+        const fetchedReview = await Review.findById(review._id);
+        expect(fetchedReview).not.toBeNull();
+        expect(fetchedReview?.reviewText).toBe('This is a test review');
+        expect(fetchedReview?.rating).toBe(4);
+        expect(fetchedReview?.user.toString()).toBe(testUser._id.toString());
+        console.log('Verified the review was created successfully.');
+   
+        // delete the review, list
+        await Review.findByIdAndDelete(review._id);
         await list.findByIdAndDelete(gameList?._id);
 
-        // verify the list was deleted
+        // verify the review and list are deleted
         const deletedList = await list.findById(gameList?._id);
+        const deletedReview = await Review.findById(review._id);
+        expect(deletedReview).toBeNull();
+        console.log('Deleted the review successfully.');
         expect(deletedList).toBeNull();
         console.log('Deleted the game list successfully.');
 
