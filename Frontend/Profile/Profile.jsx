@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/Auth";
 import { LogoutButton } from "../components";
 import GameListManager from "../GameListManager";
-import Friends from "../Friends";
-import UserReviews from "../UserReviews";
+import Friends from "./Friends";
+import UserReviews from "../components/containerFetch/UserReviews";
 
 import ProfileHeader from "./ProfileHeader";
 import ProfileTabs from "./ProfileTabs";

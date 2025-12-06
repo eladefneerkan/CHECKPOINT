@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import GameComp from "./components/globalUI/molecules/GameComp.jsx";
-import { hydrateGame } from "./services/gameUtil.js";
+import GameComp from "../components/globalUI/molecules/GameComp.jsx";
+import { hydrateGame } from "../services/gameUtil.js";
 import { fetchListDetail, updateList, removeGameFromList,
-  updateListPrivacy, deleteList } from './services/listApi.js';
+  updateListPrivacy, deleteList } from '../services/listApi.js';
 
 export default function GameListDetail({ listId, onBack }) {
   const [list, setList] = useState(null);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import GameComp from './components/globalUI/molecules/GameComp.jsx'
-import AddGameToListPopup from './AddGameToListPopup.jsx'
-import { fetchAutoCompleteGames, fetchFinalGames } from './services/gameApi.js'
-import {fetchUserLists, createNewList, addGameToList } from './services/listApi.js'
+import GameComp from '../components/globalUI/molecules/GameComp.jsx'
+import AddGameToListPopup from '../AddGameToListPopup.jsx'
+import { fetchAutoCompleteGames, fetchFinalGames } from '../services/gameApi.js'
+import {fetchUserLists, createNewList, addGameToList } from '../services/listApi.js'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 function SearchBar({ onFinalSearch, selectedGenres, clearDropdownTrigger, initialQuery }) {

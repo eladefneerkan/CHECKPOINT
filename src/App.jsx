@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import GlobalUI from "./Global.jsx";
 import Home from "../Frontend/Home.jsx";
-import GameSearch from "../Frontend/GameSearch.jsx";
+import GameSearch from "../Frontend/Game/GameSearch.jsx";
 import Profile from "../Frontend/Profile/Profile.jsx";
 import SignInPg from "../Frontend/auth/SignInPg.jsx";
 import SignUpPg from "../Frontend/auth/SignUpPg.jsx";
 import VerifyEmail from "../Frontend/auth/VerifyEmail.jsx";
 import "./styles.css";
 import { PageTransition } from "../Frontend/components";
-import GamePage from "../Frontend/GamePage.jsx"
+import GamePage from "../Frontend/Game/GamePage.jsx"
 import SearchUsers from "../Frontend/SearchUsers.jsx";
 import OtherUserProfile from "../Frontend/OtherUserProfile/OtherUserProfile.jsx";
-import GameListDetail from "../Frontend/GameList.jsx";
+import GameListDetail from "../Frontend/GameList/GameList.jsx";
 
 
 

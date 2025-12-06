@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {parseDate, formatGenres, hydrateGame, getFullDescription} from './services/gameUtil';
+import {parseDate, formatGenres, hydrateGame, getFullDescription} from '../services/gameUtil';
 
 const GamePage = () => {
   const location = useLocation();
