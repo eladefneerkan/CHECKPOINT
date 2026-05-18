@@ -3,7 +3,7 @@
 ## Authors
 
 * Vaishnavi Sam - [sam.vaishnavi@gmail.com]
-* Ela Defne Erkan - [edefneerkan@g.ucla.edu]
+* Ela Defne Erkan - [edefneerkan@gmail.com]
 * Anam Siddiqui - [anamgsiddiqui@gmail.com]
 * Allison Gao - [Scotoplane@g.ucla.edu]
 * Jeffrey Joseph - [jjeffrey0022@gmail.com]
